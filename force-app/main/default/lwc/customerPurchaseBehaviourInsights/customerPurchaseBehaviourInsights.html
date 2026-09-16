@@ -1,0 +1,428 @@
+<template>
+    <div class="oj-card-container">
+
+        <!-- ================= BRAND BANNER HEADER ================= -->
+        <header class="oj-banner">
+            <div class="oj-banner__ornament-top"></div>
+            <div class="oj-banner__inner">
+                <div class="oj-banner__text">
+                    <span class="oj-banner__eyebrow">ORIENT JEWELLERS</span>
+                    <h1 class="oj-banner__title">Purchase Behaviour Insights</h1>
+                </div>
+            </div>
+        </header>
+
+        <!-- ================= MAIN BODY ================= -->
+        <div class="oj-body">
+
+            <!-- SPINNER OVERLAY -->
+            <template if:true={isLoading}>
+                <div class="oj-loading-backdrop">
+                    <div class="oj-loading-card">
+                        <lightning-spinner alternative-text="Loading customer insights" size="medium" variant="brand"></lightning-spinner>
+                        <p class="oj-loading-text">{loadingMessage}</p>
+                    </div>
+                </div>
+            </template>
+
+            <!-- ================= SEARCH BAR SECTION ================= -->
+            <section class="oj-search-section">
+                <div class="oj-search-box">
+                    <div class="oj-search-label">
+                        <svg class="oj-icon-phone" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path>
+                        </svg>
+                        <span>Search Customer by Phone / WhatsApp</span>
+                    </div>
+
+                    <div class="oj-search-row">
+                        <div class="oj-search-input-wrap">
+                            <span class="oj-search-prefix">+91</span>
+                            <input 
+                                type="text"
+                                class="oj-search-input"
+                                placeholder="Enter mobile or WhatsApp number (e.g. 9876543210)..."
+                                value={searchKey}
+                                oninput={handleSearchInput}
+                                onkeydown={handleKeyDown}
+                            />
+                            <template if:true={hasSearchInput}>
+                                <button class="oj-btn-clear" type="button" onclick={handleClearSearch} title="Clear search">✕</button>
+                            </template>
+                        </div>
+
+                        <button class="oj-btn-search" type="button" onclick={handleSearchClick} disabled={isSearchDisabled}>
+                            <svg class="oj-btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                                <circle cx="11" cy="11" r="8"></circle>
+                                <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                            </svg>
+                            <span>Search Customer</span>
+                        </button>
+                    </div>
+
+                    <div class="oj-search-hint">
+                        <span>Tip: Type at least 4 digits to search. Press Enter or click Search.</span>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ================= MULTIPLE CUSTOMERS FOUND PICKER ================= -->
+            <template if:true={showCustomerPicker}>
+                <section class="oj-picker-section">
+                    <div class="oj-section-title-row">
+                        <div class="oj-section-title-line"></div>
+                        <h2 class="oj-section-title">Select Customer ({customerMatches.length} Matches Found)</h2>
+                        <div class="oj-section-title-line"></div>
+                    </div>
+
+                    <div class="oj-picker-grid">
+                        <template for:each={customerMatches} for:item="cust">
+                            <div key={cust.customerId} class="oj-picker-card" onclick={handleSelectCustomer} data-id={cust.customerId}>
+                                <div class="oj-picker-avatar">
+                                    <span>{cust.customerNameInitials}</span>
+                                </div>
+                                <div class="oj-picker-info">
+                                    <h3 class="oj-picker-name">{cust.customerName}</h3>
+                                    <div class="oj-picker-badges">
+                                        <template if:true={cust.phone}>
+                                            <span class="oj-badge-pill">📞 {cust.phone}</span>
+                                        </template>
+                                        <template if:true={cust.whatsAppNumber}>
+                                            <span class="oj-badge-pill oj-badge-pill-wa">💬 {cust.whatsAppNumber}</span>
+                                        </template>
+                                        <template if:true={cust.salesforceCustomerNo}>
+                                            <span class="oj-badge-pill oj-badge-pill-gold">{cust.salesforceCustomerNo}</span>
+                                        </template>
+                                        <template if:true={cust.bcCustomerNo}>
+                                            <span class="oj-badge-pill">{cust.bcCustomerNo}</span>
+                                        </template>
+                                    </div>
+                                    <template if:true={cust.preferredStore}>
+                                        <p class="oj-picker-store">📍 Preferred Store: {cust.preferredStore}</p>
+                                    </template>
+                                </div>
+                                <div class="oj-picker-action">
+                                    <button class="oj-btn-select" type="button">Select →</button>
+                                </div>
+                            </div>
+                        </template>
+                    </div>
+                </section>
+            </template>
+
+            <!-- ================= NO CUSTOMER FOUND ALERT ================= -->
+            <template if:true={showNoCustomerFound}>
+                <section class="oj-empty-search-card">
+                    <div class="oj-empty-search-icon">🔍</div>
+                    <h3 class="oj-empty-search-title">No Customer Found</h3>
+                    <p class="oj-empty-search-desc">We couldn't find any customer record matching <strong>"{lastSearchedKey}"</strong>.</p>
+                    <p class="oj-empty-search-sub">Please double-check the mobile number or try another search.</p>
+                </section>
+            </template>
+
+            <!-- ================= ACTIVE CUSTOMER & INSIGHTS DISPLAY ================= -->
+            <template if:true={hasActiveCustomer}>
+
+                <!-- CUSTOMER IDENTITY PASSPORT STRIP -->
+                <section class="oj-passport">
+                    <div class="oj-passport__header-ribbon"></div>
+                    <div class="oj-passport__inner">
+                        <div class="oj-passport__avatar-wrap">
+                            <div class="oj-passport__avatar">
+                                <span>{activeCustomerInitials}</span>
+                            </div>
+                            <div class="oj-passport__gold-crown">✦</div>
+                        </div>
+
+                        <div class="oj-passport__details">
+                            <div class="oj-passport__name-row">
+                                <h2 class="oj-passport__name">{activeCustomer.customerName}</h2>
+                                <span class="oj-passport__client-badge">Verified Customer</span>
+                            </div>
+                        </div>
+
+                        <div class="oj-passport__actions">
+                            <button class="oj-btn-outline" type="button" onclick={handleViewAccount} title="Open Account in Salesforce">
+                                <svg class="oj-btn-icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
+                                    <polyline points="15 3 21 3 21 9"></polyline>
+                                    <line x1="10" y1="14" x2="21" y2="3"></line>
+                                </svg>
+                                <span>View Account</span>
+                            </button>
+                            <button class="oj-btn-outline" type="button" onclick={handleRefresh} title="Refresh Insights">
+                                <svg class="oj-btn-icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <polyline points="23 4 23 10 17 10"></polyline>
+                                    <polyline points="1 20 1 14 7 14"></polyline>
+                                    <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path>
+                                </svg>
+                                <span>Refresh</span>
+                            </button>
+                            <button class="oj-btn-outline-maroon" type="button" onclick={handleChangeCustomer}>
+                                <span>Change Customer</span>
+                            </button>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- ================= INSIGHTS DATA DISPLAY ================= -->
+                <template if:true={hasInsights}>
+
+                    <!-- ORNAMENT DIVIDER -->
+                    <div class="oj-ornament-divider">
+                        <div class="oj-orn-line"></div>
+                        <div class="oj-orn-diamond"></div>
+                        <span class="oj-orn-label">PURCHASE BEHAVIOUR INTELLIGENCE</span>
+                        <div class="oj-orn-diamond"></div>
+                        <div class="oj-orn-line"></div>
+                    </div>
+
+                    <!-- EXECUTIVE KPI METRIC CARDS -->
+                    <section class="oj-kpi-grid">
+
+                        <!-- KPI 1: AVERAGE TICKET SIZE -->
+                        <div class="oj-kpi-card oj-kpi-ats">
+                            <div class="oj-kpi-icon-wrap oj-kpi-icon-ats">
+                                <span class="oj-currency-symbol">₹</span>
+                            </div>
+                            <div class="oj-kpi-content">
+                                <span class="oj-kpi-label">AVERAGE TICKET SIZE</span>
+                                <h3 class="oj-kpi-value">{selectedInsightFormattedATS}</h3>
+                                <p class="oj-kpi-subtext">Average spend per jewellery purchase transaction</p>
+                            </div>
+                            <div class="oj-kpi-card-foil"></div>
+                        </div>
+
+                        <!-- KPI 2: PURCHASE FREQUENCY -->
+                        <div class="oj-kpi-card oj-kpi-freq">
+                            <div class="oj-kpi-icon-wrap oj-kpi-icon-freq">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <polyline points="23 4 23 10 17 10"></polyline>
+                                    <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"></path>
+                                </svg>
+                            </div>
+                            <div class="oj-kpi-content">
+                                <span class="oj-kpi-label">PURCHASE FREQUENCY</span>
+                                <div class="oj-kpi-value-row">
+                                    <h3 class="oj-kpi-value">{selectedInsight.purchaseFrequency}</h3>
+                                    <span class={frequencyTierBadgeClass}>{selectedInsight.frequencyTier}</span>
+                                </div>
+                                <p class="oj-kpi-subtext">Purchase frequency index per evaluation cycle</p>
+                            </div>
+                            <div class="oj-kpi-card-foil"></div>
+                        </div>
+
+                        <!-- KPI 3: LAST PURCHASE DATE -->
+                        <div class="oj-kpi-card oj-kpi-last">
+                            <div class="oj-kpi-icon-wrap oj-kpi-icon-last">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                                    <line x1="16" y1="2" x2="16" y2="6"></line>
+                                    <line x1="8" y1="2" x2="8" y2="6"></line>
+                                    <line x1="3" y1="10" x2="21" y2="10"></line>
+                                </svg>
+                            </div>
+                            <div class="oj-kpi-content">
+                                <span class="oj-kpi-label">LAST PURCHASE DATE</span>
+                                <div class="oj-kpi-value-row">
+                                    <h3 class="oj-kpi-value-sm">{selectedInsightFormattedLastPurchase}</h3>
+                                    <template if:true={selectedInsightDaysAgoLabel}>
+                                        <span class="oj-badge-neutral">{selectedInsightDaysAgoLabel}</span>
+                                    </template>
+                                </div>
+                                <p class="oj-kpi-subtext">Most recent recorded purchase date</p>
+                            </div>
+                            <div class="oj-kpi-card-foil"></div>
+                        </div>
+
+                        <!-- KPI 4: NEXT EXPECTED PURCHASE DATE -->
+                        <div class="oj-kpi-card oj-kpi-next">
+                            <div class="oj-kpi-icon-wrap oj-kpi-icon-next">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <circle cx="12" cy="12" r="10"></circle>
+                                    <polyline points="12 6 12 12 16 14"></polyline>
+                                </svg>
+                            </div>
+                            <div class="oj-kpi-content">
+                                <span class="oj-kpi-label">NEXT EXPECTED PURCHASE</span>
+                                <div class="oj-kpi-value-row">
+                                    <h3 class="oj-kpi-value-sm">{selectedInsightFormattedNextPurchase}</h3>
+                                    <span class={nextPurchaseBadgeClass}>{nextPurchaseStatusLabel}</span>
+                                </div>
+                                <p class="oj-kpi-subtext">Predictive cadence for customer's next showroom visit</p>
+                            </div>
+                            <div class="oj-kpi-card-foil"></div>
+                        </div>
+
+                        <!-- KPI 5: PURCHASE OCCASION -->
+                        <div class="oj-kpi-card oj-kpi-occasion oj-kpi-span2">
+                            <div class="oj-kpi-icon-wrap oj-kpi-icon-occasion">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <polyline points="20 12 20 22 4 22 4 12"></polyline>
+                                    <rect x="2" y="7" width="20" height="5"></rect>
+                                    <line x1="12" y1="22" x2="12" y2="7"></line>
+                                    <path d="M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7z"></path>
+                                    <path d="M12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z"></path>
+                                </svg>
+                            </div>
+                            <div class="oj-kpi-content">
+                                <span class="oj-kpi-label">KEY PURCHASE OCCASION</span>
+                                <div class="oj-occasion-highlight">
+                                    <span class="oj-occasion-badge">👑 {selectedInsightOccasion}</span>
+                                </div>
+                                <p class="oj-kpi-subtext">Primary celebratory driver & buying motivation for this client</p>
+                            </div>
+                            <div class="oj-kpi-card-foil"></div>
+                        </div>
+
+                    </section>
+
+                    <!-- ================= RECORD DETAILS & HISTORY PANEL ================= -->
+                    <section class="oj-details-panel">
+                        <div class="oj-details-panel__header">
+                            <div class="oj-details-panel__title-wrap">
+                                <h3 class="oj-details-panel__title">Insight Record Details: 
+                                    <button class="oj-link-btn" type="button" onclick={handleViewInsightRecord} title="Open Insight Record in Salesforce">
+                                        {selectedInsight.recordName} ↗
+                                    </button>
+                                </h3>
+                                <p class="oj-details-panel__sub">Evaluation details from Purchase_Behaviour_Insights__c</p>
+                            </div>
+
+                            <div class="oj-details-panel__actions">
+                                <template if:true={hasMultipleInsights}>
+                                    <div class="oj-snapshot-selector">
+                                        <label class="oj-snapshot-label">Snapshot Record:</label>
+                                        <select class="oj-select-snapshot" onchange={handleSnapshotChange}>
+                                            <template for:each={insightsList} for:item="snap">
+                                                <option key={snap.recordId} value={snap.recordId}>
+                                                    {snap.recordName} ({snap.formattedShortDate})
+                                                </option>
+                                            </template>
+                                        </select>
+                                    </div>
+                                </template>
+                            </div>
+                        </div>
+
+                        <!-- 2-COLUMN METADATA GRID -->
+                        <div class="oj-meta-grid">
+                            <div class="oj-meta-item">
+                                <span class="oj-meta-label">Record Name</span>
+                                <span class="oj-meta-value oj-meta-val-gold">{selectedInsight.recordName}</span>
+                            </div>
+                            <div class="oj-meta-item">
+                                <span class="oj-meta-label">Customer Name (Lookup)</span>
+                                <span class="oj-meta-value">{activeCustomer.customerName}</span>
+                            </div>
+                            <div class="oj-meta-item">
+                                <span class="oj-meta-label">Average Ticket Size</span>
+                                <span class="oj-meta-value oj-meta-val-bold">{selectedInsightFormattedATS}</span>
+                            </div>
+                            <div class="oj-meta-item">
+                                <span class="oj-meta-label">Purchase Frequency</span>
+                                <span class="oj-meta-value">{selectedInsight.purchaseFrequency}</span>
+                            </div>
+                            <div class="oj-meta-item">
+                                <span class="oj-meta-label">Last Purchase Date</span>
+                                <span class="oj-meta-value">{selectedInsightFormattedLastPurchase}</span>
+                            </div>
+                            <div class="oj-meta-item">
+                                <span class="oj-meta-label">Next Expected Purchase Date</span>
+                                <span class="oj-meta-value">{selectedInsightFormattedNextPurchase}</span>
+                            </div>
+                            <div class="oj-meta-item">
+                                <span class="oj-meta-label">Purchase Occasion</span>
+                                <span class="oj-meta-value">{selectedInsightOccasion}</span>
+                            </div>
+                            <div class="oj-meta-item">
+                                <span class="oj-meta-label">Created Date</span>
+                                <span class="oj-meta-value">{selectedInsightFormattedCreatedDate}</span>
+                            </div>
+                        </div>
+
+                        <!-- HISTORY TABLE IF MULTIPLE RECORDS -->
+                        <template if:true={hasMultipleInsights}>
+                            <div class="oj-history-wrap">
+                                <h4 class="oj-history-title">All Historical Behaviour Insight Records ({insightsList.length})</h4>
+                                <div class="oj-table-responsive">
+                                    <table class="oj-history-table">
+                                        <thead>
+                                            <tr>
+                                                <th>Record Name</th>
+                                                <th>Avg Ticket Size</th>
+                                                <th>Frequency</th>
+                                                <th>Last Purchase</th>
+                                                <th>Next Expected</th>
+                                                <th>Occasion</th>
+                                                <th>Created Date</th>
+                                                <th>Action</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <template for:each={insightsList} for:item="item">
+                                                <tr key={item.recordId} class={item.rowClass}>
+                                                    <td>
+                                                        <strong class="oj-table-gold">{item.recordName}</strong>
+                                                    </td>
+                                                    <td>{item.formattedTicketSize}</td>
+                                                    <td>{item.purchaseFrequency}</td>
+                                                    <td>{item.formattedLastDate}</td>
+                                                    <td>{item.formattedNextDate}</td>
+                                                    <td>
+                                                        <span class="oj-badge-occasion-sm">{item.purchaseOccasion}</span>
+                                                    </td>
+                                                    <td>{item.formattedCreatedDate}</td>
+                                                    <td>
+                                                        <button 
+                                                            class="oj-btn-table-view" 
+                                                            type="button" 
+                                                            data-id={item.recordId} 
+                                                            onclick={handleRowSelect}
+                                                        >
+                                                            Select
+                                                        </button>
+                                                    </td>
+                                                </tr>
+                                            </template>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </template>
+                    </section>
+
+                </template>
+
+                <!-- ================= ZERO INSIGHTS RECORDED STATE ================= -->
+                <template if:false={hasInsights}>
+                    <section class="oj-no-insights-card">
+                        <div class="oj-no-insights-mark">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                                <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"></path>
+                            </svg>
+                        </div>
+                        <h3 class="oj-no-insights-title">No Purchase Behaviour Insights Found</h3>
+                        <p class="oj-no-insights-desc">
+                            There are currently no purchase behaviour insights recorded for <strong>{activeCustomer.customerName}</strong>.
+                        </p>
+                    </section>
+                </template>
+
+            </template>
+
+            <!-- ================= INITIAL PROMPT STATE (BEFORE SEARCH) ================= -->
+            <template if:true={isInitialState}>
+                <section class="oj-welcome-strip">
+                    <div class="oj-welcome-strip__box">
+                        <p class="oj-welcome-strip__text">
+                            Enter a customer's phone or WhatsApp number above to view purchase behaviour insights.
+                        </p>
+                    </div>
+                </section>
+            </template>
+
+        </div>
+
+    </div>
+</template>

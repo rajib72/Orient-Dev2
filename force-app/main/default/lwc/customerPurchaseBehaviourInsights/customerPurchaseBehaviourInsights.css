@@ -1,0 +1,1191 @@
+:host {
+    display: block;
+
+    /* ---- Orient Brand Tokens ---- */
+    --oj-maroon-primary: #55100f;
+    --oj-maroon-deep: #3b0a0a;
+    --oj-maroon-ink: #7a0f14;
+    --oj-maroon-warm: #78201d;
+    --oj-maroon-soft: #8e2a27;
+
+    --oj-gold-main: #c9a24d;
+    --oj-gold-light: #f6ebd2;
+    --oj-gold-soft: #ecd29b;
+    --oj-gold-dark: #7d5320;
+    --oj-gold-foil: linear-gradient(90deg, #c9a24d 0%, #fae8be 50%, #c9a24d 100%);
+
+    --oj-cream-bg: #fffdf9;
+    --oj-cream-card: #fcf7ef;
+    --oj-cream-alt: #f8efe2;
+    --oj-line-border: #e7d8c0;
+    --oj-line-subtle: #f0e4d2;
+
+    --oj-ink-title: #380808;
+    --oj-ink-body: #4a3728;
+    --oj-ink-muted: #7c6752;
+
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    color: var(--oj-ink-body);
+}
+
+/* =========================================================================
+   CONTAINER CARD & OUTER SHELL
+   ========================================================================= */
+.oj-card-container {
+    position: relative;
+    background: var(--oj-cream-bg);
+    border: 1px solid var(--oj-line-border);
+    border-radius: 20px;
+    overflow: hidden;
+    box-shadow: 0 16px 40px rgba(74, 55, 40, 0.08), 0 2px 6px rgba(0, 0, 0, 0.04);
+}
+
+/* =========================================================================
+   BANNER HEADER (ROYAL LACQUER WINE + GOLD ACCENTS)
+   ========================================================================= */
+.oj-banner {
+    position: relative;
+    background: linear-gradient(135deg, var(--oj-maroon-deep) 0%, var(--oj-maroon-primary) 45%, #6a1317 80%, #7d1c21 100%);
+    color: #ffffff;
+    padding: 20px 32px 22px 32px;
+    border-bottom: 3px solid var(--oj-gold-main);
+}
+
+.oj-banner__ornament-top {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: var(--oj-gold-foil);
+}
+
+.oj-banner__inner {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+}
+
+.oj-banner__text {
+    flex: 1 1 auto;
+}
+
+.oj-banner__eyebrow {
+    display: block;
+    font-size: 0.72rem;
+    font-weight: 800;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--oj-gold-soft);
+    margin-bottom: 4px;
+}
+
+.oj-banner__title {
+    font-family: Georgia, "Times New Roman", Garamond, serif;
+    font-size: 1.85rem;
+    font-weight: 700;
+    line-height: 1.15;
+    color: #ffffff;
+    margin: 0;
+    letter-spacing: 0.3px;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.oj-badge-royal {
+    display: inline-block;
+    padding: 8px 16px;
+    background: rgba(201, 162, 77, 0.18);
+    border: 1px solid var(--oj-gold-main);
+    border-radius: 999px;
+    color: var(--oj-gold-light);
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 1.5px;
+    backdrop-filter: blur(4px);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+/* =========================================================================
+   MAIN BODY
+   ========================================================================= */
+.oj-body {
+    position: relative;
+    padding: 28px 32px 36px 32px;
+    background: 
+        radial-gradient(circle at 100% 0%, rgba(201, 162, 77, 0.05), transparent 25%),
+        radial-gradient(circle at 0% 100%, rgba(85, 16, 15, 0.03), transparent 25%),
+        var(--oj-cream-bg);
+    min-height: 480px;
+}
+
+/* =========================================================================
+   SEARCH BAR SECTION
+   ========================================================================= */
+.oj-search-section {
+    margin-bottom: 28px;
+}
+
+.oj-search-box {
+    background: #ffffff;
+    border: 1.5px solid var(--oj-line-border);
+    border-radius: 16px;
+    padding: 20px 24px;
+    box-shadow: 0 6px 20px rgba(85, 16, 15, 0.05);
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.oj-search-box:focus-within {
+    border-color: var(--oj-gold-main);
+    box-shadow: 0 8px 24px rgba(201, 162, 77, 0.2);
+}
+
+.oj-search-label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.84rem;
+    font-weight: 700;
+    color: var(--oj-maroon-ink);
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    margin-bottom: 12px;
+}
+
+.oj-icon-phone {
+    width: 17px;
+    height: 17px;
+    color: var(--oj-gold-dark);
+}
+
+.oj-search-row {
+    display: flex;
+    gap: 12px;
+    align-items: stretch;
+    flex-wrap: wrap;
+}
+
+.oj-search-input-wrap {
+    position: relative;
+    display: flex;
+    align-items: center;
+    flex: 1 1 320px;
+    border: 1.5px solid var(--oj-line-border);
+    border-radius: 12px;
+    background: #fffdfb;
+    overflow: hidden;
+    transition: all 0.2s ease;
+}
+
+.oj-search-input-wrap:focus-within {
+    border-color: var(--oj-gold-main);
+    background: #ffffff;
+}
+
+.oj-search-prefix {
+    padding: 0 14px;
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: var(--oj-gold-dark);
+    background: #faf3e6;
+    border-right: 1px solid var(--oj-line-border);
+    height: 100%;
+    display: flex;
+    align-items: center;
+    user-select: none;
+}
+
+.oj-search-input {
+    flex: 1 1 auto;
+    border: none;
+    outline: none;
+    padding: 12px 16px;
+    font-size: 1rem;
+    font-weight: 500;
+    color: #1f1f1f;
+    background: transparent;
+}
+
+.oj-search-input::placeholder {
+    color: #a8947f;
+    font-weight: 400;
+}
+
+.oj-btn-clear {
+    background: transparent;
+    border: none;
+    color: #99826e;
+    font-size: 1.1rem;
+    padding: 0 14px;
+    cursor: pointer;
+    transition: color 0.15s ease;
+}
+
+.oj-btn-clear:hover {
+    color: var(--oj-maroon-primary);
+}
+
+.oj-btn-search {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 0 28px;
+    min-height: 48px;
+    border: none;
+    border-radius: 12px;
+    background: linear-gradient(135deg, var(--oj-maroon-primary) 0%, var(--oj-maroon-deep) 100%);
+    color: #ffffff;
+    font-size: 0.95rem;
+    font-weight: 700;
+    letter-spacing: 0.3px;
+    cursor: pointer;
+    box-shadow: 0 6px 16px rgba(85, 16, 15, 0.25);
+    transition: all 0.2s ease;
+}
+
+.oj-btn-search:hover:not(:disabled) {
+    background: linear-gradient(135deg, #6c1518 0%, var(--oj-maroon-primary) 100%);
+    box-shadow: 0 8px 22px rgba(85, 16, 15, 0.35);
+    transform: translateY(-1px);
+}
+
+.oj-btn-search:disabled {
+    background: #d8cebe;
+    color: #7d7265;
+    cursor: not-allowed;
+    box-shadow: none;
+    transform: none;
+}
+
+.oj-btn-icon {
+    width: 18px;
+    height: 18px;
+}
+
+.oj-search-hint {
+    margin-top: 8px;
+    font-size: 0.78rem;
+    color: var(--oj-ink-muted);
+}
+
+/* =========================================================================
+   CUSTOMER PICKER (MULTIPLE MATCHES)
+   ========================================================================= */
+.oj-picker-section {
+    margin-bottom: 28px;
+}
+
+.oj-section-title-row {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 16px;
+}
+
+.oj-section-title-line {
+    flex: 1 1 auto;
+    height: 1px;
+    background: var(--oj-gold-foil);
+}
+
+.oj-section-title {
+    font-family: Georgia, serif;
+    font-size: 1.15rem;
+    font-weight: 700;
+    color: var(--oj-maroon-ink);
+    margin: 0;
+    white-space: nowrap;
+}
+
+.oj-picker-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 14px;
+}
+
+.oj-picker-card {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 16px;
+    background: #ffffff;
+    border: 1.5px solid var(--oj-line-border);
+    border-radius: 14px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    box-shadow: 0 4px 12px rgba(85, 16, 15, 0.04);
+}
+
+.oj-picker-card:hover {
+    border-color: var(--oj-gold-main);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(201, 162, 77, 0.18);
+    background: #fffefb;
+}
+
+.oj-picker-avatar {
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--oj-maroon-primary), var(--oj-maroon-deep));
+    color: var(--oj-gold-light);
+    border: 2px solid var(--oj-gold-main);
+    display: grid;
+    place-items: center;
+    font-size: 0.95rem;
+    font-weight: 800;
+    flex: 0 0 44px;
+}
+
+.oj-picker-info {
+    flex: 1 1 auto;
+    min-width: 0;
+}
+
+.oj-picker-name {
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: var(--oj-maroon-ink);
+    margin: 0 0 4px 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.oj-picker-badges {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+}
+
+.oj-picker-store {
+    font-size: 0.75rem;
+    color: var(--oj-ink-muted);
+    margin: 4px 0 0 0;
+}
+
+.oj-picker-action {
+    flex: 0 0 auto;
+}
+
+.oj-btn-select {
+    padding: 6px 14px;
+    border: 1px solid var(--oj-gold-main);
+    border-radius: 999px;
+    background: #faf2e3;
+    color: var(--oj-gold-dark);
+    font-size: 0.78rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.15s ease;
+}
+
+.oj-picker-card:hover .oj-btn-select {
+    background: var(--oj-maroon-primary);
+    border-color: var(--oj-maroon-primary);
+    color: #ffffff;
+}
+
+/* =========================================================================
+   CUSTOMER IDENTITY PASSPORT STRIP
+   ========================================================================= */
+.oj-passport {
+    position: relative;
+    background: #ffffff;
+    border: 1.5px solid var(--oj-gold-main);
+    border-radius: 18px;
+    overflow: hidden;
+    margin-bottom: 28px;
+    box-shadow: 0 10px 30px rgba(85, 16, 15, 0.08);
+}
+
+.oj-passport__header-ribbon {
+    height: 5px;
+    background: var(--oj-gold-foil);
+}
+
+.oj-passport__inner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+    padding: 18px 26px;
+    flex-wrap: wrap;
+}
+
+.oj-passport__avatar-wrap {
+    position: relative;
+    flex: 0 0 auto;
+}
+
+.oj-passport__avatar {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--oj-maroon-primary) 0%, var(--oj-maroon-deep) 100%);
+    border: 2.5px solid var(--oj-gold-main);
+    box-shadow: 0 4px 12px rgba(85, 16, 15, 0.25);
+    display: grid;
+    place-items: center;
+    color: var(--oj-gold-light);
+    font-size: 1.3rem;
+    font-weight: 800;
+    letter-spacing: 1px;
+}
+
+.oj-passport__gold-crown {
+    position: absolute;
+    bottom: -4px;
+    right: -4px;
+    background: var(--oj-gold-main);
+    color: #ffffff;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    display: grid;
+    place-items: center;
+    font-size: 0.65rem;
+    border: 1.5px solid #ffffff;
+}
+
+.oj-passport__details {
+    flex: 1 1 auto;
+    min-width: 0;
+}
+
+.oj-passport__name-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 0;
+    flex-wrap: wrap;
+}
+
+.oj-passport__name {
+    font-family: Georgia, "Times New Roman", Garamond, serif;
+    font-size: 1.45rem;
+    font-weight: 700;
+    color: var(--oj-ink-title);
+    margin: 0;
+}
+
+.oj-passport__client-badge {
+    padding: 3px 10px;
+    border-radius: 999px;
+    background: #eaf6ec;
+    color: #176527;
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    border: 1px solid #bce1c3;
+}
+
+.oj-passport__actions {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin-left: auto;
+    flex: 0 0 auto;
+}
+
+.oj-btn-outline {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 16px;
+    border: 1.5px solid var(--oj-line-border);
+    border-radius: 10px;
+    background: #ffffff;
+    color: var(--oj-ink-body);
+    font-size: 0.82rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.oj-btn-outline:hover {
+    border-color: var(--oj-gold-main);
+    background: #fffaf0;
+    color: var(--oj-gold-dark);
+}
+
+.oj-btn-outline-maroon {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 16px;
+    border: 1.5px solid var(--oj-maroon-primary);
+    border-radius: 10px;
+    background: #fff5f5;
+    color: var(--oj-maroon-primary);
+    font-size: 0.82rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.oj-btn-outline-maroon:hover {
+    background: var(--oj-maroon-primary);
+    color: #ffffff;
+}
+
+.oj-btn-icon-sm {
+    width: 14px;
+    height: 14px;
+}
+
+/* =========================================================================
+   ORNAMENT DIVIDER
+   ========================================================================= */
+.oj-ornament-divider {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 14px;
+    margin: 32px 0 24px 0;
+}
+
+.oj-orn-line {
+    flex: 1 1 auto;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--oj-gold-main));
+}
+
+.oj-orn-line:last-child {
+    background: linear-gradient(90deg, var(--oj-gold-main), transparent);
+}
+
+.oj-orn-diamond {
+    width: 8px;
+    height: 8px;
+    background: var(--oj-gold-main);
+    transform: rotate(45deg);
+    flex: 0 0 auto;
+}
+
+.oj-orn-label {
+    font-size: 0.74rem;
+    font-weight: 800;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--oj-maroon-ink);
+    white-space: nowrap;
+}
+
+/* =========================================================================
+   EXECUTIVE KPI METRIC CARDS
+   ========================================================================= */
+.oj-kpi-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 18px;
+    margin-bottom: 32px;
+}
+
+.oj-kpi-card {
+    position: relative;
+    display: flex;
+    align-items: flex-start;
+    gap: 16px;
+    padding: 22px 20px;
+    background: #ffffff;
+    border: 1.5px solid var(--oj-line-border);
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow: 0 8px 24px rgba(85, 16, 15, 0.05);
+    transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+}
+
+.oj-kpi-card:hover {
+    transform: translateY(-3px);
+    border-color: var(--oj-gold-main);
+    box-shadow: 0 12px 30px rgba(201, 162, 77, 0.16);
+}
+
+.oj-kpi-card-foil {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: var(--oj-gold-foil);
+}
+
+.oj-kpi-icon-wrap {
+    width: 48px;
+    height: 48px;
+    border-radius: 12px;
+    display: grid;
+    place-items: center;
+    flex: 0 0 48px;
+}
+
+.oj-kpi-icon-wrap svg {
+    width: 22px;
+    height: 22px;
+}
+
+.oj-currency-symbol {
+    font-size: 1.5rem;
+    font-weight: 900;
+}
+
+/* Distinct card accents */
+.oj-kpi-icon-ats {
+    background: #fff4db;
+    color: var(--oj-gold-dark);
+    border: 1px solid var(--oj-gold-soft);
+}
+
+.oj-kpi-icon-freq {
+    background: #fbf0f0;
+    color: var(--oj-maroon-primary);
+    border: 1px solid #f1cece;
+}
+
+.oj-kpi-icon-last {
+    background: #eff6ff;
+    color: #1e40af;
+    border: 1px solid #bfdbfe;
+}
+
+.oj-kpi-icon-next {
+    background: #fdf2f8;
+    color: #9d174d;
+    border: 1px solid #fbcfe8;
+}
+
+.oj-kpi-icon-occasion {
+    background: #fefce8;
+    color: #854d0e;
+    border: 1px solid #fef08a;
+}
+
+.oj-kpi-span2 {
+    grid-column: span 2;
+}
+
+@media only screen and (max-width: 768px) {
+    .oj-kpi-span2 {
+        grid-column: span 1;
+    }
+}
+
+.oj-kpi-content {
+    flex: 1 1 auto;
+    min-width: 0;
+}
+
+.oj-kpi-label {
+    display: block;
+    font-size: 0.72rem;
+    font-weight: 800;
+    letter-spacing: 1.2px;
+    color: var(--oj-ink-muted);
+    text-transform: uppercase;
+    margin-bottom: 4px;
+}
+
+.oj-kpi-value {
+    font-size: 1.65rem;
+    font-weight: 800;
+    color: var(--oj-maroon-deep);
+    margin: 0;
+    line-height: 1.15;
+    letter-spacing: -0.3px;
+}
+
+.oj-kpi-value-sm {
+    font-size: 1.35rem;
+    font-weight: 800;
+    color: var(--oj-maroon-deep);
+    margin: 0;
+    line-height: 1.2;
+}
+
+.oj-kpi-value-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.oj-kpi-subtext {
+    font-size: 0.78rem;
+    color: var(--oj-ink-muted);
+    margin: 6px 0 0 0;
+    line-height: 1.35;
+}
+
+.oj-occasion-highlight {
+    margin-top: 4px;
+}
+
+.oj-occasion-badge {
+    display: inline-block;
+    padding: 6px 14px;
+    background: linear-gradient(135deg, #fff9ee 0%, #f7e8cb 100%);
+    border: 1px solid var(--oj-gold-main);
+    border-radius: 999px;
+    color: var(--oj-gold-dark);
+    font-size: 0.92rem;
+    font-weight: 700;
+    box-shadow: 0 2px 6px rgba(201, 162, 77, 0.15);
+}
+
+/* =========================================================================
+   STATUS BADGES & PILLS
+   ========================================================================= */
+.oj-badge-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 3px 8px;
+    background: #f5ede0;
+    border-radius: 6px;
+    font-size: 0.72rem;
+    color: var(--oj-ink-body);
+    font-weight: 600;
+}
+
+.oj-badge-pill-wa {
+    background: #eafaf1;
+    color: #12723a;
+}
+
+.oj-badge-pill-gold {
+    background: #fff8e8;
+    color: var(--oj-gold-dark);
+    font-weight: 700;
+}
+
+.oj-badge-gold {
+    padding: 3px 10px;
+    border-radius: 999px;
+    background: linear-gradient(135deg, #f5e4bd, #e9c882);
+    border: 1px solid var(--oj-gold-main);
+    color: var(--oj-gold-dark);
+    font-size: 0.72rem;
+    font-weight: 800;
+}
+
+.oj-badge-maroon {
+    padding: 3px 10px;
+    border-radius: 999px;
+    background: #faebeb;
+    border: 1px solid #df9f9f;
+    color: var(--oj-maroon-primary);
+    font-size: 0.72rem;
+    font-weight: 800;
+}
+
+.oj-badge-neutral {
+    padding: 3px 10px;
+    border-radius: 999px;
+    background: #f0eae1;
+    color: var(--oj-ink-muted);
+    font-size: 0.72rem;
+    font-weight: 700;
+}
+
+.oj-badge-overdue {
+    padding: 3px 10px;
+    border-radius: 999px;
+    background: #fee2e2;
+    border: 1px solid #f87171;
+    color: #991b1b;
+    font-size: 0.72rem;
+    font-weight: 800;
+}
+
+.oj-badge-warning {
+    padding: 3px 10px;
+    border-radius: 999px;
+    background: #fef3c7;
+    border: 1px solid #f59e0b;
+    color: #92400e;
+    font-size: 0.72rem;
+    font-weight: 800;
+}
+
+.oj-badge-positive {
+    padding: 3px 10px;
+    border-radius: 999px;
+    background: #d1fae5;
+    border: 1px solid #34d399;
+    color: #065f46;
+    font-size: 0.72rem;
+    font-weight: 800;
+}
+
+/* =========================================================================
+   DETAILS PANEL & SNAPSHOT BREAKDOWN
+   ========================================================================= */
+.oj-details-panel {
+    background: #ffffff;
+    border: 1.5px solid var(--oj-line-border);
+    border-radius: 16px;
+    padding: 24px 28px;
+    box-shadow: 0 6px 20px rgba(85, 16, 15, 0.04);
+}
+
+.oj-details-panel__header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    flex-wrap: wrap;
+    padding-bottom: 18px;
+    border-bottom: 1px solid var(--oj-line-border);
+    margin-bottom: 20px;
+}
+
+.oj-details-panel__title {
+    font-family: Georgia, serif;
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: var(--oj-maroon-ink);
+    margin: 0 0 4px 0;
+}
+
+.oj-details-panel__sub {
+    font-size: 0.8rem;
+    color: var(--oj-ink-muted);
+    margin: 0;
+}
+
+.oj-link-btn {
+    background: none;
+    border: none;
+    color: var(--oj-gold-dark);
+    font-family: Georgia, serif;
+    font-size: 1.25rem;
+    font-weight: 700;
+    cursor: pointer;
+    text-decoration: underline;
+    text-decoration-style: dotted;
+    transition: color 0.15s ease;
+}
+
+.oj-link-btn:hover {
+    color: var(--oj-maroon-primary);
+}
+
+.oj-details-panel__actions {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+.oj-snapshot-selector {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.oj-snapshot-label {
+    font-size: 0.82rem;
+    font-weight: 700;
+    color: var(--oj-ink-muted);
+}
+
+.oj-select-snapshot {
+    padding: 6px 12px;
+    border: 1.5px solid var(--oj-line-border);
+    border-radius: 8px;
+    background: #fdfaf3;
+    font-size: 0.82rem;
+    font-weight: 600;
+    color: var(--oj-maroon-ink);
+    outline: none;
+    cursor: pointer;
+}
+
+.oj-select-snapshot:focus {
+    border-color: var(--oj-gold-main);
+}
+
+/* 2-Column Meta Grid */
+.oj-meta-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 14px;
+}
+
+.oj-meta-item {
+    background: #fbf6ec;
+    border: 1px solid var(--oj-line-subtle);
+    border-radius: 10px;
+    padding: 12px 16px;
+}
+
+.oj-meta-label {
+    display: block;
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.8px;
+    text-transform: uppercase;
+    color: var(--oj-ink-muted);
+    margin-bottom: 4px;
+}
+
+.oj-meta-value {
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: #2b2b2b;
+}
+
+.oj-meta-val-gold {
+    color: var(--oj-gold-dark);
+    font-weight: 700;
+}
+
+.oj-meta-val-bold {
+    font-weight: 800;
+    color: var(--oj-maroon-primary);
+}
+
+/* =========================================================================
+   HISTORY TABLE
+   ========================================================================= */
+.oj-history-wrap {
+    margin-top: 28px;
+    padding-top: 22px;
+    border-top: 1px solid var(--oj-line-border);
+}
+
+.oj-history-title {
+    font-family: Georgia, serif;
+    font-size: 1.05rem;
+    font-weight: 700;
+    color: var(--oj-maroon-ink);
+    margin: 0 0 14px 0;
+}
+
+.oj-table-responsive {
+    overflow-x: auto;
+}
+
+.oj-history-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.82rem;
+    text-align: left;
+}
+
+.oj-history-table th {
+    background: #f6ecdc;
+    color: var(--oj-maroon-ink);
+    font-weight: 700;
+    padding: 10px 14px;
+    border-bottom: 2px solid var(--oj-line-border);
+    white-space: nowrap;
+}
+
+.oj-history-table td {
+    padding: 10px 14px;
+    border-bottom: 1px solid var(--oj-line-subtle);
+    color: var(--oj-ink-body);
+}
+
+.oj-row-selected {
+    background: #fff8eb;
+}
+
+.oj-table-gold {
+    color: var(--oj-gold-dark);
+}
+
+.oj-badge-occasion-sm {
+    padding: 2px 8px;
+    background: #f6eee0;
+    border-radius: 999px;
+    font-size: 0.72rem;
+    color: var(--oj-maroon-ink);
+    font-weight: 600;
+}
+
+.oj-btn-table-view {
+    padding: 4px 10px;
+    border: 1px solid var(--oj-line-border);
+    border-radius: 6px;
+    background: #ffffff;
+    color: var(--oj-maroon-primary);
+    font-size: 0.75rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.15s ease;
+}
+
+.oj-btn-table-view:hover {
+    border-color: var(--oj-gold-main);
+    background: var(--oj-maroon-primary);
+    color: #ffffff;
+}
+
+/* =========================================================================
+   ZERO-STATE: NO INSIGHTS RECORDED
+   ========================================================================= */
+.oj-no-insights-card {
+    text-align: center;
+    padding: 40px 24px;
+    background: #ffffff;
+    border: 1.5px dashed var(--oj-gold-main);
+    border-radius: 18px;
+    margin-top: 20px;
+}
+
+.oj-no-insights-mark {
+    width: 60px;
+    height: 60px;
+    margin: 0 auto 16px auto;
+    border-radius: 50%;
+    background: #fbf3e4;
+    border: 1.5px solid var(--oj-gold-main);
+    color: var(--oj-gold-dark);
+    display: grid;
+    place-items: center;
+}
+
+.oj-no-insights-mark svg {
+    width: 30px;
+    height: 30px;
+}
+
+.oj-no-insights-title {
+    font-family: Georgia, serif;
+    font-size: 1.35rem;
+    font-weight: 700;
+    color: var(--oj-maroon-ink);
+    margin: 0 0 8px 0;
+}
+
+.oj-no-insights-desc {
+    font-size: 0.9rem;
+    color: var(--oj-ink-body);
+    margin: 0 0 6px 0;
+}
+
+.oj-no-insights-sub {
+    font-size: 0.82rem;
+    color: var(--oj-ink-muted);
+    margin: 0 0 20px 0;
+}
+
+
+/* =========================================================================
+   EMPTY SEARCH STATE
+   ========================================================================= */
+.oj-empty-search-card {
+    text-align: center;
+    padding: 36px 20px;
+    background: #ffffff;
+    border: 1.5px solid #ebd8c0;
+    border-radius: 16px;
+    margin-bottom: 24px;
+}
+
+.oj-empty-search-icon {
+    font-size: 2.2rem;
+    margin-bottom: 10px;
+}
+
+.oj-empty-search-title {
+    font-family: Georgia, serif;
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: var(--oj-maroon-ink);
+    margin: 0 0 6px 0;
+}
+
+.oj-empty-search-desc {
+    font-size: 0.9rem;
+    color: var(--oj-ink-body);
+    margin: 0 0 4px 0;
+}
+
+.oj-empty-search-sub {
+    font-size: 0.8rem;
+    color: var(--oj-ink-muted);
+    margin: 0;
+}
+
+/* =========================================================================
+   INITIAL PROMPT WELCOME STRIP
+   ========================================================================= */
+.oj-welcome-strip {
+    margin-top: 10px;
+}
+
+.oj-welcome-strip__box {
+    text-align: center;
+    padding: 28px 20px;
+    background: #ffffff;
+    border: 1px dashed var(--oj-line-border);
+    border-radius: 14px;
+}
+
+.oj-welcome-strip__text {
+    font-size: 0.88rem;
+    color: var(--oj-ink-muted);
+    margin: 0 auto;
+    line-height: 1.45;
+}
+
+/* =========================================================================
+   SPINNER & LOADING BACKDROP
+   ========================================================================= */
+.oj-loading-backdrop {
+    position: absolute;
+    inset: 0;
+    background: rgba(255, 253, 249, 0.85);
+    backdrop-filter: blur(2px);
+    z-index: 99;
+    display: grid;
+    place-items: center;
+    border-radius: 0 0 20px 20px;
+}
+
+.oj-loading-card {
+    text-align: center;
+    padding: 24px 32px;
+    background: #ffffff;
+    border: 1.5px solid var(--oj-gold-main);
+    border-radius: 16px;
+    box-shadow: 0 12px 30px rgba(85, 16, 15, 0.15);
+    min-width: 220px;
+}
+
+.oj-loading-text {
+    margin-top: 14px;
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: var(--oj-maroon-ink);
+}
+
+
+/* =========================================================================
+   RESPONSIVE ADJUSTMENTS
+   ========================================================================= */
+@media only screen and (max-width: 640px) {
+    .oj-banner {
+        padding: 18px 20px;
+    }
+    .oj-banner__title {
+        font-size: 1.45rem;
+    }
+    .oj-body {
+        padding: 18px 16px;
+    }
+    .oj-passport__inner {
+        padding: 16px;
+    }
+    .oj-details-panel {
+        padding: 18px 16px;
+    }
+    .oj-kpi-card {
+        padding: 16px;
+    }
+}
