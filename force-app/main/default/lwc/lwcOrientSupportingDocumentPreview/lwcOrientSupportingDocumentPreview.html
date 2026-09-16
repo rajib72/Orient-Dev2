@@ -1,0 +1,187 @@
+<template>
+    <section
+        class="document-preview-layer"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="supporting-document-preview-title"
+        tabindex="0"
+        onkeydown={handleKeyDown}>
+
+        <div class="document-preview-backdrop"></div>
+
+        <div class="document-preview-modal">
+            <header class="document-preview-header">
+                <div class="header-copy">
+                    <div class="header-eyebrow">
+                        SUPPORTING DOCUMENTS
+                    </div>
+                    <h2 id="supporting-document-preview-title">
+                        {currentDisplayName}
+                    </h2>
+                    <div class="header-meta">
+                        <span>{currentExtensionLabel}</span>
+                        <span class="meta-dot">•</span>
+                        <span>{positionLabel}</span>
+                    </div>
+                </div>
+
+                <lightning-button-icon
+                    class="close-button"
+                    icon-name="utility:close"
+                    variant="border-filled"
+                    alternative-text="Close Supporting Document Preview"
+                    title="Close"
+                    onclick={handleClose}>
+                </lightning-button-icon>
+            </header>
+
+            <div class="document-preview-body">
+                <template if:false={hasDocuments}>
+                    <div class="empty-state">
+                        <lightning-icon
+                            icon-name="utility:file"
+                            size="medium"
+                            alternative-text="No documents">
+                        </lightning-icon>
+                        <div>No supporting document is available.</div>
+                    </div>
+                </template>
+
+                <template if:true={hasDocuments}>
+                    <div class="viewer-stage">
+                        <template if:true={isLoading}>
+                            <div class="viewer-loading">
+                                <lightning-spinner
+                                    alternative-text="Loading supporting document..."
+                                    size="medium">
+                                </lightning-spinner>
+                                <span>Loading preview...</span>
+                            </div>
+                        </template>
+
+                        <template if:true={loadError}>
+                            <div class="viewer-error">
+                                <lightning-icon
+                                    icon-name="utility:warning"
+                                    size="small"
+                                    alternative-text="Preview warning">
+                                </lightning-icon>
+                                <div>
+                                    <div class="viewer-error-title">
+                                        Inline preview unavailable
+                                    </div>
+                                    <div class="viewer-error-message">
+                                        {loadError}
+                                    </div>
+                                </div>
+                            </div>
+                        </template>
+
+                        <template if:false={isLoading}>
+                            <template if:true={showImage}>
+                                <img
+                                    class="image-preview"
+                                    src={currentPreviewUrl}
+                                    alt={currentDisplayName}
+                                    onerror={handlePreviewError} />
+                            </template>
+
+                            <template if:true={showInlineFrame}>
+                                <iframe
+                                    class="document-frame"
+                                    src={currentPreviewUrl}
+                                    title={currentDisplayName}>
+                                </iframe>
+                            </template>
+
+                            <template if:true={showRendition}>
+                                <div class="rendition-wrap">
+                                    <img
+                                        class="rendition-preview"
+                                        src={currentPreviewUrl}
+                                        alt={currentDisplayName}
+                                        onerror={handlePreviewError} />
+                                    <div class="rendition-note">
+                                        Salesforce rendered preview
+                                    </div>
+                                </div>
+                            </template>
+
+                            <template if:true={showUnsupported}>
+                                <div class="unsupported-state">
+                                    <lightning-icon
+                                        icon-name="doctype:attachment"
+                                        size="large"
+                                        alternative-text="File">
+                                    </lightning-icon>
+                                    <div class="unsupported-title">
+                                        {currentDisplayName}
+                                    </div>
+                                    <div class="unsupported-message">
+                                        This file type doesn’t have an inline rendition available in the custom viewer.
+                                    </div>
+                                    <a
+                                        class="open-original-link"
+                                        href={currentOriginalUrl}
+                                        target="_blank"
+                                        rel="noopener noreferrer">
+                                        Open Original File
+                                    </a>
+                                </div>
+                            </template>
+                        </template>
+                    </div>
+
+                    <div class="document-tabs" role="tablist">
+                        <template
+                            for:each={thumbnailDocuments}
+                            for:item="item">
+                            <button
+                                key={item.contentDocumentId}
+                                type="button"
+                                class={item.buttonClass}
+                                data-index={item.index}
+                                title={item.displayName}
+                                onclick={handleDocumentTab}>
+                                <lightning-icon
+                                    icon-name={item.iconName}
+                                    size="small"
+                                    alternative-text="File">
+                                </lightning-icon>
+                                <span class="document-tab-copy">
+                                    <span class="document-tab-number">
+                                        {item.position}
+                                    </span>
+                                    <span class="document-tab-name">
+                                        {item.displayName}
+                                    </span>
+                                </span>
+                            </button>
+                        </template>
+                    </div>
+                </template>
+            </div>
+
+            <footer class="document-preview-footer">
+                <lightning-button
+                    label="Previous"
+                    icon-name="utility:back"
+                    onclick={handlePrevious}
+                    disabled={previousDisabled}>
+                </lightning-button>
+
+                <span class="footer-position">
+                    {positionLabel}
+                </span>
+
+                <lightning-button
+                    label="Next"
+                    icon-name="utility:forward"
+                    icon-position="right"
+                    onclick={handleNext}
+                    disabled={nextDisabled}>
+                </lightning-button>
+            </footer>
+        </div>
+    </section>
+</template>

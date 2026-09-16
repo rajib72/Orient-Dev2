@@ -1,0 +1,665 @@
+<template>
+    <div class="main-wrapper">
+        <template if:true={isLoading}>
+            <div class="spinnerOverlay">
+                <lightning-spinner
+                    alternative-text="Loading"
+                    size="medium">
+                </lightning-spinner>
+            </div>
+        </template>
+
+        <!-- Search Card -->
+        <section class="search-card">
+            <div class="title-row">
+                <div class="title-left">
+                    <lightning-icon
+                        icon-name="utility:identity"
+                        size="small"
+                        class="title-icon">
+                    </lightning-icon>
+
+                    <h1>Voter ID Verification</h1>
+                </div>
+
+                <lightning-button-icon
+                    icon-name="utility:refresh"
+                    alternative-text="Refresh"
+                    title="Refresh"
+                    onclick={handleRefresh}
+                    disabled={disableRefreshButton}
+                    variant="border-filled"
+                    size="small"
+                    class="refresh-icon-btn">
+                </lightning-button-icon>
+            </div>
+
+            <div class="input-area">
+                <label class="input-label">
+                    <span class="required">*</span>
+                    Voter / EPIC Number
+                </label>
+
+                <div class="search-row">
+                    <input
+                        class="custom-input"
+                        type="text"
+                        value={voterNumber}
+                        oninput={handleVoterInput}
+                        placeholder="Enter Voter Number" />
+
+                    <button
+                        class="verify-btn"
+                        onclick={handleVerifyVoter}
+                        disabled={disableVerifyButton}>
+
+                        <lightning-icon
+                            icon-name="utility:search"
+                            size="x-small"
+                            variant="inverse">
+                        </lightning-icon>
+
+                        <span>Verify Voter</span>
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <template if:true={isRefreshing}>
+            <div class="refresh-spinner-area">
+                <lightning-spinner
+                    alternative-text="Refreshing..."
+                    size="medium">
+                </lightning-spinner>
+            </div>
+        </template>
+
+        <!-- Success Message -->
+        <template if:true={successMessage}>
+            <section class="success-card">
+                <div class="success-icon">
+                    <lightning-icon
+                        icon-name="utility:check"
+                        size="small"
+                        variant="inverse">
+                    </lightning-icon>
+                </div>
+
+                <div>
+                    <h2>Verification Successful</h2>
+                    <p>{successMessage}</p>
+                </div>
+            </section>
+        </template>
+
+        <!-- Error Message -->
+        <template if:true={errorMessage}>
+            <section class="error-card">
+                <div class="error-icon">
+                    <lightning-icon
+                        icon-name="utility:error"
+                        size="small"
+                        variant="inverse">
+                    </lightning-icon>
+                </div>
+
+                <div>
+                    <h2>Verification Failed</h2>
+                    <p>{errorMessage}</p>
+                </div>
+            </section>
+        </template>
+
+        <!-- Voter Details -->
+        <template if:true={voterData}>
+            <section class="details-card">
+                <div class="details-title-row">
+                    <lightning-icon
+                        icon-name="standard:person_account"
+                        size="small"
+                        class="details-icon">
+                    </lightning-icon>
+
+                    <h1>Voter Details</h1>
+                </div>
+
+                <div class="details-grid">
+                    <div class="detail-row">
+                        <span>EPIC No</span>
+                        <strong>{voterData.epicNo}</strong>
+                    </div>
+
+                    <div class="detail-row">
+                        <span>Name</span>
+                        <strong>{voterData.name}</strong>
+                    </div>
+
+                    <div class="detail-row">
+                        <span>Gender</span>
+                        <strong>{genderLabel}</strong>
+                    </div>
+
+                    <div class="detail-row">
+                        <span>Age</span>
+                        <strong>{voterData.age}</strong>
+                    </div>
+
+                    <div class="detail-row">
+                        <span>Relation Name</span>
+                        <strong>{voterData.relationName}</strong>
+                    </div>
+
+                    <div class="detail-row">
+                        <span>Relation Type</span>
+                        <strong>{relationTypeLabel}</strong>
+                    </div>
+
+                    <div class="detail-row">
+                        <span>State</span>
+                        <strong>{voterData.state}</strong>
+                    </div>
+
+                    <div class="detail-row">
+                        <span>District</span>
+                        <strong>{voterData.district}</strong>
+                    </div>
+
+                    <div class="detail-row">
+                        <span>Assembly Constituency</span>
+                        <strong>{voterData.assemblyConstituency}</strong>
+                    </div>
+
+                    <div class="detail-row">
+                        <span>Assembly No.</span>
+                        <strong>
+                            {voterData.assemblyConstituencyNumber}
+                        </strong>
+                    </div>
+
+                    <div class="detail-row">
+                        <span>Polling Station</span>
+                        <strong>{voterData.pollingStation}</strong>
+                    </div>
+
+                    <div class="detail-row">
+                        <span>Part Number</span>
+                        <strong>{voterData.partNumber}</strong>
+                    </div>
+
+                    <div class="detail-row">
+                        <span>Part Name</span>
+                        <strong>{voterData.partName}</strong>
+                    </div>
+
+                    <div class="detail-row">
+                        <span>Serial No. In Part</span>
+                        <strong>{voterData.slnoInpart}</strong>
+                    </div>
+
+                    <div class="detail-row">
+                        <span>Last Update</span>
+                        <strong>{voterData.lastUpdate}</strong>
+                    </div>
+
+                    <div class="detail-row full-width">
+                        <span>Area</span>
+                        <strong>{voterData.area}</strong>
+                    </div>
+                </div>
+
+                <div class="button-row">
+                    <button
+                        class={updateButtonClass}
+                        onclick={handleUpdateVoter}
+                        disabled={disableUpdateButton}>
+
+                        <lightning-icon
+                            icon-name={updateButtonIcon}
+                            size="x-small"
+                            variant="inverse">
+                        </lightning-icon>
+
+                        <span>{updateButtonLabel}</span>
+                    </button>
+                </div>
+            </section>
+        </template>
+
+        <!-- 1. VOTER DETAILS MATCH / MISMATCH REVIEW MODAL -->
+        <template if:true={showMismatchPopup}>
+            <section
+                role="dialog"
+                tabindex="-1"
+                aria-modal="true"
+                aria-labelledby="voter-review-heading"
+                aria-describedby="voter-review-description"
+                class="slds-modal slds-fade-in-open voter-modal">
+
+                <div class="slds-modal__container voter-modal-container voter-review-modal">
+                    <header class="slds-modal__header voter-modal-header">
+                        <div class="header-content">
+                            <lightning-icon
+                                icon-name={changesModalIcon}
+                                size="small"
+                                class={changesModalIconClass}>
+                            </lightning-icon>
+
+                            <h2
+                                id="voter-review-heading"
+                                class="slds-text-heading_medium header-title">
+                                {changesModalTitle}
+                            </h2>
+                        </div>
+
+                        <button
+                            class="slds-button slds-button_icon voter-modal-close"
+                            title="Close"
+                            onclick={closeModals}>
+
+                            <lightning-icon
+                                icon-name="utility:close"
+                                alternative-text="Close"
+                                size="small">
+                            </lightning-icon>
+
+                            <span class="slds-assistive-text">Close</span>
+                        </button>
+                    </header>
+
+                    <div class="slds-modal__content voter-modal-content">
+                        <p
+                            id="voter-review-description"
+                            class="modal-text slds-m-bottom_medium">
+                            {changesModalDescription}
+                        </p>
+
+                        <div class="comparison-table-wrapper">
+                            <table
+                                class="slds-table slds-table_cell-buffer slds-table_bordered slds-table_col-bordered custom-table">
+
+                                <thead>
+                                    <tr class="slds-line-height_reset">
+                                        <th scope="col">Particulars</th>
+                                        <th scope="col">Current Account Details</th>
+                                        <th scope="col">Verified Voter Details</th>
+                                    </tr>
+                                </thead>
+
+                                <tbody>
+                                    <template if:true={showNameComparisonRow}>
+                                        <tr>
+                                            <td class="comparison-field">
+                                                <strong>Customer Name</strong>
+                                            </td>
+                                            <td data-label="Current Account">
+                                                {mismatchDetails.accName}
+                                            </td>
+                                            <td data-label="Verified Voter">
+                                                {mismatchDetails.apiName}
+                                            </td>
+                                        </tr>
+                                    </template>
+
+                                    <template if:true={showGenderComparisonRow}>
+                                        <tr>
+                                            <td class="comparison-field">
+                                                <strong>Gender</strong>
+                                            </td>
+                                            <td data-label="Current Account">
+                                                {mismatchDetails.accGender}
+                                            </td>
+                                            <td data-label="Verified Voter">
+                                                {mismatchDetails.apiGender}
+                                            </td>
+                                        </tr>
+                                    </template>
+
+                                    <template if:true={showVoterComparisonRow}>
+                                        <tr>
+                                            <td class="comparison-field">
+                                                <strong>Voter / EPIC Number</strong>
+                                            </td>
+                                            <td data-label="Current Account">
+                                                {mismatchDetails.accVoter}
+                                            </td>
+                                            <td data-label="Verified Voter">
+                                                {mismatchDetails.apiVoter}
+                                            </td>
+                                        </tr>
+                                    </template>
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <template if:true={showApprovalInfo}>
+                            <div class="info-alert-box slds-m-top_medium">
+                                <lightning-icon
+                                    icon-name="utility:info"
+                                    size="small"
+                                    class="info-icon-custom">
+                                </lightning-icon>
+
+                                <p>
+                                    One or more populated Account values conflict
+                                    with the verified Voter details. The Account
+                                    will remain unchanged until the approval
+                                    request is approved.
+                                </p>
+                            </div>
+                        </template>
+                    </div>
+
+                    <footer class="slds-modal__footer voter-modal-footer">
+                        <button
+                            class="slds-button slds-button_neutral custom-btn"
+                            onclick={closeModals}>
+                            Cancel
+                        </button>
+
+                        <button
+                            class="slds-button slds-button_brand custom-btn"
+                            onclick={handleProceedFromChanges}>
+                            {changesProceedButtonLabel}
+                        </button>
+                    </footer>
+                </div>
+            </section>
+
+            <div class="slds-backdrop slds-backdrop_open"></div>
+        </template>
+
+        <!-- 2. CONFIRM DIRECT UPDATE MODAL -->
+        <template if:true={showConfirmPopup}>
+            <section
+                role="dialog"
+                tabindex="-1"
+                aria-modal="true"
+                aria-labelledby="voter-confirm-heading"
+                aria-describedby="voter-confirm-description"
+                class="slds-modal slds-fade-in-open voter-modal">
+
+                <div class="slds-modal__container voter-modal-container voter-standard-modal">
+                    <header class="slds-modal__header voter-modal-header">
+                        <div class="header-content">
+                            <lightning-icon
+                                icon-name="utility:warning"
+                                size="small"
+                                class="warning-icon-header">
+                            </lightning-icon>
+
+                            <h2
+                                id="voter-confirm-heading"
+                                class="slds-text-heading_medium header-title">
+                                Confirm Update
+                            </h2>
+                        </div>
+
+                        <button
+                            class="slds-button slds-button_icon voter-modal-close"
+                            title="Close"
+                            onclick={closeModals}>
+
+                            <lightning-icon
+                                icon-name="utility:close"
+                                alternative-text="Close"
+                                size="small">
+                            </lightning-icon>
+
+                            <span class="slds-assistive-text">Close</span>
+                        </button>
+                    </header>
+
+                    <div class="slds-modal__content voter-modal-content confirm-modal-content">
+                        <div class="warning-icon-large-wrapper">
+                            <lightning-icon
+                                icon-name="utility:warning"
+                                size="medium"
+                                class="warning-icon-custom">
+                            </lightning-icon>
+                        </div>
+
+                        <p
+                            id="voter-confirm-description"
+                            class="modal-text confirm-message">
+                            Are you sure you want to update the Account with the
+                            verified Voter details?
+                        </p>
+                    </div>
+
+                    <footer class="slds-modal__footer voter-modal-footer">
+                        <button
+                            class="slds-button slds-button_neutral custom-btn"
+                            onclick={closeModals}>
+                            Cancel
+                        </button>
+
+                        <button
+                            class="slds-button slds-button_brand custom-btn"
+                            onclick={handleConfirmUpdate}>
+                            Yes, Update
+                        </button>
+                    </footer>
+                </div>
+            </section>
+
+            <div class="slds-backdrop slds-backdrop_open"></div>
+        </template>
+
+        <!-- 3. APPROVAL CONFIRMATION -->
+        <template if:true={showApprovalPopup}>
+            <section
+                role="dialog"
+                tabindex="-1"
+                aria-modal="true"
+                aria-labelledby="voter-approval-heading"
+                aria-describedby="voter-approval-description"
+                class="slds-modal slds-fade-in-open voter-modal">
+
+                <div class="slds-modal__container voter-modal-container voter-standard-modal">
+                    <header class="slds-modal__header voter-modal-header">
+                        <div class="header-content">
+                            <lightning-icon
+                                icon-name="utility:warning"
+                                size="small"
+                                class="warning-icon-header">
+                            </lightning-icon>
+
+                            <h2
+                                id="voter-approval-heading"
+                                class="slds-text-heading_medium header-title">
+                                Approval Required
+                            </h2>
+                        </div>
+
+                        <button
+                            class="slds-button slds-button_icon voter-modal-close"
+                            title="Close"
+                            onclick={closeModals}>
+
+                            <lightning-icon
+                                icon-name="utility:close"
+                                alternative-text="Close"
+                                size="small">
+                            </lightning-icon>
+
+                            <span class="slds-assistive-text">Close</span>
+                        </button>
+                    </header>
+
+                    <div class="slds-modal__content voter-modal-content">
+                        <p
+                            id="voter-approval-description"
+                            class="modal-text slds-m-bottom_medium">
+                            Are you sure you want to submit the verified Voter
+                            changes for approval?
+                        </p>
+
+                        <div class="info-alert-box">
+                            <lightning-icon
+                                icon-name="utility:info"
+                                size="small"
+                                class="info-icon-custom">
+                            </lightning-icon>
+
+                            <p>
+                                This Voter verification cannot be updated directly.
+                                The Account details and verification status will remain
+                                unchanged until the approval request is approved.
+                            </p>
+                        </div>
+                    </div>
+
+                    <footer class="slds-modal__footer voter-modal-footer">
+                        <button
+                            class="slds-button slds-button_neutral custom-btn"
+                            onclick={closeModals}>
+                            Cancel
+                        </button>
+
+                        <button
+                            class="slds-button slds-button_brand custom-btn"
+                            onclick={handleSendForApproval}>
+                            Send for Approval
+                        </button>
+                    </footer>
+                </div>
+            </section>
+
+            <div class="slds-backdrop slds-backdrop_open"></div>
+        </template>
+
+        <!-- 4. APPROVAL SUBMITTED MODAL -->
+        <template if:true={showApprovalSubmittedPopup}>
+            <section
+                role="dialog"
+                tabindex="-1"
+                aria-modal="true"
+                aria-labelledby="voter-approval-submitted-heading"
+                aria-describedby="voter-approval-submitted-description"
+                class="slds-modal slds-fade-in-open voter-modal">
+
+                <div class="slds-modal__container voter-modal-container voter-standard-modal">
+                    <header class="slds-modal__header voter-modal-header success-modal-header">
+                        <div class="header-content">
+                            <lightning-icon
+                                icon-name="utility:success"
+                                size="small"
+                                class="success-icon-header">
+                            </lightning-icon>
+
+                            <h2
+                                id="voter-approval-submitted-heading"
+                                class="slds-text-heading_medium header-title">
+                                Approval Submitted
+                            </h2>
+                        </div>
+
+                        <button
+                            class="slds-button slds-button_icon voter-modal-close"
+                            title="Close"
+                            onclick={closeModals}>
+
+                            <lightning-icon
+                                icon-name="utility:close"
+                                alternative-text="Close"
+                                size="small">
+                            </lightning-icon>
+
+                            <span class="slds-assistive-text">Close</span>
+                        </button>
+                    </header>
+
+                    <div class="slds-modal__content voter-modal-content">
+                        <div class="success-alert-box">
+                            <lightning-icon
+                                icon-name="utility:info"
+                                size="small"
+                                class="success-icon-header">
+                            </lightning-icon>
+
+                            <p id="voter-approval-submitted-description">
+                                The Voter changes have been submitted for approval.
+                                The Account will be updated only after the approval
+                                is completed.
+                            </p>
+                        </div>
+                    </div>
+
+                    <footer class="slds-modal__footer voter-modal-footer">
+                        <button
+                            class="slds-button slds-button_brand custom-btn"
+                            onclick={closeModals}>
+                            Close
+                        </button>
+                    </footer>
+                </div>
+            </section>
+
+            <div class="slds-backdrop slds-backdrop_open"></div>
+        </template>
+
+        <!-- 5. SUCCESS / ALREADY MATCHED MODAL -->
+        <template if:true={showSuccessPopup}>
+            <section
+                role="dialog"
+                tabindex="-1"
+                aria-modal="true"
+                aria-labelledby="voter-success-heading"
+                aria-describedby="voter-success-description"
+                class="slds-modal slds-fade-in-open voter-modal">
+
+                <div class="slds-modal__container voter-modal-container voter-standard-modal">
+                    <div class="slds-modal__content voter-modal-content success-modal-content">
+                        <button
+                            class="slds-button slds-button_icon voter-modal-close success-close-color"
+                            title="Close"
+                            onclick={closeModals}>
+
+                            <lightning-icon
+                                icon-name="utility:close"
+                                alternative-text="Close"
+                                size="small">
+                            </lightning-icon>
+
+                            <span class="slds-assistive-text">Close</span>
+                        </button>
+
+                        <div class="success-body">
+                            <div class="success-icon-container">
+                                <lightning-icon
+                                    icon-name="utility:check"
+                                    size="medium"
+                                    variant="inverse">
+                                </lightning-icon>
+                            </div>
+
+                            <div class="success-text-content">
+                                <h2
+                                    id="voter-success-heading"
+                                    class="success-heading">
+                                    {successPopupTitle}
+                                </h2>
+
+                                <p
+                                    id="voter-success-description"
+                                    class="success-desc">
+                                    {successPopupDescription}
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <footer class="slds-modal__footer voter-modal-footer success-modal-footer">
+                        <button
+                            class="slds-button slds-button_brand custom-btn"
+                            onclick={closeModals}>
+                            Close
+                        </button>
+                    </footer>
+                </div>
+            </section>
+
+            <div class="slds-backdrop slds-backdrop_open"></div>
+        </template>
+    </div>
+</template>

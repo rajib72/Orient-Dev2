@@ -1,0 +1,199 @@
+<template>
+    <c-fdb-screen nav-label={navLabel} layout={screenLayout} onnavclick={handleNav} onhelpclick={handleHelp}>
+            <!-- CONTENT -->
+            <div class="ojp__body ojf__body">
+
+                <!-- TITLE -->
+                <div class="oji__head">
+                    <h1 class="oji__title">Thank You For Visiting</h1>
+                    <div class="oj-orn oj-orn_sm">
+                        <span class="oj-orn__line"></span>
+                        <span class="oj-orn__diamond"></span>
+                        <span class="oj-orn__line"></span>
+                    </div>
+                    <p class="oji__lede">
+                        Please answer a few simple questions.<br />It should take less than one minute.
+                    </p>
+                </div>
+
+                <!-- LANGUAGE -->
+                <div class="language-toggle">
+                    <button class={enBtnClass} type="button" onclick={setLanguageEn}>English</button>
+                    <button class={bnBtnClass} type="button" onclick={setLanguageBn}>বাংলা</button>
+                </div>
+
+                <!-- QUESTIONS -->
+                <div class="ojp__section ojf__sec_qs">
+                    <div class="ojp__section-head">
+                        <span class="ojp__section-icon">
+                            <lightning-icon icon-name="utility:like" size="xx-small" variant="inverse"></lightning-icon>
+                        </span>
+                        <h3>Your Experience</h3>
+                    </div>
+
+                    <div class="ojf__qs">
+                        <!-- Q1 -->
+                        <div class="ojf__q">
+                            <div class="ojf__q-head">
+                                <span class="ojf__q-no">1</span>
+                                <p class="ojf__q-text">{question1}</p>
+                            </div>
+                            <div class="options-group options-group_stars">
+                                <template for:each={q1Options} for:item="opt">
+                                    <button key={opt.value} class={opt.class} type="button"
+                                            data-q="1" data-val={opt.value}
+                                            aria-label={opt.ariaLabel} aria-pressed={opt.ariaPressed}
+                                            onclick={handleOptionSelect}>
+                                        <svg class="star-btn__icon" viewBox="0 0 24 24" aria-hidden="true">
+                                            <path d="M12 3.1l2.72 5.51 6.08.88-4.4 4.29 1.04 6.06L12 16.98l-5.44 2.86 1.04-6.06-4.4-4.29 6.08-.88z"></path>
+                                        </svg>
+                                    </button>
+                                </template>
+                            </div>
+                        </div>
+
+                        <!-- Q2 -->
+                        <div class="ojf__q">
+                            <div class="ojf__q-head">
+                                <span class="ojf__q-no">2</span>
+                                <p class="ojf__q-text">{question2}</p>
+                            </div>
+                            <div class="options-group options-group_stars">
+                                <template for:each={q2Options} for:item="opt">
+                                    <button key={opt.value} class={opt.class} type="button"
+                                            data-q="2" data-val={opt.value}
+                                            aria-label={opt.ariaLabel} aria-pressed={opt.ariaPressed}
+                                            onclick={handleOptionSelect}>
+                                        <svg class="star-btn__icon" viewBox="0 0 24 24" aria-hidden="true">
+                                            <path d="M12 3.1l2.72 5.51 6.08.88-4.4 4.29 1.04 6.06L12 16.98l-5.44 2.86 1.04-6.06-4.4-4.29 6.08-.88z"></path>
+                                        </svg>
+                                    </button>
+                                </template>
+                            </div>
+                        </div>
+
+                        <!-- Q3 -->
+                        <div class="ojf__q">
+                            <div class="ojf__q-head">
+                                <span class="ojf__q-no">3</span>
+                                <p class="ojf__q-text">{question3}</p>
+                            </div>
+                            <div class="options-group options-group_stars">
+                                <template for:each={q3Options} for:item="opt">
+                                    <button key={opt.value} class={opt.class} type="button"
+                                            data-q="3" data-val={opt.value}
+                                            aria-label={opt.ariaLabel} aria-pressed={opt.ariaPressed}
+                                            onclick={handleOptionSelect}>
+                                        <svg class="star-btn__icon" viewBox="0 0 24 24" aria-hidden="true">
+                                            <path d="M12 3.1l2.72 5.51 6.08.88-4.4 4.29 1.04 6.06L12 16.98l-5.44 2.86 1.04-6.06-4.4-4.29 6.08-.88z"></path>
+                                        </svg>
+                                    </button>
+                                </template>
+                                <button class={q3NotApplicableClass} type="button"
+                                        data-q="3" data-val="N.A." onclick={handleOptionSelect}>N.A.</button>
+                            </div>
+                        </div>
+
+                        <!-- Q4 -->
+                        <div class="ojf__q">
+                            <div class="ojf__q-head">
+                                <span class="ojf__q-no">4</span>
+                                <p class="ojf__q-text">{question4}</p>
+                            </div>
+                            <div class="options-group options-group_stars">
+                                <template for:each={q4Options} for:item="opt">
+                                    <button key={opt.value} class={opt.class} type="button"
+                                            data-q="4" data-val={opt.value}
+                                            aria-label={opt.ariaLabel} aria-pressed={opt.ariaPressed}
+                                            onclick={handleOptionSelect}>
+                                        <svg class="star-btn__icon" viewBox="0 0 24 24" aria-hidden="true">
+                                            <path d="M12 3.1l2.72 5.51 6.08.88-4.4 4.29 1.04 6.06L12 16.98l-5.44 2.86 1.04-6.06-4.4-4.29 6.08-.88z"></path>
+                                        </svg>
+                                    </button>
+                                </template>
+                            </div>
+                        </div>
+
+                        <!-- Q5 -->
+                        <div class="ojf__q">
+                            <div class="ojf__q-head">
+                                <span class="ojf__q-no">5</span>
+                                <p class="ojf__q-text">{question5}</p>
+                            </div>
+                            <div class="options-group options-group_stars">
+                                <template for:each={q5Options} for:item="opt">
+                                    <button key={opt.value} class={opt.class} type="button"
+                                            data-q="5" data-val={opt.value}
+                                            aria-label={opt.ariaLabel} aria-pressed={opt.ariaPressed}
+                                            onclick={handleOptionSelect}>
+                                        <svg class="star-btn__icon" viewBox="0 0 24 24" aria-hidden="true">
+                                            <path d="M12 3.1l2.72 5.51 6.08.88-4.4 4.29 1.04 6.06L12 16.98l-5.44 2.86 1.04-6.06-4.4-4.29 6.08-.88z"></path>
+                                        </svg>
+                                    </button>
+                                </template>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Q6 (OPTIONAL) -->
+                <div class="ojp__section ojf__sec_note">
+                    <div class="ojp__section-head">
+                        <span class="ojp__section-icon">
+                            <lightning-icon icon-name="utility:comments" size="xx-small" variant="inverse"></lightning-icon>
+                        </span>
+                        <h3>Anything Else? (Optional)</h3>
+                    </div>
+
+                    <div class="ojf__comment">
+                        <p class="ojf__q-text">{question6}</p>
+                        <lightning-textarea
+                            class="ojf__textarea"
+                            label="Comments"
+                            variant="label-hidden"
+                            placeholder="Write here..."
+                            value={q6Value}
+                            onchange={handleQ6Change}>
+                        </lightning-textarea>
+                    </div>
+                </div>
+
+                <!-- NOTE -->
+                <!-- CTA -->
+                <button class="ojp__cta" type="button"
+                        disabled={isSubmitting} onclick={handleSubmitFeedback}>
+                    <svg class="ojp__cta-lead" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                         stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                        <path d="M20.5 12.2c0 3.9-3.8 7-8.5 7-1 0-2-.15-2.9-.42L4 20.5l1.5-3.7A6.7 6.7 0 0 1 3.5 12.2c0-3.9 3.8-7 8.5-7s8.5 3.1 8.5 7z"></path>
+                    </svg>
+                    <span>{submitButtonLabel}</span>
+                    <svg class="ojp__cta-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                         stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                        <path d="M4 12h15"></path>
+                        <path d="M13.5 6.5L20 12l-6.5 5.5"></path>
+                    </svg>
+                </button>
+
+
+                <!-- FOOTER -->
+                <div class="oj-footer">
+                    <div class="oj-footer__row">
+                        <span class="oj-footer__lock">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"
+                                 stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                <rect x="4.5" y="10" width="15" height="10.5" rx="2.2"></rect>
+                                <path d="M8.2 10V7.2a3.8 3.8 0 0 1 7.6 0V10"></path>
+                            </svg>
+                        </span>
+                        <p>Your responses help us serve you better.<br />We never share your details with anyone.</p>
+                    </div>
+                    <div class="oj-orn oj-orn_sm oj-orn_footer">
+                        <span class="oj-orn__line"></span>
+                        <span class="oj-orn__diamond"></span>
+                        <span class="oj-orn__line"></span>
+                    </div>
+                </div>
+
+            </div>
+    </c-fdb-screen>
+</template>

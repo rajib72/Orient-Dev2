@@ -1,0 +1,444 @@
+<template>
+    <lightning-quick-action-panel header="Manage Activity">
+
+        <template if:true={isLoading}>
+            <div class="spinnerOverlay">
+                <lightning-spinner
+                    alternative-text="Processing..."
+                    size="medium">
+                </lightning-spinner>
+            </div>
+        </template>
+
+        <div class="mainWrapper">
+
+            <div class="headerCard">
+                <div class="iconCircle">
+                    <lightning-icon
+                        icon-name="standard:event"
+                        size="small">
+                    </lightning-icon>
+                </div>
+
+                <div>
+                    <h2>Manage Form Activity</h2>
+                    <p>
+                        Select an existing activity and update its
+                        Teams, Sales Executives, dates and locations.
+                    </p>
+                </div>
+            </div>
+
+            <div class="formCard">
+
+                <div class="sectionTitle">
+                    Select Activity
+                </div>
+
+                <lightning-combobox
+                    label="Form Activity"
+                    value={selectedActivityId}
+                    options={activityOptions}
+                    placeholder="Select Form Activity"
+                    onchange={handleActivitySelectionChange}
+                    disabled={isActivityPickerDisabled}
+                    required>
+                </lightning-combobox>
+
+                <template if:false={hasActivities}>
+                    <div class="emptyMsg">
+                        No Form Activities were found for this
+                        Final Customize Form.
+                    </div>
+                </template>
+
+                <template if:true={hasSelectedActivity}>
+
+                    <template if:true={hasLockedAssignments}>
+                        <div
+                            class="slds-scoped-notification slds-media slds-media_center slds-theme_warning slds-m-top_medium slds-m-bottom_medium"
+                            role="status">
+                            <div class="slds-media__figure">
+                                <lightning-icon
+                                    icon-name="utility:lock"
+                                    size="small">
+                                </lightning-icon>
+                            </div>
+                            <div class="slds-media__body">
+                                <p class="slds-text-heading_small">
+                                    Some Target Dates Are Locked
+                                </p>
+                                <p>
+                                    {activityEditLockMessage}
+                                </p>
+                            </div>
+                        </div>
+                    </template>
+
+                    <template if:true={isReturnedForCorrection}>
+                        <div
+                            class="slds-scoped-notification slds-media slds-media_center slds-theme_info slds-m-top_medium slds-m-bottom_medium"
+                            role="status">
+                            <div class="slds-media__figure">
+                                <lightning-icon
+                                    icon-name="utility:edit"
+                                    size="small">
+                                </lightning-icon>
+                            </div>
+                            <div class="slds-media__body">
+                                <p class="slds-text-heading_small">
+                                    Activity Returned for Correction
+                                </p>
+                                <p>
+                                    Returned Target Date assignments are editable for correction and can be resubmitted. Pending or approved Target Dates remain locked.
+                                </p>
+                            </div>
+                        </div>
+                    </template>
+
+                    <div class="sectionTitle secondSection">
+                        Activity Information
+                    </div>
+
+                    <div class="slds-grid slds-wrap slds-gutters">
+
+                        <div class="slds-col slds-size_1-of-1 inputGap">
+                            <lightning-input
+                                type="text"
+                                label="Activity Name"
+                                value={activityName}
+                                onchange={handleActivityNameChange}
+                                disabled={isEditorDisabled}
+                                required>
+                            </lightning-input>
+                        </div>
+
+                        <div class="slds-col slds-size_1-of-1 slds-medium-size_1-of-2 inputGap">
+                            <lightning-input
+                                type="date"
+                                label="Activity Start Date"
+                                value={activityDate}
+                                onchange={handleActivityDateChange}
+                                disabled={isEditorDisabled}
+                                required>
+                            </lightning-input>
+                        </div>
+
+                        <div class="slds-col slds-size_1-of-1 slds-medium-size_1-of-2 inputGap">
+                            <lightning-input
+                                type="date"
+                                label="Activity End Date"
+                                data-id="activityEndDate"
+                                value={activityEndDate}
+                                onchange={handleActivityEndDateChange}
+                                disabled={isEditorDisabled}
+                                required>
+                            </lightning-input>
+                        </div>
+
+                        <div class="slds-col slds-size_1-of-1 inputGap">
+                            <lightning-input
+                                type="text"
+                                label="Assigned Store"
+                                value={storeName}
+                                disabled>
+                            </lightning-input>
+                        </div>
+                    </div>
+
+                    <div class="sectionTitle secondSection">
+                        Teams and Sales Executives
+                    </div>
+
+                    <div class="storeGroupHeader">
+                        <div>
+                            <h4>{storeName}</h4>
+                            <p>
+                                {selectedCount} Sales Executive(s) selected
+                            </p>
+                        </div>
+
+                        <lightning-button
+                            label="Add Team"
+                            icon-name="utility:add"
+                            variant="brand-outline"
+                            onclick={handleAddTeam}
+                            disabled={disableAddTeam}>
+                        </lightning-button>
+                    </div>
+
+                    <template
+                        for:each={teamSectionsView}
+                        for:item="teamSection">
+
+                        <div
+                            key={teamSection.id}
+                            class="teamAssignmentCard">
+
+                            <div class="teamAssignmentHeader">
+                                <div>
+                                    <h5>
+                                        Team Assignment
+                                        {teamSection.indexLabel}
+                                    </h5>
+                                </div>
+
+                                <template if:true={teamSection.canRemove}>
+                                    <lightning-button-icon
+                                        icon-name="utility:delete"
+                                        alternative-text="Remove Team"
+                                        title="Remove Team"
+                                        variant="border-filled"
+                                        data-section-id={teamSection.id}
+                                        onclick={handleRemoveTeam}
+                                        disabled={isEditorDisabled}>
+                                    </lightning-button-icon>
+                                </template>
+                            </div>
+
+                            <lightning-combobox
+                                label="Team"
+                                data-section-id={teamSection.id}
+                                value={teamSection.selectedTeamName}
+                                options={teamSection.teamOptions}
+                                placeholder="Select Team"
+                                onchange={handleTeamChange}
+                                disabled={teamSection.isTeamLocked}>
+                            </lightning-combobox>
+
+                            <template if:true={teamSection.hasLockedAssignments}>
+                                <div class="slds-text-body_small slds-text-color_weak slds-m-top_x-small">
+                                    <lightning-icon
+                                        icon-name="utility:lock"
+                                        size="xx-small">
+                                    </lightning-icon>
+                                    Team cannot be changed or removed while it contains a pending or approved Target Date.
+                                </div>
+                            </template>
+
+                            <div class="executiveList">
+
+                                <template
+                                    for:each={teamSection.executives}
+                                    for:item="exec">
+
+                                    <div
+                                        key={exec.value}
+                                        class={exec.cardClass}
+                                        data-id={exec.value}
+                                        data-section-id={teamSection.id}
+                                        onclick={handleExecutiveCardClick}>
+
+                                        <div class="avatarCircle">
+                                            {exec.initial}
+                                        </div>
+
+                                        <div class="executiveInfo">
+                                            <div class="executiveName">
+                                                {exec.label}
+                                            </div>
+
+                                            <div class="executiveSubText">
+                                                {exec.assignmentSubText}
+                                            </div>
+
+                                            <template if:true={exec.hasLockedAssignments}>
+                                                <div class="executiveSubText">
+                                                    <lightning-icon
+                                                        icon-name="utility:lock"
+                                                        size="xx-small">
+                                                    </lightning-icon>
+                                                    Pending / approved Target Dates are protected.
+                                                </div>
+                                            </template>
+                                        </div>
+
+                                        <div class="checkArea">
+                                            <template if:true={exec.selected}>
+                                                <lightning-icon
+                                                    icon-name="utility:check"
+                                                    size="x-small"
+                                                    class="checkIcon">
+                                                </lightning-icon>
+                                            </template>
+                                        </div>
+
+                                        <template if:true={exec.selected}>
+
+                                            <div
+                                                class="assignmentDateBox"
+                                                onclick={stopEvent}>
+
+                                                <label class="customLabel">
+                                                    <abbr
+                                                        class="slds-required"
+                                                        title="required">*</abbr>
+                                                    Target Dates
+                                                </label>
+
+                                                <div
+                                                    class="dateMultiSelectBox"
+                                                    data-id={exec.value}
+                                                    onclick={toggleExecutiveDateDropdown}>
+
+                                                    <span class={exec.dateTextClass}>
+                                                        {exec.assignedDateDisplay}
+                                                    </span>
+
+                                                    <lightning-icon
+                                                        icon-name="utility:chevrondown"
+                                                        size="xx-small"
+                                                        class="dateDropdownIcon">
+                                                    </lightning-icon>
+                                                </div>
+
+                                                <template if:true={exec.isDateDropdownOpen}>
+                                                    <div class="dateDropdownPanel">
+
+                                                        <template
+                                                            for:each={exec.dateOptions}
+                                                            for:item="dateOption">
+
+                                                            <div
+                                                                key={dateOption.value}
+                                                                class={dateOption.optionClass}
+                                                                data-exec-id={exec.value}
+                                                                data-date={dateOption.value}
+                                                                onclick={handleExecutiveDateOptionClick}>
+
+                                                                <div class="dateCheckBox">
+                                                                    <template if:true={dateOption.selected}>
+                                                                        <lightning-icon
+                                                                            icon-name="utility:check"
+                                                                            size="xx-small">
+                                                                        </lightning-icon>
+                                                                    </template>
+                                                                </div>
+
+                                                                <span>
+                                                                    {dateOption.label}
+                                                                </span>
+
+                                                                <template if:true={dateOption.locked}>
+                                                                    <lightning-icon
+                                                                        icon-name="utility:lock"
+                                                                        size="xx-small"
+                                                                        alternative-text="Locked">
+                                                                    </lightning-icon>
+                                                                </template>
+                                                            </div>
+                                                        </template>
+                                                    </div>
+                                                </template>
+
+                                                <template if:true={exec.hasAssignedDates}>
+                                                    <div class="selectedDatePills">
+
+                                                        <template
+                                                            for:each={exec.selectedDatePills}
+                                                            for:item="datePill">
+
+                                                            <span
+                                                                key={datePill.value}
+                                                                class="datePill">
+
+                                                                {datePill.label}
+
+                                                                <template if:true={datePill.isLocked}>
+                                                                    <lightning-icon
+                                                                        icon-name="utility:lock"
+                                                                        size="xx-small"
+                                                                        alternative-text="Locked">
+                                                                    </lightning-icon>
+                                                                </template>
+
+                                                                <button
+                                                                    type="button"
+                                                                    class="datePillClose"
+                                                                    data-exec-id={exec.value}
+                                                                    data-assignment-key={datePill.assignmentKey}
+                                                                    onclick={handleRemoveExecutiveDate}
+                                                                    disabled={datePill.isRemoveDisabled}>
+                                                                    ×
+                                                                </button>
+                                                            </span>
+                                                        </template>
+                                                    </div>
+
+                                                    <div class="dateLocationList">
+                                                        <div class="dateLocationTitle">
+                                                            Date-wise Activity Location
+                                                        </div>
+
+                                                        <template
+                                                            for:each={exec.dateAssignmentRows}
+                                                            for:item="dateRow">
+
+                                                            <div
+                                                                key={dateRow.key}
+                                                                class="dateLocationRow">
+
+                                                                <div class="dateLabelBox">
+                                                                    <lightning-icon
+                                                                        icon-name="utility:event"
+                                                                        size="x-small">
+                                                                    </lightning-icon>
+
+                                                                    <span>
+                                                                        {dateRow.targetDateLabel}
+                                                                    </span>
+
+                                                                    <template if:true={dateRow.showLockIcon}>
+                                                                        <lightning-icon
+                                                                            icon-name="utility:lock"
+                                                                            size="xx-small"
+                                                                            alternative-text="Locked"
+                                                                            title={dateRow.lockMessage}>
+                                                                        </lightning-icon>
+                                                                    </template>
+                                                                </div>
+
+                                                                <lightning-input
+                                                                    type="text"
+                                                                    label="Activity Location"
+                                                                    data-exec-id={exec.value}
+                                                                    data-date={dateRow.targetDate}
+                                                                    data-assignment-key={dateRow.assignmentKey}
+                                                                    value={dateRow.activityLocation}
+                                                                    onchange={handleDateLocationChange}
+                                                                    disabled={dateRow.isLocationDisabled}
+                                                                    required>
+                                                                </lightning-input>
+                                                            </div>
+                                                        </template>
+                                                    </div>
+                                                </template>
+                                            </div>
+                                        </template>
+                                    </div>
+                                </template>
+                            </div>
+                        </div>
+                    </template>
+                </template>
+            </div>
+
+            <div class="footerBtn">
+                <lightning-button
+                    label="Cancel"
+                    variant="neutral"
+                    onclick={handleCancel}
+                    disabled={isSaving}>
+                </lightning-button>
+
+                <lightning-button
+                    class="slds-m-left_small"
+                    label="Update Activity"
+                    variant="brand"
+                    onclick={handleUpdate}
+                    disabled={isUpdateDisabled}>
+                </lightning-button>
+            </div>
+        </div>
+    </lightning-quick-action-panel>
+</template>

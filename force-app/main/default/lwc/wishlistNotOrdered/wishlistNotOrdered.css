@@ -1,0 +1,333 @@
+/* =========================================================
+   HEADER STYLES
+   ========================================================= */
+
+/* Header container for modal title */
+.summary-header {
+    text-align: center;                  /* Center align title text */
+    position: sticky;                    /* Keeps header visible on scroll */
+    padding: 1rem;                       /* Spacing around header */
+    font-size: 1.3rem;                   /* Larger title font */
+    font-weight: 600;                    /* Semi-bold title */
+    color: #7a4a00;                      /* Dark gold/brown text */
+    background: linear-gradient(
+        135deg,
+        #fff8e1,
+        #f5d88c
+    );                                   /* Gold gradient background */
+    border-bottom: 1px solid #e6c76a;    /* Bottom separator line */
+}
+
+
+/* =========================================================
+   TABLE BASE STYLES
+   ========================================================= */
+
+/* Main table styling */
+.slds-table {
+    table-layout: fixed;                 /* Forces fixed column widths */
+    width: 100%;                         /* Full width table */
+    border-radius: 12px;                 /* Rounded table corners */
+    overflow: hidden;                    /* Prevents overflow bleeding */
+    background: #fffaf0;                 /* Light cream background */
+}
+
+/* Header row background */
+.slds-table thead tr {
+    background: linear-gradient(
+        135deg,
+        #bfa44a,
+        #8c6d1f
+    );                                   /* Dark gold gradient */
+}
+
+/* Header cells */
+.slds-table thead th {
+    background: linear-gradient(
+        135deg,
+        #f5d37a,
+        #e6b85c
+    );                                   /* Light gold gradient */
+    color: #3b2f14;                      /* Dark readable text */
+    font-weight: 600;                    /* Semi-bold headings */
+    text-align: center;                  /* Center header text */
+}
+
+/* Hover effect for table rows */
+.slds-table tbody tr:hover {
+    background-color: #fff6dc;           /* Soft highlight on hover */
+}
+
+
+/* =========================================================
+   STATUS BADGE STYLES
+   ========================================================= */
+
+/* Base badge styling */
+.status-badge {
+    display: inline-block;               /* Inline pill */
+    padding: 6px 14px;                   /* Inner spacing */
+    border-radius: 999px;                /* Fully rounded pill */
+    font-size: 12px;                     /* Compact text */
+    font-weight: 700;                    /* Bold text */
+    letter-spacing: 0.3px;               /* Slight spacing for clarity */
+}
+
+/* Available status (green) */
+.status-badge.available {
+    background: linear-gradient(
+        135deg,
+        #e6f4ea,
+        #cdebd7
+    );                                   /* Green gradient */
+    color: #1f7a1f;                      /* Dark green text */
+    border: 1px solid #9fd3b4;           /* Subtle border */
+}
+
+/* Not Ordered status (gold) */
+.status-badge.not-ordered {
+    background: linear-gradient(
+        135deg,
+        #fff3e0,
+        #f5d88c
+    );                                   /* Gold gradient */
+    color: #8c6d1f;                      /* Dark gold text */
+    border: 1px solid #e0b84c;
+}
+
+/* Order Placed status (red) */
+.status-badge.order-placed {
+    background: linear-gradient(
+        135deg,
+        #fdecea,
+        #f3b6b0
+    );                                   /* Red gradient */
+    color: #9b1c1c;                      /* Dark red text */
+    border: 1px solid #e09a94;
+}
+
+/* Returned status */
+.status-badge.returned {
+    background: #ffebee;                 /* Light red background */
+    color: #c62828;                      /* Red text */
+}
+
+
+/* =========================================================
+   SAVE BUTTON STYLES
+   ========================================================= */
+
+/* Default SLDS brand button override */
+.slds-button_brand {
+    background: linear-gradient(
+        135deg,
+        #caa64b,
+        #8c6d1f
+    );                                   /* Gold gradient */
+    border: none;                        /* Remove border */
+    font-weight: 600;                    /* Bold text */
+}
+
+/* Hover state for brand button */
+.slds-button_brand:hover {
+    background: linear-gradient(
+        135deg,
+        #d8b75c,
+        #a07d2b
+    );
+}
+
+/* Primary CTA save button */
+.save-btn {
+    --slds-c-button-brand-color-background: #d4af37;       /* Gold */
+    --slds-c-button-brand-color-border: #b8962e;
+    --slds-c-button-brand-color-background-hover: #c9a227;
+    --slds-c-button-brand-color-border-hover: #a98723;
+    --slds-c-button-brand-text-color: #3b2f14;
+
+    font-size: 1.1rem;                   /* Slightly larger text */
+    font-weight: 700;                    /* Strong emphasis */
+    padding: 0.8rem 2.6rem;              /* Pill padding */
+    border-radius: 999px;                /* Pill shape */
+    min-width: 160px;                    /* Minimum width */
+    box-shadow: 0 6px 14px rgba(
+        212,
+        175,
+        55,
+        0.35
+    );                                   /* Soft glow shadow */
+}
+
+/* Mobile-friendly tap target */
+.save-btn lightning-button {
+    width: 100%;                         /* Full-width on mobile */
+}
+
+/* Hover elevation effect */
+.save-btn:hover {
+    box-shadow: 0 8px 18px rgba(
+        212,
+        175,
+        55,
+        0.55
+    );
+}
+
+
+/* =========================================================
+   HOST & OVERFLOW CONTROL
+   ========================================================= */
+
+/* Root LWC host */
+:host {
+    display: block;                      /* Block layout */
+    width: 100%;                         /* Full width */
+    overflow: hidden;                   /* Prevent scroll bleed */
+    background: #fff;                   /* White background */
+}
+
+/* Ensure dropdowns are not clipped */
+.slds-table,
+.slds-table td,
+.slds-modal__content {
+    overflow: visible !important;        /* Allow dropdown overflow */
+}
+
+/* Combobox stacking context fix */
+lightning-combobox {
+    position: relative;                 /* Create stacking context */
+    z-index: 1000;                      /* Bring above table */
+}
+
+
+/* =========================================================
+   TABLE SCROLL HANDLING
+   ========================================================= */
+
+/* Horizontal scrolling container */
+.table-scroll {
+    width: 100%;                        /* Full width */
+    overflow-x: auto;                   /* Horizontal scroll if needed */
+    overflow-y: visible;                /* Vertical visible */
+    -webkit-overflow-scrolling: touch;  /* Smooth scrolling on iOS */
+}
+
+
+/* =========================================================
+   RESPONSIVE ADJUSTMENTS
+   ========================================================= */
+
+@media (max-width: 768px) {
+    .reason-row {
+        grid-template-columns: 1fr;     /* Stack items vertically */
+    }
+}
+
+
+/* =========================================================
+   TEXT WRAPPING FOR DESCRIPTION
+   ========================================================= */
+   /* =========================
+   DESCRIPTION CELL FIX
+========================= */
+   .desc-cell {
+    vertical-align: middle;     /* Center text vertically */
+    padding: 14px 12px;         /* Better breathing space */
+    text-align: left;           /* Natural reading alignment */
+}
+
+/* Ensures long description wraps instead of expanding table */
+.wrap-text {
+    white-space: normal;                /* Allow multi-line text */
+    word-break: break-word;             /* Break long words */
+    overflow-wrap: anywhere;            /* Wrap any overflow text */
+    line-height: 1.4;                   /* Comfortable line spacing */
+}
+
+/* =========================
+   DEVICE VISIBILITY CONTROL
+========================= */
+
+.desktop-only {
+    display: block;
+}
+
+.mobile-only {
+    display: none;
+}
+
+/* Tablet + Mobile */
+@media (max-width: 1024px) {
+    .desktop-only {
+        display: none;
+    }
+    .mobile-only {
+        display: block;
+    }
+}
+
+/* =========================
+   MOBILE CARD LAYOUT
+========================= */
+
+.mobile-card {
+    background: #fffaf0;
+    border-radius: 14px;
+    padding: 14px;
+    margin-bottom: 16px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.08);
+}
+
+.mobile-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+}
+
+.mobile-field {
+    margin-bottom: 12px;
+}
+
+.mobile-field .label {
+    display: block;
+    font-size: 12px;
+    font-weight: 600;
+    color: #8c6d1f;
+    margin-bottom: 4px;
+}
+
+.mobile-field .value {
+    font-size: 14px;
+    color: #3b2f14;
+}
+
+/* FULL dropdown visibility */
+.mobile-field lightning-combobox {
+    width: 100%;
+}
+/* =========================
+   MOBILE / TABLET STATUS FIX
+========================= */
+
+/* Force Available badge color on tablet & mobile */
+@media (max-width: 1024px) {
+    .status-badge.available {
+        background: #cdebd7 !important;   /* solid green */
+        color: #1f7a1f !important;        /* dark green text */
+        border: 1px solid #9fd3b4 !important;
+    }
+
+ 
+}
+
+
+/* =========================
+   FORCE STATUS COLORS (ALL VIEWS)
+========================= */
+
+.status-badge.available {
+    background-color: #cdebd7 !important;
+    color: #1f7a1f !important;
+    border: 1px solid #9fd3b4 !important;
+}

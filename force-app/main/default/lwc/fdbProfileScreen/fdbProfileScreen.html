@@ -1,0 +1,319 @@
+<template>
+    <c-fdb-screen nav-label="Back" onnavclick={handleNav} onhelpclick={handleHelp}>
+            <!-- CONTENT -->
+            <div class="ojp__body">
+
+                <!-- Two groups so landscape can set them side by side. In
+                     portrait both are display:contents, so the children stack
+                     exactly as they did before. -->
+                <div class="oj-col oj-col_lead">
+
+                <!-- FOUND BANNER -->
+                <div class="ojp__banner">
+                    <span class="ojp__banner-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6"
+                             stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                            <path d="M6 12.5l4 4 8-8.5"></path>
+                        </svg>
+                    </span>
+                    <div class="ojp__banner-text">
+                        <strong>{bannerTitle}</strong>
+                        <span>{bannerText}</span>
+                    </div>
+                </div>
+
+                <!-- IDENTITY + PROMPT -->
+                <div class="ojp__split">
+                    <div class="ojp__card ojp__identity">
+                        <span class="ojp__avatar">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"
+                                 stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                <circle cx="12" cy="8.4" r="3.6"></circle>
+                                <path d="M4.6 20c0-3.9 3.3-6.2 7.4-6.2s7.4 2.3 7.4 6.2"></path>
+                            </svg>
+                        </span>
+                        <div class="ojp__identity-text">
+                            <span class="ojp__identity-hi">Welcome,</span>
+                            <strong class="ojp__identity-name">{visit.CustomerName}</strong>
+                            <span class="ojp__identity-id">Customer ID : {visit.CustomerNo}</span>
+                        </div>
+                    </div>
+
+                    <template if:true={showProfileEditor}>
+                        <div class="ojp__card ojp__prompt">
+                            <div class="ojp__prompt-head">
+                                <span class="ojp__prompt-icon">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"
+                                         stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                        <circle cx="12" cy="12" r="9"></circle>
+                                        <path d="M12 11v5.2"></path>
+                                        <path d="M12 7.6h.01"></path>
+                                    </svg>
+                                </span>
+                                <strong>Would you like to update your profile information?</strong>
+                            </div>
+                            <p>You can add or correct details by clicking <em>Request Update</em> beside eligible fields.</p>
+                            <p>You will be asked to verify the changes using OTP.</p>
+                        </div>
+                    </template>
+                </div>
+
+                </div><!-- /oj-col_lead -->
+
+                <div class="oj-col oj-col_main">
+
+                <!-- PERSONAL INFORMATION
+                     On both faces. Arriving from a visit the customer sees
+                     the same details, but Request Update explains itself
+                     rather than opening the field - the update request is
+                     raised after the feedback, not instead of it. -->
+                <div class="ojp__section">
+                        <div class="ojp__section-head">
+                            <span class="ojp__section-icon">
+                                <lightning-icon icon-name="utility:user" size="xx-small" variant="inverse"></lightning-icon>
+                            </span>
+                            <h3>Personal Information</h3>
+                        </div>
+
+                        <template for:each={profileRows} for:item="row">
+                            <div key={row.field} class={row.rowClass}>
+                                <div class="ojp-row__main">
+                                    <span class="ojp-row__icon">
+                                        <lightning-icon icon-name={row.icon} size="xx-small"></lightning-icon>
+                                    </span>
+                                    <span class="ojp-row__label">{row.label}</span>
+                                    <span class="ojp-row__sep">:</span>
+                                    <span class="ojp-row__value">{row.value}</span>
+
+                                    <template if:true={row.isLocked}>
+                                        <span class="ojp-row__locked">
+                                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"
+                                                 stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                                <rect x="5" y="10.5" width="14" height="9.5" rx="2"></rect>
+                                                <path d="M8.4 10.5V7.6a3.6 3.6 0 0 1 7.2 0v2.9"></path>
+                                            </svg>
+                                            <span>
+                                                KYC Verified
+                                                <em>(Cannot be changed)</em>
+                                            </span>
+                                        </span>
+                                    </template>
+
+                                    <template if:false={row.isLocked}>
+                                        <button class={row.buttonClass} type="button"
+                                                data-field={row.field} onclick={handleRequestUpdate}>
+                                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"
+                                                 stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                                <path d="M4 20h4l10-10a2.1 2.1 0 0 0-3-3L5 17v3z"></path>
+                                            </svg>
+                                            <span>{row.buttonLabel}</span>
+                                        </button>
+                                    </template>
+                                </div>
+
+                                <template if:true={row.isEditing}>
+                                    <div class="ojp-row__edit">
+                                        <lightning-input
+                                            type={row.type}
+                                            label="New value"
+                                            variant="label-hidden"
+                                            placeholder="Enter new value"
+                                            value={row.newValue}
+                                            data-field={row.field}
+                                            onchange={handleInputChange}>
+                                        </lightning-input>
+                                    </div>
+                                </template>
+                            </div>
+                        </template>
+                </div>
+
+                <!-- TODAY'S SHOWROOM VISIT -->
+                <template if:true={showVisitSummary}>
+                    <div class="ojp__section">
+                        <div class="ojp__section-head">
+                            <span class="ojp__section-icon">
+                                <lightning-icon icon-name="utility:store" size="xx-small" variant="inverse"></lightning-icon>
+                            </span>
+                            <h3>Today's Showroom Visit</h3>
+                        </div>
+
+                        <div class="ojpv__hero">
+                            <span class="ojpv__hero-icon">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"
+                                     stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                    <path d="M3.6 9.4L5.2 4.6h13.6l1.6 4.8"></path>
+                                    <path d="M3.6 9.4a2.4 2.4 0 0 0 4.8 0 2.4 2.4 0 0 0 4.8 0 2.4 2.4 0 0 0 4.8 0 2.4 2.4 0 0 0 2.4 0"></path>
+                                    <path d="M5.2 11.4V20h13.6v-8.6"></path>
+                                    <path d="M9.8 20v-5h4.4v5"></path>
+                                </svg>
+                            </span>
+                            <div class="ojpv__hero-text">
+                                <span class="ojpv__hero-label">Showroom</span>
+                                <strong>{visitHero.store}</strong>
+                            </div>
+                            <span class={visitHero.statusClass}>{visitHero.status}</span>
+                        </div>
+
+                        <div class="ojpv__orn-wrap">
+                            <div class="oj-orn oj-orn_sm ojpv__orn">
+                                <span class="oj-orn__line"></span>
+                                <span class="oj-orn__diamond"></span>
+                                <span class="oj-orn__line"></span>
+                            </div>
+                        </div>
+
+                        <div class="ojpv__grid">
+                            <template for:each={visitTiles} for:item="tile">
+                                <div key={tile.key} class="ojpv__tile">
+                                    <span class="ojpv__tile-icon">
+                                        <lightning-icon icon-name={tile.icon} size="xx-small"></lightning-icon>
+                                    </span>
+                                    <span class="ojpv__tile-label">{tile.label}</span>
+                                    <strong class="ojpv__tile-value">{tile.value}</strong>
+                                </div>
+                            </template>
+                        </div>
+                    </div>
+                </template>
+
+                <!-- NOTES -->
+                <template if:true={showVisitSummary}>
+                    <div class="ojp__note ojp__note_warn">
+                        <span class="ojp__note-icon">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"
+                                 stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                <path d="M20.5 12.2c0 3.9-3.8 7-8.5 7-1 0-2-.15-2.9-.42L4 20.5l1.5-3.7A6.7 6.7 0 0 1 3.5 12.2c0-3.9 3.8-7 8.5-7s8.5 3.1 8.5 7z"></path>
+                            </svg>
+                        </span>
+                        <div>
+                            <strong>Share Your Experience</strong>
+                            <p>Please tell us how this visit went. It takes less than a minute, and your answers help us serve you better.</p>
+                        </div>
+                    </div>
+                </template>
+
+                <template if:true={showProfileEditor}>
+                    <div class="ojp__note ojp__note_info">
+                        <span class="ojp__note-icon">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"
+                                 stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                <circle cx="12" cy="12" r="9"></circle>
+                                <path d="M12 11v5.2"></path>
+                                <path d="M12 7.6h.01"></path>
+                            </svg>
+                        </span>
+                        <div>
+                            <strong>Important</strong>
+                            <ul>
+                                <li>Only eligible fields can be updated.</li>
+                                <li>KYC verified Date of Birth cannot be changed here.</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="ojp__note ojp__note_warn">
+                        <span class="ojp__note-icon">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"
+                                 stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                <path d="M18 15.6V11a6 6 0 1 0-12 0v4.6L4.6 18h14.8L18 15.6z"></path>
+                                <path d="M10.2 20.6a2 2 0 0 0 3.6 0"></path>
+                            </svg>
+                        </span>
+                        <div>
+                            <strong>Reminder</strong>
+                            <p>You will be asked to verify the above changes using OTP before they are applied.</p>
+                        </div>
+                    </div>
+                </template>
+
+                <!-- CTA -->
+                <button class="ojp__cta" type="button" onclick={handleContinueToFeedback}>
+                    <svg class="ojp__cta-lead" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                         stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                        <path d="M20.5 12.2c0 3.9-3.8 7-8.5 7-1 0-2-.15-2.9-.42L4 20.5l1.5-3.7A6.7 6.7 0 0 1 3.5 12.2c0-3.9 3.8-7 8.5-7s8.5 3.1 8.5 7z"></path>
+                    </svg>
+                    <span>{continueButtonLabel}</span>
+                    <svg class="ojp__cta-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                         stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                        <path d="M4 12h15"></path>
+                        <path d="M13.5 6.5L20 12l-6.5 5.5"></path>
+                    </svg>
+                </button>
+
+                </div><!-- /oj-col_main -->
+
+                <!-- FOOTER -->
+                <div class="oj-footer">
+                    <div class="oj-footer__row">
+                        <span class="oj-footer__lock">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"
+                                 stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                <rect x="4.5" y="10" width="15" height="10.5" rx="2.2"></rect>
+                                <path d="M8.2 10V7.2a3.8 3.8 0 0 1 7.6 0V10"></path>
+                            </svg>
+                        </span>
+                        <p>Your information is safe and secure with us.<br />We never share your details with anyone.</p>
+                    </div>
+                    <div class="oj-orn oj-orn_sm oj-orn_footer">
+                        <span class="oj-orn__line"></span>
+                        <span class="oj-orn__diamond"></span>
+                        <span class="oj-orn__line"></span>
+                    </div>
+                </div>
+
+            </div>
+    </c-fdb-screen>
+
+    <!-- REQUEST UPDATE, ARRIVING FROM A VISIT
+         The request is raised after the feedback, not instead of it, so the
+         field does not open here - this says why and offers the one way on. -->
+    <template if:true={showUpdateNotice}>
+        <div class="ojo__backdrop" onclick={handleNoticeCancel}></div>
+
+        <div class="ojo" role="dialog" aria-modal="true" aria-labelledby="ojp-notice-title">
+            <div class="ojo__card">
+
+                <span class="ojo__mark">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"
+                         stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                        <rect x="3.2" y="4.6" width="17.6" height="14.8" rx="2.4"></rect>
+                        <circle cx="9.2" cy="10.6" r="1.9"></circle>
+                        <path d="M6.2 16.2c0-1.8 1.3-2.9 3-2.9s3 1.1 3 2.9"></path>
+                        <path d="M14.6 9.6h3.8"></path>
+                        <path d="M14.6 13h3.8"></path>
+                    </svg>
+                </span>
+
+                <h2 id="ojp-notice-title" class="ojo__title">Profile Update</h2>
+
+                <div class="oj-orn oj-orn_sm">
+                    <span class="oj-orn__line"></span>
+                    <span class="oj-orn__diamond"></span>
+                    <span class="oj-orn__line"></span>
+                </div>
+
+                <p class="ojo__text">You can request an update to this information.</p>
+                <p class="ojo__text">
+                    To ensure a smooth experience, your profile update request will be
+                    processed <strong>after you submit your feedback</strong>.
+                </p>
+
+                <div class="ojo__actions">
+                    <button class="ojo__btn ojo__btn_ghost" type="button" onclick={handleNoticeCancel}>
+                        <span>Cancel</span>
+                    </button>
+                    <button class="ojo__btn ojo__btn_primary" type="button" onclick={handleNoticeContinue}>
+                        <span>Continue to Feedback</span>
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"
+                             stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                            <path d="M4 12h15"></path>
+                            <path d="M13.5 6.5L20 12l-6.5 5.5"></path>
+                        </svg>
+                    </button>
+                </div>
+
+            </div>
+        </div>
+    </template>
+</template>

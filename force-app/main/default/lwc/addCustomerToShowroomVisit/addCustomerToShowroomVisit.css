@@ -1,0 +1,214 @@
+.premium-container {
+    padding: 18px;
+    background: linear-gradient(135deg, #fffaf3 0%, #fff6ea 45%, #f6e4cf 100%);
+    border-radius: 14px;
+}
+
+/* Orient Jewellers Style Header */
+.premium-header {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 18px 20px;
+    margin-bottom: 18px;
+    border-radius: 18px;
+    background: linear-gradient(135deg, #fffaf3 0%, #f3dfc5 100%);
+    border: 1px solid #ead6bd;
+    box-shadow: 0 10px 24px rgba(90, 55, 30, 0.14);
+    position: relative;
+    overflow: hidden;
+}
+
+.premium-header::before {
+    content: '';
+    position: absolute;
+    right: -45px;
+    top: -55px;
+    width: 150px;
+    height: 150px;
+    border-radius: 50%;
+    background: rgba(227, 27, 35, 0.08);
+}
+
+.header-icon {
+    height: 48px;
+    width: 48px;
+    min-width: 48px;
+    border-radius: 50%;
+    background: #dd912d;
+    color: #ffffff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 22px;
+    box-shadow: 0 8px 18px rgba(227, 27, 35, 0.28);
+    z-index: 1;
+}
+
+.header-title {
+    font-size: 21px;
+    font-weight: 800;
+    color: #2b1a14;
+    letter-spacing: 0.3px;
+    z-index: 1;
+}
+
+.header-subtitle {
+    margin-top: 4px;
+    font-size: 12px;
+    color: #6b4b3b;
+    font-weight: 600;
+    z-index: 1;
+}
+
+/* Input Cards */
+.field-card {
+    background: rgba(255, 255, 255, 0.86);
+    padding: 14px 16px;
+    border-radius: 14px;
+    border: 1px solid #ead6bd;
+    margin-bottom: 14px;
+    box-shadow: 0 6px 16px rgba(90, 55, 30, 0.08);
+}
+
+/* Search Hint */
+.hint-box {
+    background: #fffaf3;
+    color: #6b3b22;
+    border: 1px solid #ead6bd;
+    border-left: 5px solid #e31b23;
+    padding: 11px 14px;
+    border-radius: 12px;
+    margin-bottom: 14px;
+    font-size: 13px;
+    font-weight: 700;
+}
+
+/* Result Card */
+.result-card {
+    background: #ffffff;
+    border: 1px solid #ead6bd;
+    border-radius: 16px;
+    margin-bottom: 16px;
+    overflow: hidden;
+    box-shadow: 0 10px 24px rgba(90, 55, 30, 0.12);
+}
+
+.result-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: linear-gradient(90deg, #fffaf3 0%, #f3dfc5 100%);
+    padding: 13px 15px;
+    border-bottom: 1px solid #ead6bd;
+}
+
+.result-title {
+    font-size: 14px;
+    font-weight: 800;
+    color: #2b1a14;
+}
+
+.result-count {
+    background: #e31b23;
+    color: #ffffff;
+    font-size: 11px;
+    font-weight: 800;
+    padding: 4px 11px;
+    border-radius: 20px;
+    box-shadow: 0 4px 10px rgba(227, 27, 35, 0.25);
+}
+
+.table-container {
+    max-height: 220px;
+    overflow-y: auto;
+    background: #ffffff;
+}
+
+/* Success Message */
+.success-box {
+    background: linear-gradient(90deg, #f0fdf4 0%, #ffffff 100%);
+    color: #166534;
+    border-left: 5px solid #22c55e;
+    padding: 11px 14px;
+    border-radius: 12px;
+    margin-bottom: 14px;
+    font-weight: 700;
+    font-size: 13px;
+    box-shadow: 0 4px 12px rgba(34, 197, 94, 0.10);
+}
+
+/* Info Message */
+.info-box {
+    background: linear-gradient(90deg, #fffaf3 0%, #ffffff 100%);
+    color: #6b3b22;
+    border-left: 5px solid #e31b23;
+    padding: 11px 14px;
+    border-radius: 12px;
+    margin-bottom: 14px;
+    font-weight: 700;
+    font-size: 13px;
+    box-shadow: 0 4px 12px rgba(90, 55, 30, 0.08);
+}
+
+/* Footer */
+.premium-footer {
+    background: #fffaf3;
+    border-top: 1px solid #ead6bd;
+}
+
+/* Spinner */
+.spinner-container {
+    position: relative;
+    min-height: 80px;
+}
+
+/* Salesforce Input + Button Theme */
+:host {
+    --slds-c-input-radius-border: 12px;
+    --slds-c-input-color-border: #d9c1a6;
+    --slds-c-input-color-border-focus: #e31b23;
+    --slds-c-input-shadow-focus: 0 0 0 2px rgba(227, 27, 35, 0.14);
+
+    --slds-c-button-brand-color-background: #e31b23;
+    --slds-c-button-brand-color-border: #e31b23;
+    --slds-c-button-brand-color-background-hover: #bf1118;
+    --slds-c-button-brand-color-border-hover: #bf1118;
+    --slds-c-button-brand-text-color: #ffffff;
+}
+
+/* Datatable soft premium look */
+.table-container lightning-datatable {
+    --slds-c-table-header-color-background: #fff6ea;
+    --slds-c-table-color-border: #ead6bd;
+}
+
+/* Mobile Responsive */
+@media only screen and (max-width: 600px) {
+    .premium-container {
+        padding: 12px;
+    }
+
+    .premium-header {
+        padding: 14px;
+        border-radius: 14px;
+    }
+
+    .header-title {
+        font-size: 17px;
+    }
+
+    .header-subtitle {
+        font-size: 11px;
+    }
+
+    .field-card {
+        padding: 12px;
+    }
+
+    .result-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 8px;
+    }
+}

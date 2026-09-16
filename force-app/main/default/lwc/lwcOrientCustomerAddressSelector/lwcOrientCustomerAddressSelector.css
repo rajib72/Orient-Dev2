@@ -1,0 +1,291 @@
+:host {
+    --orient-red: #a61d28;
+    --orient-red-strong: #c81724;
+    --orient-red-dark: #86151e;
+    --orient-red-border: #efc2c6;
+}
+
+.selector-shell {
+    position: relative;
+    padding: 0.8rem;
+    border: 1px solid var(--orient-red-border);
+    border-radius: 0.65rem;
+    background: #fffdfd;
+    box-shadow: 0 3px 10px rgba(166, 29, 40, 0.05);
+}
+
+.selector-spinner {
+    position: absolute;
+    inset: 0;
+    z-index: 20;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 0.65rem;
+    background: rgba(255, 255, 255, 0.76);
+}
+
+.selector-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 0.75rem;
+    padding-bottom: 0.6rem;
+    border-bottom: 1px solid #f0e3e4;
+}
+
+.selector-heading-left {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.55rem;
+    min-width: 0;
+}
+
+.selector-step-badge,
+.selector-fields-heading > span {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 1.35rem;
+    height: 1.35rem;
+    flex: 0 0 auto;
+    border-radius: 50%;
+    color: #ffffff;
+    background: var(--orient-red-strong);
+    font-size: 0.62rem;
+    font-weight: 800;
+}
+
+.selector-title {
+    color: #3d2d2f;
+    font-size: 0.82rem;
+    font-weight: 800;
+}
+
+.selector-subtitle {
+    margin-top: 0.1rem;
+    color: #756669;
+    font-size: 0.69rem;
+    line-height: 1.35;
+}
+
+.api-pill {
+    flex: 0 0 auto;
+    padding: 0.16rem 0.45rem;
+    border: 1px solid #e9aeb4;
+    border-radius: 999px;
+    color: var(--orient-red);
+    background: #fdecee;
+    font-size: 0.6rem;
+    font-weight: 800;
+}
+
+.pin-row {
+    display: flex;
+    align-items: flex-end;
+    gap: 0.6rem;
+    margin-top: 0.65rem;
+}
+
+.pin-input {
+    flex: 1 1 16rem;
+    max-width: 22rem;
+}
+
+.pin-row lightning-button,
+.selector-actions lightning-button[variant="brand"] {
+    --slds-c-button-brand-color-background: var(--orient-red-strong);
+    --slds-c-button-brand-color-border: var(--orient-red-strong);
+    --slds-c-button-brand-color-background-hover: var(--orient-red-dark);
+    --slds-c-button-brand-color-border-hover: var(--orient-red-dark);
+    --slds-c-button-radius-border: 999px;
+}
+
+.selector-fields-heading {
+    display: flex;
+    align-items: center;
+    gap: 0.45rem;
+    margin-top: 0.7rem;
+    padding-top: 0.65rem;
+    border-top: 1px solid #f0e3e4;
+    color: #3d2d2f;
+    font-size: 0.72rem;
+}
+
+.address-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.65rem 0.8rem;
+    margin-top: 0.55rem;
+}
+
+.village-field {
+    min-width: 0;
+}
+
+.village-dropdown {
+    z-index: 9999;
+}
+
+.message-box {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.4rem;
+    margin-top: 0.6rem;
+    padding: 0.55rem 0.65rem;
+    border-radius: 0.5rem;
+    font-size: 0.7rem;
+}
+
+.info-box {
+    border: 1px solid #e5c9a4;
+    color: #6a512e;
+    background: #fff9f0;
+}
+
+.error-box {
+    border: 1px solid #f0b4b4;
+    color: #b42318;
+    background: #fff0f0;
+}
+
+.selection-preview {
+    margin-top: 0.7rem;
+    padding: 0.6rem 0.7rem;
+    border: 1px solid #b7dfc1;
+    border-radius: 0.55rem;
+    background: #f4fbf6;
+}
+
+.selection-preview-title {
+    color: #267a42;
+    font-size: 0.58rem;
+    font-weight: 800;
+    letter-spacing: 0.025em;
+    text-transform: uppercase;
+}
+
+.selection-preview-value {
+    margin-top: 0.18rem;
+    color: #2a3e2e;
+    font-size: 0.72rem;
+    font-weight: 700;
+    line-height: 1.4;
+}
+
+.selector-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 0.5rem;
+    margin-top: 0.75rem;
+    padding-top: 0.65rem;
+    border-top: 1px solid #f0e3e4;
+}
+
+@media only screen and (max-width: 768px) {
+    .selector-header,
+    .pin-row {
+        align-items: stretch;
+        flex-direction: column;
+    }
+
+    .pin-input {
+        max-width: none;
+    }
+
+    .address-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .selector-actions {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+    }
+}
+
+
+/* FORM_FACTOR-driven mobile layout */
+.selector-shell-mobile {
+    padding: 0.65rem;
+    border-radius: 0.6rem;
+}
+
+.selector-shell-mobile .selector-header {
+    align-items: stretch;
+    flex-direction: column;
+    gap: 0.45rem;
+}
+
+.selector-shell-mobile .api-pill {
+    align-self: flex-start;
+}
+
+.selector-shell-mobile .pin-row {
+    align-items: stretch;
+    flex-direction: column;
+}
+
+.selector-shell-mobile .pin-input {
+    max-width: none;
+}
+
+.selector-shell-mobile .address-grid {
+    grid-template-columns: 1fr;
+    gap: 0.55rem;
+}
+
+.selector-shell-mobile .selector-actions {
+    display: grid;
+    grid-template-columns: 1fr;
+}
+
+.selector-shell-mobile .selection-preview {
+    padding: 0.6rem;
+}
+
+
+/* V1.5.4 native/stretch actions */
+.selector-native-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.35rem;
+    min-height: 2.25rem;
+    border-radius: 999px;
+    font-weight: 700;
+}
+
+.selector-primary-button,
+.selector-search-button {
+    border-color: #c81724;
+    background: #c81724;
+}
+
+.selector-primary-button:hover,
+.selector-primary-button:focus,
+.selector-search-button:hover,
+.selector-search-button:focus {
+    border-color: #86151e;
+    background: #86151e;
+}
+
+.selector-shell-mobile .selector-native-button {
+    width: 100%;
+    min-height: 2.65rem;
+}
+
+.selector-shell-mobile .selector-actions {
+    grid-template-columns: 1fr;
+    width: 100%;
+}
+
+.selector-shell-mobile .selector-search-button {
+    width: 100%;
+}
+
+.selector-shell-mobile .pin-row {
+    width: 100%;
+}
+
+/* Medium FORM_FACTOR uses selector-shell-mobile as well, so tablet
+   receives the same full-width interaction controls. */

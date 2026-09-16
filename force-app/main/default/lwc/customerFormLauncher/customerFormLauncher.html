@@ -1,0 +1,13 @@
+<template>
+    <lightning-card title="Customer Form Launcher">
+        <div class="slds-p-around_medium">
+            <lightning-button label={buttonLabel} variant="brand" onclick={toggleForm}>
+            </lightning-button>
+        </div>
+
+        <!-- Show or hide form -->
+        <template if:true={showForm}>
+            <c-customer-enrollment-form></c-customer-enrollment-form>
+        </template>
+    </lightning-card>
+</template>

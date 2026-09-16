@@ -1,0 +1,8 @@
+<template>
+    <div class="slds-is-relative slds-p-around_large">
+        <template if:true={isLoading}>
+            <lightning-spinner alternative-text="Loading" size="medium"></lightning-spinner>
+            <p class="slds-text-align_center slds-m-top_large">Fetching Pre-Estimate from Business Central...</p>
+        </template>
+    </div>
+</template>

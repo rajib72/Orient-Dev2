@@ -1,0 +1,214 @@
+<template>
+    <lightning-card>
+        <!-- HEADER -->
+        <div class="summary-header">
+            <span class="summary-title">Sales Executive Activity Tracking</span>
+        </div>
+
+        <!-- SESSION TABLE -->
+        <div class="slds-p-around_medium table-scroll">
+            <table class="slds-table slds-table_bordered slds-table_cell-buffer">
+                <thead>
+                    <tr>
+                        <th>No.</th>
+                        <th>Sales Executive</th>
+                        <th>Session Status</th>
+                        <th>Start Date</th>
+                        <th>Start Time</th>
+                        <th>End Date</th>
+                        <th>End Time</th>
+                        <th>Duration</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    <template for:each={sessions} for:item="s">
+                        <tr key={s.id}>
+                            <td style="text-align: center;">{s.slNo}</td>
+
+                            <td style="text-align: center;">{s.salesExecutiveName}</td>
+
+                            <td style="text-align: center;">
+                                <span class={s.statusClass}>{s.status}</span>
+                            </td>
+
+                            <td style="text-align: center;">{s.startDate}</td>
+                            <td style="text-align: center;">{s.startTimeFormatted}</td>
+
+                            <td style="text-align: center;">{s.startDate}</td>
+                            <td style="text-align: center;">{s.endTimeFormatted}</td>
+
+                            <td style="text-align: center;">{s.duration}</td>
+
+                            <td>
+                                <lightning-button label="Handover" variant="brand" size="small" disabled={s.isCompleted}
+                                    data-id={s.id} onclick={openHandoverModal}>
+                                </lightning-button>
+
+                                <lightning-button label="Mark Exit" variant="neutral" size="small"
+                                    class="slds-m-left_x-small" disabled={s.isCompleted} data-id={s.id}
+                                    onclick={handleMarkExit}>
+                                </lightning-button>
+
+                                <lightning-button label="View" variant="neutral" size="small"
+                                    class="slds-m-left_x-small" data-id={s.id} onclick={handleView}>
+                                </lightning-button>
+                            </td>
+                        </tr>
+                    </template>
+
+                    <template if:true={noSessions}>
+                        <tr>
+                            <td colspan="9" class="slds-text-align_center slds-text-color_weak">
+                                No session records found
+                            </td>
+                        </tr>
+                    </template>
+                </tbody>
+            </table>
+        </div>
+    </lightning-card>
+
+    <!-- HANDOVER MODAL -->
+    <template if:true={showModal}>
+        <section class="slds-modal slds-fade-in-open">
+            <div class="slds-modal__container">
+
+                <header class="slds-modal__header">
+                    <h2 class="slds-text-heading_medium">
+                        Session Handover
+                    </h2>
+                </header>
+
+                <div class="slds-modal__content slds-p-around_medium">
+                    <lightning-combobox label="Select Sales Executive" options={salesExecutiveOptions}
+                        value={selectedSalesExecutive} onchange={handleExecutiveChange} required>
+                    </lightning-combobox>
+                </div>
+
+                <footer class="slds-modal__footer">
+                    <lightning-button label="Cancel" onclick={closeModal}>
+                    </lightning-button>
+
+                    <lightning-button label="Save" variant="brand" class="slds-m-left_small" onclick={handleHandover}>
+                    </lightning-button>
+                </footer>
+            </div>
+        </section>
+
+        <div class="slds-backdrop slds-backdrop_open"></div>
+    </template>
+
+    <!-- MARK EXIT CONFIRMATION MODAL -->
+    <template if:true={showExitModal}>
+        <section class="slds-modal slds-fade-in-open">
+            <div class="slds-modal__container">
+
+                <header class="slds-modal__header">
+                    <h2 class="slds-text-heading_medium">
+                        Confirm Session Exit
+                    </h2>
+                </header>
+
+                <div class="slds-modal__content slds-p-around_medium">
+
+                    <template if:false={showFollowUpPage}>
+                        <div class="slds-text-align_center">
+                            <p class="slds-text-heading_small">
+                                Are you sure you want to exit this session?
+                            </p>
+
+                            <div class="slds-box slds-theme_shade slds-m-top_medium">
+                                <p class="slds-text-title_bold">
+                                    Running Duration Before Update
+                                </p>
+                                <p class="slds-text-heading_medium">
+                                    {previousDurationAtExit}
+                                </p>
+                            </div>
+
+                            
+
+                            <lightning-input type="checkbox" label="Update Exit Time" checked={updateExitTime}
+                                onchange={handleUpdateExitTimeChange} class="slds-m-top_medium"
+                                disabled={isUpdateExitTimeMandatory}>
+                            </lightning-input>
+
+                        </div>
+
+                        <template if:true={updateExitTime}>
+                            <div class="slds-grid slds-wrap slds-gutters slds-m-top_medium">
+
+                                <!--<div class="slds-col slds-size_1-of-1 slds-medium-size_1-of-2">
+                                    <lightning-input type="time" label="End Time" value={exitEndTime}
+                                        onchange={handleExitEndTimeChange} required>
+                                    </lightning-input>
+                                </div>
+
+                                <div class="slds-col slds-size_1-of-1 slds-medium-size_1-of-2">
+                                    <lightning-input type="date" label="End Date" value={exitEndDate}
+                                        onchange={handleExitEndDateChange} required>
+                                    </lightning-input>
+                                </div>-->
+
+                                <div class="slds-col slds-size_1-of-1 slds-medium-size_1-of-2">
+                                    <lightning-input type="time" label="End Time" value={exitEndTime}
+                                        onchange={handleExitEndTimeChange} required>
+                                    </lightning-input>
+                                </div>
+
+                                <div class="slds-col slds-size_1-of-1 slds-medium-size_1-of-2">
+                                    <div class="slds-box slds-theme_shade slds-text-align_center">
+                                        <p class="slds-text-title_bold">
+                                            Final Duration Based On Selected End Time
+                                        </p>
+                                        <p class="slds-text-heading_medium">
+                                            {exitDuration}
+                                        </p>
+                                    </div>
+                                </div>
+
+                            </div>
+                        </template>
+                    </template>
+
+                    <template if:true={showFollowUpPage}>
+                        <lightning-input type="date" label="Next Follow Up Date" value={followUpDate}
+                            onchange={handleFollowUpDateChange} required>
+                        </lightning-input>
+                    </template>
+
+                </div>
+
+                <footer class="slds-modal__footer">
+                    <lightning-button label="Cancel" onclick={closeExitModal}>
+                    </lightning-button>
+
+                    <template if:false={showFollowUpPage}>
+                        <lightning-button label="Yes, Exit" variant="brand" class="slds-m-left_small"
+                            onclick={confirmMarkExit}>
+                        </lightning-button>
+
+                        <lightning-button label="Exit & Follow Up" variant="brand" class="slds-m-left_small"
+                            onclick={openFollowUpPage}>
+                        </lightning-button>
+                    </template>
+
+                    <template if:true={showFollowUpPage}>
+                        <lightning-button label="Back" variant="neutral" class="slds-m-left_small"
+                            onclick={backToExitPage}>
+                        </lightning-button>
+
+                        <lightning-button label="Save Follow Up & Exit" variant="brand" class="slds-m-left_small"
+                            onclick={confirmExitWithFollowUp}>
+                        </lightning-button>
+                    </template>
+                </footer>
+
+            </div>
+        </section>
+
+        <div class="slds-backdrop slds-backdrop_open"></div>
+    </template>
+</template>

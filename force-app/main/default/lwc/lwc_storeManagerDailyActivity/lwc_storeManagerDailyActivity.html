@@ -1,0 +1,1084 @@
+<template>
+    <div class="page-container">
+
+        <template if:true={isLoading}>
+            <div class="spinner-container">
+                <lightning-spinner
+                    alternative-text="Loading"
+                    size="medium">
+                </lightning-spinner>
+            </div>
+        </template>
+
+        <div class="page-header">
+            <div class="title-section">
+                <div class="title-icon">
+                    <lightning-icon
+                        icon-name="standard:store"
+                        size="medium">
+                    </lightning-icon>
+                </div>
+
+                <div>
+                    <h1>Store Manager BTL Activities</h1>
+                    <p>
+                        Review and initiate today's BTL activities
+                    </p>
+                </div>
+            </div>
+
+            <div class="header-date">
+                <lightning-icon
+                    icon-name="utility:event"
+                    size="small">
+                </lightning-icon>
+
+                <div>
+                    <span>Selected Date</span>
+                    <strong>{selectedDateLabel}</strong>
+                </div>
+            </div>
+        </div>
+
+        <div class="filter-card">
+            <div class="filter-field">
+                <lightning-input
+                    type="date"
+                    label="Activity Date"
+                    value={selectedDate}
+                    onchange={handleDateChange}>
+                </lightning-input>
+            </div>
+
+            <div class="filter-field">
+                <lightning-combobox
+                    label="Store"
+                    value={selectedStoreId}
+                    options={storeOptions}
+                    disabled={disableStoreSelection}
+                    onchange={handleStoreChange}>
+                </lightning-combobox>
+            </div>
+
+            <div class="filter-action">
+                <lightning-button
+                    label="Refresh"
+                    icon-name="utility:refresh"
+                    onclick={handleRefresh}>
+                </lightning-button>
+            </div>
+        </div>
+
+        <div class="information-banner">
+            <lightning-icon
+                icon-name="utility:info"
+                size="small">
+            </lightning-icon>
+
+            <span>
+                Store Manager actions become available only after the
+                Form Activity team receives final approval. Activities still
+                under approval remain read-only, and fully dropped activities
+                are removed from this dashboard.
+            </span>
+        </div>
+
+        <div class="summary-grid">
+            <div class="summary-card total-card">
+                <div class="summary-icon">
+                    <lightning-icon
+                        icon-name="utility:event"
+                        size="medium">
+                    </lightning-icon>
+                </div>
+
+                <div>
+                    <span>Total Activities</span>
+                    <strong>{totalActivities}</strong>
+                </div>
+            </div>
+
+            <div class="summary-card pending-card">
+                <div class="summary-icon">
+                    <lightning-icon
+                        icon-name="utility:clock"
+                        size="medium">
+                    </lightning-icon>
+                </div>
+
+                <div>
+                    <span>Pending Initiation</span>
+                    <strong>{pendingInitiation}</strong>
+                </div>
+            </div>
+
+            <div class="summary-card live-card">
+                <div class="summary-icon">
+                    <lightning-icon
+                        icon-name="utility:broadcast"
+                        size="medium">
+                    </lightning-icon>
+                </div>
+
+                <div>
+                    <span>Live</span>
+                    <strong>{liveActivities}</strong>
+                </div>
+            </div>
+
+            <div class="summary-card progress-card">
+                <div class="summary-icon">
+                    <lightning-icon
+                        icon-name="utility:play"
+                        size="medium">
+                    </lightning-icon>
+                </div>
+
+                <div>
+                    <span>In Progress</span>
+                    <strong>{inProgressActivities}</strong>
+                </div>
+            </div>
+
+            <div class="summary-card completed-card">
+                <div class="summary-icon">
+                    <lightning-icon
+                        icon-name="utility:success"
+                        size="medium">
+                    </lightning-icon>
+                </div>
+
+                <div>
+                    <span>Completed</span>
+                    <strong>{completedActivities}</strong>
+                </div>
+            </div>
+        </div>
+
+        <div class="activity-card">
+            <div class="section-header">
+                <div>
+                    <h2>Daily BTL Activities</h2>
+                    <p>
+                        Activities available for {selectedDateLabel}
+                    </p>
+                </div>
+
+                <span class="activity-count">
+                    {totalActivities} Activities
+                </span>
+            </div>
+
+            <template if:true={hasActivities}>
+                <div class="table-container">
+                    <table class="activity-table">
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>Activity</th>
+                                <th>Store</th>
+                                <th>Activity Period</th>
+                                <th>Activity Location</th>
+                                <th>Today's Executives</th>
+                                <th>Status</th>
+                                <th>Initiated Details</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+
+                        <tbody>
+                            <template
+                                for:each={activities}
+                                for:item="activity">
+
+                                <tr
+                                    key={activity.rowKey}
+                                    class={activity.rowClass}>
+                                    <td class="serial-column">
+                                        {activity.serialNo}
+                                    </td>
+
+                                    <td>
+                                        <div class="activity-details">
+                                            <a
+                                                href={activity.recordUrl}
+                                                target="_blank"
+                                                class="activity-link">
+                                                {activity.activityName}
+                                            </a>
+
+                                            <template if:true={activity.hasTeam}>
+                                                <span class="team-badge">
+                                                    {activity.teamName}
+                                                </span>
+                                            </template>
+
+                                            <span class="activity-number">
+                                                {activity.activityNo}
+                                            </span>
+
+                                            <template
+                                                if:true={activity.finalCustomizeFormName}>
+                                                <span class="form-name">
+                                                    Form:
+                                                    {activity.finalCustomizeFormName}
+                                                </span>
+                                            </template>
+                                        </div>
+                                    </td>
+
+                                    <td>
+                                        <div class="store-details">
+                                            <lightning-icon
+                                                icon-name="standard:store"
+                                                size="small">
+                                            </lightning-icon>
+
+                                            <span>{activity.storeName}</span>
+                                        </div>
+                                    </td>
+
+                                    <td>
+                                        <div class="period-details">
+                                            <strong>
+                                                {activity.periodLabel}
+                                            </strong>
+
+                                            <span>
+                                                {activity.durationLabel}
+                                            </span>
+                                        </div>
+                                    </td>
+
+                                    <td>
+                                        <div class="location-details">
+                                            <lightning-icon
+                                                icon-name="utility:location"
+                                                size="xx-small">
+                                            </lightning-icon>
+
+                                            <template
+                                                if:true={activity.activityLocation}>
+                                                <strong>
+                                                    {activity.activityLocation}
+                                                </strong>
+                                            </template>
+
+                                            <template
+                                                if:false={activity.activityLocation}>
+                                                <span>
+                                                    Not specified
+                                                </span>
+                                            </template>
+                                        </div>
+                                    </td>
+
+                                    <td>
+                                        <template if:true={activity.hasMembers}>
+                                            <div class="member-list">
+                                                <template
+                                                    for:each={activity.members}
+                                                    for:item="member">
+
+                                                    <div
+                                                        key={member.dateAssignmentId}
+                                                        class={member.memberClass}>
+
+                                                        <div class="member-avatar">
+                                                            {member.initials}
+                                                        </div>
+
+                                                        <div class="member-information">
+                                                            <strong>
+                                                                {member.displayName}
+                                                            </strong>
+
+                                                            <template
+                                                                if:true={member.teamName}>
+                                                                <span>
+                                                                    {member.teamName}
+                                                                </span>
+                                                            </template>
+                                                        </div>
+                                                    </div>
+                                                </template>
+                                            </div>
+                                        </template>
+
+                                        <template if:false={activity.hasMembers}>
+                                            <div class="no-member-message">
+                                                <lightning-icon
+                                                    icon-name="utility:warning"
+                                                    size="xx-small">
+                                                </lightning-icon>
+
+                                                No executives assigned
+                                            </div>
+                                        </template>
+                                    </td>
+
+                                    <td>
+                                        <span class={activity.statusClass}>
+                                            {activity.status}
+                                        </span>
+                                    </td>
+
+                                    <td>
+                                        <template
+                                            if:true={activity.hasInitiationDetails}>
+
+                                            <div class="initiation-details">
+                                                <strong>
+                                                    {activity.initiatedByName}
+                                                </strong>
+
+                                                <span>
+                                                    {activity.initiatedLabel}
+                                                </span>
+                                            </div>
+                                        </template>
+
+                                        <template
+                                            if:false={activity.hasInitiationDetails}>
+                                            <span class="not-initiated">
+                                                Not initiated
+                                            </span>
+                                        </template>
+                                    </td>
+
+                                    <td>
+                                        <template
+                                            if:true={activity.showAnyActions}>
+
+                                            <div class="action-buttons">
+                                                <template
+                                                    if:true={activity.showInitiateActions}>
+
+                                                    <button
+                                                        type="button"
+                                                        class="change-button"
+                                                        data-key={activity.rowKey}
+                                                        disabled={activity.disableInitiate}
+                                                        onclick={handleOpenWithChanges}>
+
+                                                        <lightning-icon
+                                                            icon-name="utility:edit"
+                                                            size="xx-small">
+                                                        </lightning-icon>
+
+                                                        Initiate With Changes
+                                                    </button>
+
+                                                    <button
+                                                        type="button"
+                                                        class="initiate-button"
+                                                        data-key={activity.rowKey}
+                                                        disabled={activity.disableInitiate}
+                                                        onclick={handleInitiateWithoutChanges}>
+
+                                                        <lightning-icon
+                                                            icon-name="utility:play"
+                                                            size="xx-small">
+                                                        </lightning-icon>
+
+                                                        Initiate Without Changes
+                                                    </button>
+                                                </template>
+
+                                                <template
+                                                    if:true={activity.canReschedule}>
+
+                                                    <button
+                                                        type="button"
+                                                        class="reschedule-button"
+                                                        data-key={activity.rowKey}
+                                                        onclick={handleOpenReschedule}>
+
+                                                        <lightning-icon
+                                                            icon-name="utility:event"
+                                                            size="xx-small">
+                                                        </lightning-icon>
+
+                                                        Postpone/Prepone Activity
+                                                    </button>
+                                                </template>
+
+                                                <template
+                                                    if:true={activity.canDrop}>
+
+                                                    <button
+                                                        type="button"
+                                                        class="drop-activity-button"
+                                                        data-key={activity.rowKey}
+                                                        onclick={handleOpenDrop}>
+
+                                                        <lightning-icon
+                                                            icon-name="utility:delete"
+                                                            size="xx-small">
+                                                        </lightning-icon>
+
+                                                        Drop Activity
+                                                    </button>
+                                                </template>
+                                            </div>
+
+                                            <template
+                                                if:true={activity.disableInitiate}>
+                                                <template
+                                                    if:true={activity.showInitiateActions}>
+                                                    <div class="action-warning">
+                                                        Assign at least one
+                                                        executive for this date.
+                                                    </div>
+                                                </template>
+                                            </template>
+                                        </template>
+
+                                        <template
+                                            if:false={activity.showAnyActions}>
+
+                                            <div class="completed-action">
+                                                <lightning-icon
+                                                    icon-name={activity.actionIcon}
+                                                    size="small">
+                                                </lightning-icon>
+
+                                                <span>
+                                                    {activity.actionMessage}
+                                                </span>
+                                            </div>
+                                        </template>
+                                    </td>
+                                </tr>
+                            </template>
+                        </tbody>
+                    </table>
+                </div>
+            </template>
+
+            <template if:false={hasActivities}>
+                <div class="empty-state">
+                    <div class="empty-icon">
+                        <lightning-icon
+                            icon-name="utility:event"
+                            size="large">
+                        </lightning-icon>
+                    </div>
+
+                    <h3>No BTL Activities Found</h3>
+
+                    <p>
+                        No Form Activity is available for
+                        {selectedDateLabel}.
+                    </p>
+                </div>
+            </template>
+        </div>
+    </div>
+
+
+    <template if:true={showRescheduleModal}>
+        <section
+            role="dialog"
+            tabindex="-1"
+            aria-modal="true"
+            aria-labelledby="reschedule-modal-heading"
+            class="slds-modal slds-fade-in-open schedule-action-modal">
+
+            <div class="slds-modal__container">
+                <header class="slds-modal__header modal-header">
+                    <button
+                        class="slds-button slds-button_icon slds-modal__close"
+                        title="Close"
+                        onclick={closeRescheduleModal}>
+
+                        <lightning-icon
+                            icon-name="utility:close"
+                            alternative-text="Close"
+                            variant="inverse"
+                            size="small">
+                        </lightning-icon>
+                    </button>
+
+                    <div class="modal-title-row">
+                        <div class="modal-icon reschedule-modal-icon">
+                            <lightning-icon
+                                icon-name="utility:event"
+                                size="medium">
+                            </lightning-icon>
+                        </div>
+
+                        <div>
+                            <h2
+                                id="reschedule-modal-heading"
+                                class="slds-text-heading_medium">
+                                Postpone/Prepone Activity
+                            </h2>
+
+                            <p>
+                                Move the selected Team activity to another
+                                date and restart its approval chain.
+                            </p>
+                        </div>
+                    </div>
+                </header>
+
+                <div class="slds-modal__content schedule-action-body">
+                    <div class="schedule-summary-grid reschedule-summary-grid">
+                        <div>
+                            <span>Activity</span>
+                            <strong>{selectedActivity.activityName}</strong>
+                        </div>
+
+                        <div>
+                            <span>Team</span>
+                            <strong>{selectedActivity.teamDisplayLabel}</strong>
+                        </div>
+
+                        <div>
+                            <span>Current Date</span>
+                            <strong>{selectedDateLabel}</strong>
+                        </div>
+
+                        <div>
+                            <span>Form Activity End Date</span>
+                            <strong>{selectedActivity.endDateLabel}</strong>
+                        </div>
+
+                        <div>
+                            <span>Change Type</span>
+                            <strong>{rescheduleTypeLabel}</strong>
+                        </div>
+                    </div>
+
+                    <div class="schedule-warning">
+                        <lightning-icon
+                            icon-name="utility:warning"
+                            size="small">
+                        </lightning-icon>
+
+                        <span>
+                            Only the selected Team and its active manpower
+                            assignments will be moved. The old date records
+                            remain as Rescheduled history, and the new date
+                            records will be sent for fresh approval.
+                        </span>
+                    </div>
+
+                    <div class="schedule-input-grid">
+                        <lightning-input
+                            class="reschedule-action-input"
+                            type="date"
+                            label="New Activity Date"
+                            value={newActivityDate}
+                            min={rescheduleMinDate}
+                            max={rescheduleMaxDate}
+                            required
+                            onchange={handleNewActivityDateChange}>
+                        </lightning-input>
+
+                        <lightning-textarea
+                            class="reschedule-action-input"
+                            label="Reason"
+                            value={rescheduleReason}
+                            maxlength="32000"
+                            required
+                            onchange={handleRescheduleReasonChange}>
+                        </lightning-textarea>
+                    </div>
+                </div>
+
+                <footer class="slds-modal__footer modal-footer">
+                    <lightning-button
+                        label="Cancel"
+                        onclick={closeRescheduleModal}>
+                    </lightning-button>
+
+                    <lightning-button
+                        class="slds-m-left_small"
+                        label="Move &amp; Send for Approval"
+                        variant="brand"
+                        disabled={disableRescheduleSave}
+                        onclick={handleConfirmReschedule}>
+                    </lightning-button>
+                </footer>
+            </div>
+        </section>
+
+        <div class="slds-backdrop slds-backdrop_open"></div>
+    </template>
+
+    <template if:true={showDropModal}>
+        <section
+            role="dialog"
+            tabindex="-1"
+            aria-modal="true"
+            aria-labelledby="drop-modal-heading"
+            class="slds-modal slds-fade-in-open schedule-action-modal">
+
+            <div class="slds-modal__container">
+                <header class="slds-modal__header modal-header">
+                    <button
+                        class="slds-button slds-button_icon slds-modal__close"
+                        title="Close"
+                        onclick={closeDropModal}>
+
+                        <lightning-icon
+                            icon-name="utility:close"
+                            alternative-text="Close"
+                            variant="inverse"
+                            size="small">
+                        </lightning-icon>
+                    </button>
+
+                    <div class="modal-title-row">
+                        <div class="modal-icon drop-modal-icon">
+                            <lightning-icon
+                                icon-name="utility:delete"
+                                size="medium">
+                            </lightning-icon>
+                        </div>
+
+                        <div>
+                            <h2
+                                id="drop-modal-heading"
+                                class="slds-text-heading_medium">
+                                Drop Activity
+                            </h2>
+
+                            <p>
+                                Drop the selected approved Team activity
+                                for the selected date.
+                            </p>
+                        </div>
+                    </div>
+                </header>
+
+                <div class="slds-modal__content schedule-action-body">
+                    <div class="schedule-summary-grid drop-summary-grid">
+                        <div>
+                            <span>Activity</span>
+                            <strong>{selectedActivity.activityName}</strong>
+                        </div>
+
+                        <div>
+                            <span>Team</span>
+                            <strong>{selectedActivity.teamDisplayLabel}</strong>
+                        </div>
+
+                        <div>
+                            <span>Activity Date</span>
+                            <strong>{selectedDateLabel}</strong>
+                        </div>
+
+                        <div>
+                            <span>Store</span>
+                            <strong>{selectedActivity.storeName}</strong>
+                        </div>
+                    </div>
+
+                    <div class="drop-warning">
+                        <lightning-icon
+                            icon-name="utility:error"
+                            size="small">
+                        </lightning-icon>
+
+                        <span>
+                            Only the selected Team and its active manpower
+                            assignments for this date will move to Dropped
+                            status. Other Teams will remain unchanged.
+                        </span>
+                    </div>
+
+                    <lightning-textarea
+                        class="drop-action-input"
+                        label="Drop Reason"
+                        value={dropReason}
+                        maxlength="32000"
+                        required
+                        onchange={handleDropReasonChange}>
+                    </lightning-textarea>
+                </div>
+
+                <footer class="slds-modal__footer modal-footer">
+                    <lightning-button
+                        label="Cancel"
+                        onclick={closeDropModal}>
+                    </lightning-button>
+
+                    <lightning-button
+                        class="slds-m-left_small"
+                        label="Drop Activity"
+                        variant="destructive"
+                        disabled={disableDropSave}
+                        onclick={handleConfirmDrop}>
+                    </lightning-button>
+                </footer>
+            </div>
+        </section>
+
+        <div class="slds-backdrop slds-backdrop_open"></div>
+    </template>
+
+    <template if:true={showChangeModal}>
+        <section
+            role="dialog"
+            tabindex="-1"
+            aria-modal="true"
+            aria-labelledby="change-modal-heading"
+            class="slds-modal slds-fade-in-open executive-modal">
+
+            <div class="slds-modal__container">
+                <header class="slds-modal__header modal-header">
+                    <button
+                        class="slds-button slds-button_icon slds-modal__close"
+                        title="Close"
+                        onclick={closeChangeModal}>
+
+                        <lightning-icon
+                            icon-name="utility:close"
+                            alternative-text="Close"
+                            variant="inverse"
+                            size="small">
+                        </lightning-icon>
+                    </button>
+
+                    <div class="modal-title-row">
+                        <div class="modal-icon">
+                            <lightning-icon
+                                icon-name="utility:groups"
+                                size="medium">
+                            </lightning-icon>
+                        </div>
+
+                        <div>
+                            <h2
+                                id="change-modal-heading"
+                                class="slds-text-heading_medium">
+                                Update Today's Executives
+                            </h2>
+
+                            <p>
+                                Change the executives before making
+                                the activity live.
+                            </p>
+                        </div>
+                    </div>
+                </header>
+
+                <div class="slds-modal__content modal-body">
+                    <div class="selected-activity-summary">
+                        <div>
+                            <span>Activity</span>
+                            <strong>
+                                {selectedActivity.activityName}
+                            </strong>
+
+                            <template if:true={selectedActivity.hasTeam}>
+                                <small class="modal-team-label">
+                                    {selectedActivity.teamName}
+                                </small>
+                            </template>
+                        </div>
+
+                        <div>
+                            <span>Activity No.</span>
+                            <strong>
+                                {selectedActivity.activityNo}
+                            </strong>
+                        </div>
+
+                        <div>
+                            <span>Store</span>
+                            <strong>
+                                {selectedActivity.storeName}
+                            </strong>
+                        </div>
+
+                        <div>
+                            <span>Activity Date</span>
+                            <strong>{selectedDateLabel}</strong>
+                        </div>
+                    </div>
+
+                    <div class="modal-information">
+                        <lightning-icon
+                            icon-name="utility:info"
+                            size="small">
+                        </lightning-icon>
+
+                        <span>
+                            Existing assignments can be activated,
+                            deactivated, updated, and assigned a location.
+                            Additional executives can be added with a location
+                            before sending the changes for approval.
+                        </span>
+                    </div>
+
+                    <div class="assignment-title-row">
+                        <div>
+                            <h3>Executive Assignments</h3>
+                            <p>
+                                Review the predefined team and add any
+                                additional executives required for today.
+                            </p>
+                        </div>
+
+                        <span class="assignment-total-badge">
+                            {activeChangeCount} Active Today
+                        </span>
+                    </div>
+
+                    <section class="executive-section predefined-section">
+                        <div class="executive-section-header">
+                            <div class="executive-section-title">
+                                <div class="section-icon predefined-section-icon">
+                                    <lightning-icon
+                                        icon-name="utility:user_role"
+                                        size="small">
+                                    </lightning-icon>
+                                </div>
+
+                                <div>
+                                    <h4>Predefined Executives</h4>
+                                    <p>
+                                        Executives configured on the activity.
+                                        Use Active for Today to include or
+                                        exclude them for the selected date.
+                                    </p>
+                                </div>
+                            </div>
+
+                            <span class="section-count-badge">
+                                {predefinedActiveCount} of
+                                {predefinedExecutiveCount} Active
+                            </span>
+                        </div>
+
+                        <div class="executive-section-body">
+                            <template
+                                for:each={predefinedChangeMembers}
+                                for:item="member">
+
+                                <div
+                                    key={member.clientRowKey}
+                                    class={member.modalRowClass}>
+
+                                    <div class="active-checkbox">
+                                        <lightning-input
+                                            type="checkbox"
+                                            label="Active for Today"
+                                            data-key={member.clientRowKey}
+                                            checked={member.activeForDate}
+                                            onchange={handleActiveMemberChange}>
+                                        </lightning-input>
+                                    </div>
+
+                                    <div class="predefined-executive">
+                                        <span>Predefined Executive</span>
+
+                                        <strong>
+                                            {member.assignedExecutiveName}
+                                        </strong>
+
+                                        <template if:true={member.teamName}>
+                                            <small>
+                                                Team: {member.teamName}
+                                            </small>
+                                        </template>
+                                    </div>
+
+                                    <div class="location-field readonly-location-field">
+                                        <span class="readonly-field-label">
+                                            Activity Location
+                                        </span>
+
+                                        <div class="readonly-field-value">
+                                            <lightning-icon
+                                                icon-name="utility:location"
+                                                size="xx-small">
+                                            </lightning-icon>
+
+                                            <span>
+                                                {member.activityLocation}
+                                            </span>
+                                        </div>
+                                    </div>
+
+                                    <div class="actual-executive">
+                                        <lightning-combobox
+                                            label="Actual Executive for Today"
+                                            data-key={member.clientRowKey}
+                                            value={member.actualExecutiveId}
+                                            options={member.executiveOptions}
+                                            disabled={member.executiveDisabled}
+                                            required={member.selectionRequired}
+                                            onchange={handleExecutiveChange}>
+                                        </lightning-combobox>
+                                    </div>
+                                </div>
+                            </template>
+                        </div>
+                    </section>
+
+                    <section class="executive-section additional-section">
+                        <div class="executive-section-header">
+                            <div class="executive-section-title">
+                                <div class="section-icon additional-section-icon">
+                                    <lightning-icon
+                                        icon-name="utility:add"
+                                        size="small">
+                                    </lightning-icon>
+                                </div>
+
+                                <div>
+                                    <h4>Additional Executives</h4>
+                                    <p>
+                                        Add temporary executives and assign
+                                        one of the locations available for this
+                                        team and activity date.
+                                    </p>
+                                </div>
+                            </div>
+
+                            <div class="additional-section-actions">
+                                <span class="section-count-badge additional-count">
+                                    {addedExecutiveCount} Added
+                                </span>
+
+                                <lightning-button
+                                    label="Add Executive"
+                                    icon-name="utility:add"
+                                    disabled={disableAddExecutive}
+                                    onclick={handleAddExecutive}>
+                                </lightning-button>
+                            </div>
+                        </div>
+
+                        <div class="executive-section-body additional-section-body">
+                            <template if:true={hasAddedChangeMembers}>
+                                <template
+                                    for:each={addedChangeMembers}
+                                    for:item="member">
+
+                                    <div
+                                        key={member.clientRowKey}
+                                        class={member.modalRowClass}>
+
+                                        <div class="additional-executive-summary">
+                                            <div class="additional-row-icon">
+                                                <lightning-icon
+                                                    icon-name="utility:user"
+                                                    size="x-small">
+                                                </lightning-icon>
+                                            </div>
+
+                                            <div>
+                                                <span>Additional Executive</span>
+                                                <strong>
+                                                    {member.addedRowLabel}
+                                                </strong>
+
+                                                <template if:true={member.teamName}>
+                                                    <small>
+                                                        Team: {member.teamName}
+                                                    </small>
+                                                </template>
+                                            </div>
+                                        </div>
+
+                                        <div class="location-field">
+                                            <lightning-combobox
+                                                label="Activity Location"
+                                                data-key={member.clientRowKey}
+                                                value={member.activityLocation}
+                                                options={member.locationOptions}
+                                                required
+                                                onchange={handleLocationChange}>
+                                            </lightning-combobox>
+                                        </div>
+
+                                        <div class="actual-executive">
+                                            <lightning-combobox
+                                                label="Select Executive"
+                                                data-key={member.clientRowKey}
+                                                value={member.actualExecutiveId}
+                                                options={member.executiveOptions}
+                                                required
+                                                onchange={handleExecutiveChange}>
+                                            </lightning-combobox>
+                                        </div>
+
+                                        <div class="remove-executive">
+                                            <button
+                                                type="button"
+                                                class="remove-executive-button"
+                                                data-key={member.clientRowKey}
+                                                onclick={handleRemoveExecutive}>
+
+                                                <lightning-icon
+                                                    icon-name="utility:delete"
+                                                    size="xx-small">
+                                                </lightning-icon>
+
+                                                Remove
+                                            </button>
+                                        </div>
+                                    </div>
+                                </template>
+                            </template>
+
+                            <template if:false={hasAddedChangeMembers}>
+                                <div class="additional-empty-state">
+                                    <div class="additional-empty-icon">
+                                        <lightning-icon
+                                            icon-name="utility:adduser"
+                                            size="small">
+                                        </lightning-icon>
+                                    </div>
+
+                                    <div>
+                                        <strong>No additional executives added</strong>
+                                        <span>
+                                            Use Add Executive when another
+                                            team member is required for one of
+                                            today's team locations.
+                                        </span>
+                                    </div>
+                                </div>
+                            </template>
+                        </div>
+                    </section>
+
+                    <template if:true={hasChangeValidationError}>
+                        <div class="validation-message">
+                            <lightning-icon
+                                icon-name="utility:error"
+                                size="small">
+                            </lightning-icon>
+
+                            <span>{changeValidationMessage}</span>
+                        </div>
+                    </template>
+                </div>
+
+                <footer class="slds-modal__footer modal-footer">
+                    <lightning-button
+                        label="Cancel"
+                        onclick={closeChangeModal}>
+                    </lightning-button>
+
+                    <lightning-button
+                        class="slds-m-left_small"
+                        label="Save &amp; Send for Approval"
+                        variant="brand"
+                        disabled={disableInitiateWithChanges}
+                        onclick={handleSaveAndSendForApproval}>
+                    </lightning-button>
+                </footer>
+            </div>
+        </section>
+
+        <div class="slds-backdrop slds-backdrop_open"></div>
+    </template>
+</template>

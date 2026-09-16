@@ -1,0 +1,63 @@
+<template>
+    <div class="slds-p-around_medium slds-box slds-theme_default">
+
+        <!-- SCHEME SEARCH -->
+        <lightning-input
+            type="search"
+            label="Scheme Number"
+            placeholder="Enter Scheme Number"
+            value={schemeNo}
+            onchange={handleSchemeChange}>
+        </lightning-input>
+
+        <!-- AUTO POPULATED SCHEME DETAILS -->
+        <template if:true={schemeFound}>
+            <div class="slds-m-top_medium slds-box slds-theme_shade">
+
+                <div class="slds-grid slds-wrap slds-gutters">
+                    <div class="slds-col slds-size_1-of-2">
+                        <p><strong>Scheme Name:</strong> {schemeData.name}</p>
+                    </div>
+                    <div class="slds-col slds-size_1-of-2">
+                        <p><strong>Customer:</strong> {schemeData.customer}</p>
+                    </div>
+
+                    <div class="slds-col slds-size_1-of-2 slds-m-top_small">
+                        <p><strong>Total Amount:</strong> ₹ {schemeData.totalAmount}</p>
+                    </div>
+                    <div class="slds-col slds-size_1-of-2 slds-m-top_small">
+                        <p><strong>Pending Amount:</strong> ₹ {schemeData.pendingAmount}</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- PAYMENT AMOUNT -->
+            <lightning-input
+                class="slds-m-top_medium"
+                type="number"
+                label="Payment Amount"
+                value={paymentAmount}
+                onchange={handlePaymentChange}>
+            </lightning-input>
+
+            <!-- SAVE BUTTON -->
+            <div class="slds-m-top_medium slds-text-align_right">
+                <lightning-button label="Cancel" variant="neutral" class="slds-m-left_small" onclick={handleCancel}></lightning-button>
+                <lightning-button
+                    variant="brand"
+                    label="Save Payment"
+                    onclick={handleSavePayment}>
+                </lightning-button>
+   
+            </div>
+        </template>
+
+        <!-- NO SCHEME FOUND -->
+        <template if:true={showError}>
+            <div class="slds-text-color_error slds-m-top_small">
+                Invalid Scheme Number. Please check and try again.
+            </div>
+        </template>
+
+    </div>
+</template>

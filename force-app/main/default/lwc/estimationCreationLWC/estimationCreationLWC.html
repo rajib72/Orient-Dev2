@@ -1,0 +1,640 @@
+<template>
+
+    <!-- LOADER -->
+    <template if:false={dataLoaded}>
+        <lightning-spinner size="medium" alternative-text="Loading..."></lightning-spinner>
+    </template>
+
+    <!-- MAIN CONTENT -->
+    <template if:true={dataLoaded}>
+
+        <!-- ================= STEP 1 ================= -->
+        <template if:true={isStep1}>
+            <lightning-card class="main-card">
+
+                <!-- HEADER -->
+                <div class="summary-header header-with-refresh">
+                    <span class="summary-title">Showroom Visit Summary</span>
+                      <lightning-button-icon
+        icon-name="utility:refresh"
+        alternative-text="Refresh"
+        title="Refresh"
+        variant="bare"
+        class="refresh-icon"
+        onclick={handleRefresh}>
+    </lightning-button-icon>
+                </div>
+
+                <!-- SUMMARY CARD -->
+                <div class="summary-card">
+
+                    <div class="slds-grid slds-wrap slds-gutters_large">
+
+                        <div class="slds-col slds-size_1-of-2 summary-item">
+                            <span class="label">Showroom Visit No</span>
+                            <span class="value">{showroomVisit.Name}</span>
+                        </div>
+
+                        <div class="slds-col slds-size_1-of-2 summary-item">
+                            <span class="label">Visit Date</span>
+                            <span class="value">{showroomVisit.Visit_Date__c}</span>
+                        </div>
+
+                        <div class="slds-col slds-size_1-of-2 summary-item">
+                            <span class="label">Customer Name</span>
+                            <span class="value">{customerName}</span>
+                        </div>
+
+                        <div class="slds-col slds-size_1-of-2 summary-item">
+                            <span class="label">Phone</span>
+                            <span class="value">{phone}</span>
+                        </div>
+
+                    </div>
+                </div>
+
+                <!-- TABLE -->
+                <div class="table-wrapper">
+                    <table class="modern-table">
+                        <thead>
+                            <tr>
+                                <th>SKU</th>
+                                <th>Gross Weight</th>
+                                <th>Net Weight</th>
+                                <th>Diamond Wt.</th>
+                                <th>Stone Wt.</th>
+                                <th>Product Price<br />(Incl. GST)</th>
+                                <th>Sales Executive</th>
+                                <th>Wishlist No</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <template for:each={wishlistItems} for:item="wi">
+                                <tr key={wi.id} data-id={wi.id} onclick={toggleWishlistRow} class="clickable-row">
+                                    <td>
+                                        <lightning-icon icon-name={wi.expandIcon} size="xx-small"
+                                            class="slds-m-right_x-small">
+                                        </lightning-icon>
+                                        {wi.barcode}
+                                    </td>
+                                    <td style="text-align: center;">{wi.grossWeight}</td>
+                                    <td style="text-align: center;">{wi.netWeight}</td>
+                                    <td style="text-align: center;">{wi.diamondWt}</td>
+                                    <td style="text-align: center;">{wi.stoneWt}</td>
+                                    <td style="text-align: center;">{wi.productPrice}</td>
+                                    <td>{wi.salesExecutive}</td>
+                                    <td class="badge" style="text-align: center;">{wi.name}</td>
+                                </tr>
+
+                                <template if:true={wi.isExpanded}>
+                                    <tr key={wi.id}>
+                                        <td colspan="8" class="expanded-cell">
+
+                                            <div class="more-info-box">
+                                                <h3 class="section-title">Tag Price Detail Line</h3>
+
+                                                <template if:true={wi.hasTagPriceDetails}>
+                                                    <table class="inner-table">
+                                                        <thead>
+                                                            <tr>
+                                                                <th>BOM Item</th>
+                                                                <th>Purity</th>
+                                                                <th>Quantity</th>
+                                                                <th>UOM</th>
+                                                                <th>Rate</th>
+                                                                <th>Amount</th>
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody>
+                                                            <template for:each={wi.tagPriceDetails} for:item="d">
+                                                                <tr key={d.bomItem}>
+                                                                    <td>{d.bomItem}</td>
+                                                                    <td>{d.purity}</td>
+                                                                    <td>{d.quantity}</td>
+                                                                    <td>{d.uom}</td>
+                                                                    <td>{d.rate}</td>
+                                                                    <td>{d.amount}</td>
+                                                                </tr>
+                                                            </template>
+                                                        </tbody>
+                                                    </table>
+                                                </template>
+
+                                                <template if:false={wi.hasTagPriceDetails}>
+                                                    <div class="no-data">No Tag Price Detail Line found.</div>
+                                                </template>
+
+                                                <h3 class="section-title slds-m-top_medium">Tag Price SMC</h3>
+
+                                                <template if:true={wi.hasTagPriceScms}>
+                                                    <table class="inner-table">
+                                                        <thead>
+                                                            <tr>
+                                                                <th>BOM Item</th>
+                                                                <th>Quantity</th>
+                                                                <th>Rate</th>
+                                                                <th>Amount</th>
+                                                                <th>Making Type</th>
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody>
+                                                            <template for:each={wi.tagPriceScms} for:item="s">
+                                                                <tr key={s.bomItem}>
+                                                                    <td>{s.bomItem}</td>
+                                                                    <td>{s.quantity}</td>
+                                                                    <td>{s.rate}</td>
+                                                                    <td>{s.amount}</td>
+                                                                    <td>{s.makingType}</td>
+                                                                </tr>
+                                                            </template>
+                                                        </tbody>
+                                                    </table>
+                                                </template>
+
+                                                <template if:false={wi.hasTagPriceScms}>
+                                                    <div class="no-data">No Tag Price SMC found.</div>
+                                                </template>
+                                            </div>
+
+                                        </td>
+                                    </tr>
+                                </template>
+                            </template>
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- CTA -->
+                <div class="footer-cta">
+                    <lightning-button label="Next" variant="brand" class="next-btn" onclick={goStep2}>
+                    </lightning-button>
+                </div>
+
+            </lightning-card>
+        </template>
+
+
+        <!-- ================= STEP 2 ================= -->
+        <template if:true={isStep2}>
+            <lightning-card class="main-card">
+
+                <!-- HEADER -->
+                <div class="summary-header header-with-refresh">
+                    <span class="summary-title">Select Wishlist Items</span>
+                      <lightning-button-icon
+        icon-name="utility:refresh"
+        alternative-text="Refresh"
+        title="Refresh"
+        variant="bare"
+        class="refresh-icon"
+        onclick={handleRefresh}>
+    </lightning-button-icon>
+                </div>
+
+                <!-- TABLE -->
+                <div class="table-wrapper">
+                    <table class="modern-table">
+                        <thead>
+                            <tr>
+                                <th style="width: 45px;">More</th>
+                                <th style="width: 55px;">Select</th>
+                                <th>SKU</th>
+                                <th>Gross Weight</th>
+                                <th>Net Weight</th>
+                                <th>Diamond Wt.</th>
+                                <th>Stone Wt.</th>
+                                <th>Product Price<br />(Incl. GST)</th>
+                                <th>Wishlist No</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <template for:each={wishlistItems} for:item="wi">
+                                <tr key={wi.id}>
+                                    <td class="icon-cell">
+                                        <lightning-button-icon icon-name={wi.expandIcon}
+                                            alternative-text="Toggle details" variant="bare" data-id={wi.id}
+                                            onclick={toggleWishlistRow}>
+                                        </lightning-button-icon>
+                                    </td>
+
+                                    <td class="checkbox-cell">
+                                        <lightning-input type="checkbox" data-id={wi.id} checked={wi.isSelected}
+                                            disabled={wi.isDisabled} onchange={handleCheckbox}>
+                                        </lightning-input>
+                                    </td>
+
+                                    <td>{wi.barcode}</td>
+                                    <td style="text-align: center;">{wi.grossWeight}</td>
+                                    <td style="text-align: center;">{wi.netWeight}</td>
+                                    <td style="text-align: center;">{wi.diamondWt}</td>
+                                    <td style="text-align: center;">{wi.stoneWt}</td>
+                                    <td style="text-align: center;">{wi.productPrice}</td>
+                                    <td class="badge">{wi.name}</td>
+                                    <td>
+                                        <span class={wi.badgeClass} style="text-align: center;">{wi.status}</span>
+                                    </td>
+                                </tr>
+
+                                <template if:true={wi.isExpanded}>
+                                    <tr key={wi.id}>
+                                        <td colspan="10" class="expanded-cell">
+                                            <div class="more-info-box">
+                                                <h3 class="section-title">Tag Price Detail Line</h3>
+
+                                                <template if:true={wi.hasTagPriceDetails}>
+                                                    <table class="inner-table">
+                                                        <thead>
+                                                            <tr>
+                                                                <th>BOM Item</th>
+                                                                <th>Purity</th>
+                                                                <th>Quantity</th>
+                                                                <th>UOM</th>
+                                                                <th>Rate</th>
+                                                                <th>Amount</th>
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody>
+                                                            <template for:each={wi.tagPriceDetails} for:item="d">
+                                                                <tr key={d.bomItem}>
+                                                                    <td>{d.bomItem}</td>
+                                                                    <td>{d.purity}</td>
+                                                                    <td>{d.quantity}</td>
+                                                                    <td>{d.uom}</td>
+                                                                    <td>{d.rate}</td>
+                                                                    <td>{d.amount}</td>
+                                                                </tr>
+                                                            </template>
+                                                        </tbody>
+                                                    </table>
+                                                </template>
+
+                                                <template if:false={wi.hasTagPriceDetails}>
+                                                    <div class="no-data">No Tag Price Detail Line found.</div>
+                                                </template>
+
+                                                <h3 class="section-title slds-m-top_medium">Tag Price SMC</h3>
+
+                                                <template if:true={wi.hasTagPriceScms}>
+                                                    <table class="inner-table">
+                                                        <thead>
+                                                            <tr>
+                                                                <th>BOM Item</th>
+                                                                <th>Quantity</th>
+                                                                <th>Rate</th>
+                                                                <th>Amount</th>
+                                                                <th>Making Type</th>
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody>
+                                                            <template for:each={wi.tagPriceScms} for:item="s">
+                                                                <tr key={s.bomItem}>
+                                                                    <td>{s.bomItem}</td>
+                                                                    <td>{s.quantity}</td>
+                                                                    <td>{s.rate}</td>
+                                                                    <td>{s.amount}</td>
+                                                                    <td>{s.makingType}</td>
+                                                                </tr>
+                                                            </template>
+                                                        </tbody>
+                                                    </table>
+                                                </template>
+
+                                                <template if:false={wi.hasTagPriceScms}>
+                                                    <div class="no-data">No Tag Price SMC found.</div>
+                                                </template>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                </template>
+                            </template>
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- FOOTER -->
+                <div class="footer-cta">
+                    <lightning-button label="Back" onclick={goStep1}></lightning-button>
+                    <lightning-button class="slds-m-left_small next-btn" label="Next" variant="brand" onclick={goStep3}>
+                    </lightning-button>
+                </div>
+
+            </lightning-card>
+        </template>
+
+
+
+        <!-- ================= STEP 3 ================= -->
+        <template if:true={isStep3}>
+            <lightning-card class="main-card">
+
+                <!-- HEADER -->
+                <div class="summary-header header-with-refresh">
+                    <span class="summary-title">Confirm Customer & Create Estimation</span>
+                     <lightning-button-icon
+        icon-name="utility:refresh"
+        alternative-text="Refresh"
+        title="Refresh"
+        variant="bare"
+        class="refresh-icon"
+        onclick={handleRefresh}>
+    </lightning-button-icon>
+                </div>
+
+                <!-- CUSTOMER INFO -->
+                <div class="summary-card">
+                    <div class="slds-grid slds-wrap slds-gutters_large">
+
+                        <div class="slds-col slds-size_1-of-2">
+                            <lightning-input label="Customer Name" value={customerName} disabled></lightning-input>
+                        </div>
+
+                        <div class="slds-col slds-size_1-of-2">
+                            <lightning-input label="Phone" value={phone} disabled></lightning-input>
+                        </div>
+
+                        <div class="slds-col slds-size_1-of-2">
+                            <lightning-input label="PAN" value={pan} disabled>
+                            </lightning-input>
+                        </div>
+
+                        <div class="slds-col slds-size_1-of-2">
+                            <lightning-input label="GST" value={gst} disabled>
+                            </lightning-input>
+                        </div>
+
+                        <div class="slds-col slds-size_1-of-2">
+                            <lightning-input label="State Code" value={stateCode} disabled>
+                            </lightning-input>
+
+                            <template if:true={stateCodeMessage}>
+                                <div class="state-code-warning">
+                                    {stateCodeMessage}
+                                </div>
+                            </template>
+                        </div>
+
+                        <div class="slds-col slds-size_1-of-2">
+                            <template if:true={isGenderBlank}>
+                                <lightning-combobox label="Gender" placeholder="Select Gender" value={gender}
+                                    options={genderOptions} required onchange={handleGenderChange}>
+                                </lightning-combobox>
+                            </template>
+
+                            <template if:false={isGenderBlank}>
+                                <lightning-input label="Gender" value={gender} disabled>
+                                </lightning-input>
+                            </template>
+                        </div>
+
+                        <!-- Alternate Customer Checkbox -->
+                        <div class="slds-col slds-size_1-of-1 slds-m-top_small">
+                            <lightning-input type="checkbox" label="Create order with another customer?"
+                                onchange={handleAlternateCustomerToggle}>
+                            </lightning-input>
+                        </div>
+
+                        <!-- Buying For -->
+                        <div class="slds-col slds-size_1-of-2">
+                            <lightning-combobox label="Buying For" value={buyingFor} options={buyingForOptions} required
+                                disabled={isBuyingForDisabled} onchange={handleBuyingForChange}>
+                            </lightning-combobox>
+                        </div>
+
+                    </div>
+                </div>
+
+                <!-- Buying For Name / Phone -->
+                <template if:true={showBuyingForSection}>
+                    <div class="summary-card">
+                        <div class="slds-grid slds-wrap slds-gutters_large">
+
+                            <div class="slds-col slds-size_1-of-2">
+                                <lightning-input label={buyingForNameLabel} value={buyingForName}
+                                    onchange={handleBuyingForName}>
+                                </lightning-input>
+                            </div>
+
+                            <!-- UPDATED: added billing-phone-wrapper here -->
+                            <div class="slds-col slds-size_1-of-2 billing-phone-wrapper">
+                                <lightning-input label={buyingForPhoneLabel} type="search" maxlength="15"
+                                    value={buyingForPhone} onchange={handleBuyingForPhone}>
+                                </lightning-input>
+
+                                <template if:true={showBuyingForSuggestions}>
+                                    <div class="billing-suggestion-box">
+                                        <template for:each={buyingForCustomerSuggestions} for:item="cust">
+                                            <div key={cust.id} class="billing-suggestion-item" data-id={cust.id}
+                                                onclick={handleBuyingForCustomerSelect}>
+
+                                                <div class="billing-suggestion-name">{cust.name}</div>
+                                                <div class="billing-suggestion-phone">{cust.phone}</div>
+                                            </div>
+                                        </template>
+                                    </div>
+                                </template>
+                            </div>
+
+                        </div>
+                    </div>
+                </template>
+
+                <!-- Alternate Customer Section -->
+                <template if:true={useAlternateCustomer}>
+                    <div class="summary-card">
+                        <div class="slds-grid slds-wrap slds-gutters_large">
+
+                            <div class="slds-col slds-size_1-of-2">
+                                <lightning-combobox label="Relation with Customer" placeholder="Select Relation"
+                                    options={relationOptions} value={relation} required disabled={isRelationDisabled}
+                                    onchange={handleRelation}>
+                                </lightning-combobox>
+                            </div>
+
+                            <div class="slds-col slds-size_1-of-2 billing-phone-wrapper">
+                                <lightning-input label="Billing Customer Phone" type="search"
+                                    value={billingCustomerPhone} required maxlength="15" pattern="[0-9]{1,15}"
+                                    message-when-pattern-mismatch="Enter digits only" onchange={handleBillingPhone}>
+                                </lightning-input>
+
+                                <template if:true={showBillingSuggestions}>
+                                    <div class="billing-suggestion-box">
+                                        <template for:each={billingCustomerSuggestions} for:item="cust">
+                                            <div key={cust.id} class="billing-suggestion-item" data-id={cust.id}
+                                                onclick={handleBillingCustomerSelect}>
+
+                                                <div class="billing-suggestion-name">{cust.name}</div>
+                                                <div class="billing-suggestion-phone">{cust.phone}</div>
+                                            </div>
+                                        </template>
+                                    </div>
+                                </template>
+                            </div>
+
+                            <div class="slds-col slds-size_1-of-2">
+                                <lightning-input label="Billing Customer Name" required value={billingCustomerName}
+                                    onchange={handleBillingName}>
+                                </lightning-input>
+                            </div>
+
+                            <div class="slds-col slds-size_1-of-2">
+                                <lightning-input label="Billing Customer State Code" value={billingStateCode} disabled>
+                                </lightning-input>
+                            </div>
+
+                            <div class="slds-col slds-size_1-of-1">
+                                <lightning-input type="checkbox" label="Address same as Primary Customer"
+                                    checked={sameAddressAsPrimary} onchange={handleSameAddressChange}>
+                                </lightning-input>
+                            </div>
+
+                        </div>
+                    </div>
+                </template>
+
+                <!-- ADVANCE SECTION -->
+                <template if:true={showAdvanceSection}>
+                    <div class="summary-card">
+                        <div class="slds-grid slds-wrap slds-gutters_large">
+
+                            <div class="slds-col slds-size_1-of-2">
+                                <lightning-combobox label="Advance Against" value="Order"
+                                    options={advanceAgainstOptions} disabled>
+                                </lightning-combobox>
+                            </div>
+
+                            <div class="slds-col slds-size_1-of-2">
+                                <lightning-input type="number" label="Advance Amount" min="1" required
+                                    value={advanceAmount} onchange={handleAdvanceAmount}>
+                                </lightning-input>
+                            </div>
+
+                        </div>
+                    </div>
+                </template>
+
+
+                <!-- SELECTED WISHLIST ITEMS -->
+                <div class="table-wrapper">
+                    <table class="modern-table">
+                        <thead>
+                            <tr>
+                                <th style="width: 60px;">More</th>
+                                <th>SKU</th>
+                                <th>Gross Weight</th>
+                                <th>Net Weight</th>
+                                <th>Diamond Wt.</th>
+                                <th>Stone Wt.</th>
+                                <th>Product Price<br />(Incl. GST)</th>
+                                <th>Wishlist No</th>
+                                <th>Sales Executive</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <template for:each={selectedWishlistItems} for:item="wi">
+                                <tr key={wi.id}>
+                                    <td class="icon-cell">
+                                        <lightning-button-icon icon-name={wi.expandIcon}
+                                            alternative-text="Toggle details" variant="bare" data-id={wi.id}
+                                            onclick={toggleWishlistRow}>
+                                        </lightning-button-icon>
+                                    </td>
+                                    <td>{wi.barcode}</td>
+                                    <td style="text-align: center;">{wi.grossWeight}</td>
+                                    <td style="text-align: center;">{wi.netWeight}</td>
+                                    <td style="text-align: center;">{wi.diamondWt}</td>
+                                    <td style="text-align: center;">{wi.stoneWt}</td>
+                                    <td style="text-align: center;">{wi.productPrice}</td>
+                                    <td class="badge" style="text-align: center;">{wi.name}</td>
+                                    <td>{wi.salesExecutive}</td>
+                                </tr>
+
+                                <template if:true={wi.isExpanded}>
+                                    <tr key={wi.id}>
+                                        <td colspan="9" class="expanded-cell">
+                                            <div class="more-info-box">
+                                                <h3 class="section-title">Tag Price Detail Line</h3>
+
+                                                <template if:true={wi.hasTagPriceDetails}>
+                                                    <table class="inner-table">
+                                                        <thead>
+                                                            <tr>
+                                                                <th>BOM Item</th>
+                                                                <th>Purity</th>
+                                                                <th>Quantity</th>
+                                                                <th>UOM</th>
+                                                                <th>Rate</th>
+                                                                <th>Amount</th>
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody>
+                                                            <template for:each={wi.tagPriceDetails} for:item="d">
+                                                                <tr key={d.bomItem}>
+                                                                    <td>{d.bomItem}</td>
+                                                                    <td>{d.purity}</td>
+                                                                    <td>{d.quantity}</td>
+                                                                    <td>{d.uom}</td>
+                                                                    <td>{d.rate}</td>
+                                                                    <td>{d.amount}</td>
+                                                                </tr>
+                                                            </template>
+                                                        </tbody>
+                                                    </table>
+                                                </template>
+
+                                                <template if:false={wi.hasTagPriceDetails}>
+                                                    <div class="no-data">No Tag Price Detail Line found.</div>
+                                                </template>
+
+                                                <h3 class="section-title slds-m-top_medium">Tag Price SMC</h3>
+
+                                                <template if:true={wi.hasTagPriceScms}>
+                                                    <table class="inner-table">
+                                                        <thead>
+                                                            <tr>
+                                                                <th>BOM Item</th>
+                                                                <th>Quantity</th>
+                                                                <th>Rate</th>
+                                                                <th>Amount</th>
+                                                                <th>Making Type</th>
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody>
+                                                            <template for:each={wi.tagPriceScms} for:item="s">
+                                                                <tr key={s.bomItem}>
+                                                                    <td>{s.bomItem}</td>
+                                                                    <td>{s.quantity}</td>
+                                                                    <td>{s.rate}</td>
+                                                                    <td>{s.amount}</td>
+                                                                    <td>{s.makingType}</td>
+                                                                </tr>
+                                                            </template>
+                                                        </tbody>
+                                                    </table>
+                                                </template>
+
+                                                <template if:false={wi.hasTagPriceScms}>
+                                                    <div class="no-data">No Tag Price SMC found.</div>
+                                                </template>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                </template>
+                            </template>
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- CTA -->
+                <div class="footer-cta">
+                    <lightning-button label="Back" onclick={goStep2}></lightning-button>
+                    <lightning-button class="slds-m-left_small next-btn" label="Create Estimation" variant="brand"
+                        onclick={handleCreateOrder}>
+                    </lightning-button>
+                </div>
+
+            </lightning-card>
+        </template>
+
+    </template>
+</template>

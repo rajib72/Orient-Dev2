@@ -1,0 +1,40 @@
+.default-row {
+    transition: all 0.2s ease-in-out;
+}
+
+/* Highlight the row in a pale green when approved */
+.approved-row {
+    background-color: #f3fdf5; 
+    box-shadow: inset 4px 0 0 #2e844a; 
+    transition: all 0.2s ease-in-out;
+}
+
+.vertical-center {
+    vertical-align: middle !important;
+}
+
+.field-label {
+    font-weight: 600;
+    color: #080707;
+}
+
+/* Grey badge for current value */
+.old-value-badge {
+    color: #444444;
+    background-color: #f3f3f3;
+    border: 1px solid #e5e5e5;
+    padding: 0.25rem 0.5rem;
+    border-radius: 0.25rem;
+    display: inline-block;
+}
+
+/* Green badge for requested new value */
+.new-value-badge {
+    color: #0c5e26;
+    background-color: #e6f9ed;
+    border: 1px solid #b7e8ca;
+    padding: 0.25rem 0.5rem;
+    border-radius: 0.25rem;
+    display: inline-block;
+    font-weight: 600;
+}

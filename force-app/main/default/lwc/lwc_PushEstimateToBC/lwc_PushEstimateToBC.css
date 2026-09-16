@@ -1,0 +1,100 @@
+/* ========================================= */
+/* NEW THEME HEADER STYLES                   */
+/* ========================================= */
+
+/* Primary Header Card with thick red left border */
+.theme-header-card {
+    background-color: #ffffff;
+    border: 1px solid #e5e5e5;
+    border-left: 6px solid #900000; /* Dark Maroon/Red */
+    border-radius: 0.5rem;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+/* Rounded Dark Red Icon Box */
+.theme-icon-container {
+    background-color: #900000;
+    width: 44px;
+    height: 44px;
+    border-radius: 0.5rem;
+    box-shadow: 0 2px 6px rgba(144, 0, 0, 0.3);
+}
+
+/* Main Title Styling */
+.theme-main-title {
+    color: #900000;
+    font-weight: 700;
+    font-size: 1.15rem;
+}
+
+/* Secondary Banner with thin brownish border */
+.theme-sub-banner {
+    background-color: #ffffff;
+    border: 1px solid #d8c3c3; 
+    border-radius: 0.5rem;
+}
+
+/* Sub Title Styling */
+.theme-sub-title {
+    color: #900000;
+    font-weight: 700;
+    font-size: 0.95rem;
+}
+
+/* Dark Red Circular Count Badge */
+.theme-badge {
+    background-color: #900000;
+    color: #ffffff;
+    font-weight: 700;
+    border-radius: 50%;
+    min-width: 24px;
+    height: 24px;
+    padding: 0 8px;
+    font-size: 0.8rem;
+}
+
+/* Grey Instruction Text on the right */
+.theme-instruction {
+    color: #555555;
+    font-size: 0.85rem;
+}
+
+/* Target the refresh button icon specifically to make it blue */
+.rounded-refresh-btn {
+    --sds-c-icon-button-radius-border: 50%;
+    --sds-c-button-radius-border: 50%;
+    --sds-c-icon-color-foreground-default: #0152cc; /* Blue Icon */
+}
+
+
+/* ========================================= */
+/* EXISTING TABLE STYLES (Keep these)        */
+/* ========================================= */
+.table-container {
+    max-height: 350px;
+    border-radius: 0.5rem;
+    border: 1px solid #e5e5e5;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.04);
+    background-color: white;
+}
+
+.custom-header-row {
+    background-color: #fafaf9;
+}
+
+.custom-header-row th {
+    font-weight: 600;
+    text-transform: uppercase;
+    font-size: 0.75rem;
+    color: #444444;
+    padding-top: 0.5rem;
+    padding-bottom: 0.5rem;
+}
+
+.slds-table td {
+    vertical-align: middle;
+}
+
+lightning-input[type="checkbox"] {
+    margin-bottom: 0;
+}

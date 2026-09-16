@@ -1,0 +1,761 @@
+<template>
+    <lightning-quick-action-panel title={panelTitle}>
+        <template if:true={isLoading}>
+            <div class="spinner-overlay">
+                <lightning-spinner alternative-text="Loading" size="medium"></lightning-spinner>
+            </div>
+        </template>
+
+        <template if:true={errorMessage}>
+            <div class="error-banner slds-m-bottom_small">
+                <lightning-icon icon-name="utility:error" size="x-small"></lightning-icon>
+                <span>{errorMessage}</span>
+            </div>
+        </template>
+
+        <template if:false={isPreviewMode}>
+            <div class="summary-grid slds-m-bottom_medium">
+                <div class="summary-card group-summary-card">
+                    <span class="summary-label">Activity Groups</span>
+                    <span class="summary-value">{groupCount}</span>
+                </div>
+                <div class="summary-card">
+                    <span class="summary-label">Records Shown</span>
+                    <span class="summary-value">{totalRows}</span>
+                </div>
+                <div class="summary-card returned-summary-card">
+                    <span class="summary-label">Returned</span>
+                    <span class="summary-value">{returnedCount}</span>
+                </div>
+                <div class="summary-card date-over-summary-card">
+                    <span class="summary-label">Date Over</span>
+                    <span class="summary-value">{dateOverCount}</span>
+                </div>
+                <div class="summary-card selected-card">
+                    <span class="summary-label">Selected</span>
+                    <span class="summary-value">{selectedCount}</span>
+                </div>
+            </div>
+
+            <div class="toolbar slds-m-bottom_small">
+                <div class="toolbar-search">
+                    <lightning-input
+                        type="search"
+                        label="Search"
+                        variant="label-hidden"
+                        placeholder="Search activity, person, store, executive or team..."
+                        value={searchKey}
+                        onchange={handleSearch}>
+                    </lightning-input>
+                </div>
+
+                <div class="toolbar-filter">
+                    <lightning-combobox
+                        label="Approval Status"
+                        variant="label-hidden"
+                        value={statusFilter}
+                        options={statusOptions}
+                        onchange={handleStatusFilter}>
+                    </lightning-combobox>
+                </div>
+
+                <div class="select-visible-control">
+                    <lightning-input
+                        type="checkbox"
+                        label="Select visible"
+                        checked={allVisibleSelected}
+                        disabled={disableSelectVisible}
+                        onchange={handleSelectAll}>
+                    </lightning-input>
+                </div>
+
+                <lightning-button-icon
+                    icon-name="utility:refresh"
+                    alternative-text="Refresh"
+                    title="Refresh"
+                    onclick={handleRefresh}>
+                </lightning-button-icon>
+            </div>
+
+            <div class="selection-guidance">
+                <lightning-icon icon-name="utility:info" size="x-small"></lightning-icon>
+                <span>{selectedActionMessage}</span>
+            </div>
+
+            <template if:true={hasRows}>
+                <div class="activity-groups">
+                    <template for:each={filteredGroups} for:item="group">
+                        <section key={group.key} class={group.cardClass}>
+                            <div class="activity-group-header">
+                                <div class="activity-heading-icon">
+                                    <lightning-icon icon-name="standard:people" size="small"></lightning-icon>
+                                </div>
+
+                                <div class="activity-heading-content">
+                                    <div class="activity-title-line">
+                                        <span class="activity-number">{group.activityNo}</span>
+                                        <span class="activity-name">{group.activityName}</span>
+                                    </div>
+                                    <div class="activity-meta-line">
+                                        <span>Store: {group.storeName}</span>
+                                        <span>Team: {group.teamName}</span>
+                                        <span>Location: {group.activityLocation}</span>
+                                        <span>Date: {group.formattedTargetDate}</span>
+                                    </div>
+                                </div>
+
+                                <div class="activity-group-badges">
+                                    <span class="count-badge">{group.assignedCount} Assigned</span>
+                                    <template if:true={group.hasNotSubmitted}>
+                                        <span class="status-badge status-not-submitted">{group.notSubmittedCount} Not Submitted</span>
+                                    </template>
+                                    <template if:true={group.hasReturned}>
+                                        <span class="status-badge status-returned">{group.returnedCount} Returned</span>
+                                    </template>
+                                    <template if:true={group.hasDateOver}>
+                                        <span class="status-badge status-date-over">{group.dateOverCount} Date Over</span>
+                                    </template>
+                                    <template if:true={group.hasDropEligible}>
+                                        <span class="drop-eligible-badge">{group.dropEligibleCount} Droppable</span>
+                                    </template>
+                                </div>
+
+                                <div class="activity-group-actions">
+                                    <lightning-input
+                                        type="checkbox"
+                                        label="Select Team"
+                                        data-key={group.key}
+                                        checked={group.allSelected}
+                                        disabled={group.disableGroupSelection}
+                                        onchange={handleGroupSelection}>
+                                    </lightning-input>
+
+                                    <lightning-button
+                                        label={group.previewLabel}
+                                        icon-name="utility:preview"
+                                        data-id={group.previewRecordId}
+                                        data-group-key={group.key}
+                                        data-group-size={group.assignedCount}
+                                        onclick={handlePreview}>
+                                    </lightning-button>
+
+                                    <lightning-button-icon
+                                        icon-name={group.toggleIcon}
+                                        alternative-text="Expand or collapse"
+                                        title="Expand or collapse"
+                                        data-key={group.key}
+                                        onclick={handleToggleGroup}>
+                                    </lightning-button-icon>
+                                </div>
+                            </div>
+
+                            <template if:true={group.isExpanded}>
+                                <div class="group-table-wrap">
+                                    <table class="slds-table slds-table_cell-buffer group-table">
+                                        <thead>
+                                            <tr>
+                                                <th class="checkbox-column">Select</th>
+                                                <th>Assigned Person</th>
+                                                <th>Date Record</th>
+                                                <th>Executive</th>
+                                                <th>Location</th>
+                                                <th>Status</th>
+                                                <th>Returned From</th>
+                                                <th>Last Comments</th>
+                                                <th>Preview</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <template for:each={group.rows} for:item="row">
+                                                <tr key={row.dateRecordId} class={row.rowClass}>
+                                                    <td>
+                                                        <lightning-input
+                                                            type="checkbox"
+                                                            variant="label-hidden"
+                                                            data-id={row.dateRecordId}
+                                                            checked={row.isSelected}
+                                                            disabled={row.selectionDisabled}
+                                                            onchange={handleRowSelection}>
+                                                        </lightning-input>
+                                                    </td>
+                                                    <td>
+                                                        <span class="primary-value">{row.assignedPersonName}</span>
+                                                        <span class="secondary-value">{row.assignedPersonNo}</span>
+                                                    </td>
+                                                    <td>
+                                                        <span class="record-number">{row.dateRecordNo}</span>
+                                                    </td>
+                                                    <td>{row.executiveName}</td>
+                                                    <td>{row.activityLocation}</td>
+                                                    <td>
+                                                        <span class={row.statusClass}>{row.displayStatus}</span>
+                                                    </td>
+                                                    <td>{row.returnedFromLevel}</td>
+                                                    <td>
+                                                        <span class="comment-preview">{row.lastActionComments}</span>
+                                                    </td>
+                                                    <td>
+                                                        <lightning-button
+                                                            label="Preview"
+                                                            icon-name="utility:preview"
+                                                            data-id={row.dateRecordId}
+                                                            data-group-key={group.key}
+                                                            data-group-size="1"
+                                                            onclick={handlePreview}>
+                                                        </lightning-button>
+                                                    </td>
+                                                </tr>
+                                            </template>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </template>
+                        </section>
+                    </template>
+                </div>
+            </template>
+
+            <template if:false={hasRows}>
+                <div class="empty-state">
+                    <lightning-icon icon-name="utility:info" size="small"></lightning-icon>
+                    <h3>No eligible activity found</h3>
+                    <p>No Not Submitted or Returned activity matches the current search and filter.</p>
+                </div>
+            </template>
+
+            <lightning-textarea
+                class="slds-m-top_medium"
+                label="Submission Comments / Drop Reason"
+                placeholder="Optional for submission; mandatory when dropping a returned activity."
+                value={submissionComments}
+                maxlength="32768"
+                onchange={handleComments}>
+            </lightning-textarea>
+        </template>
+
+        <template if:true={isPreviewMode}>
+            <div class="preview-header">
+                <div>
+                    <div class="preview-title">
+                        {previewSummary.activityNo}
+                    </div>
+                    <div class="preview-subtitle">
+                        {previewSummary.activityName}
+                        &nbsp;•&nbsp;
+                        {previewSummary.storeName}
+                        &nbsp;•&nbsp;
+                        {previewSummary.formattedTargetDate}
+                    </div>
+                </div>
+                <span class={previewSummary.statusClass}>
+                    {previewSummary.displayStatus}
+                </span>
+            </div>
+
+            <template if:true={hasWarnings}>
+                <div class="warning-container">
+                    <template for:each={previewWarnings} for:item="warning">
+                        <div key={warning.key} class="warning-message">
+                            <lightning-icon
+                                icon-name="utility:warning"
+                                size="x-small">
+                            </lightning-icon>
+                            <span>{warning.message}</span>
+                        </div>
+                    </template>
+                </div>
+            </template>
+
+            <section class="overview-section approval-section">
+                <div class="section-heading">
+                    <lightning-icon
+                        icon-name="standard:approval"
+                        size="small">
+                    </lightning-icon>
+                    <span>Approval Overview</span>
+                </div>
+
+                <div class="overview-field-grid">
+                    <template for:each={approvalSummaryFields} for:item="field">
+                        <div key={field.key} class="overview-field">
+                            <span class="field-label">{field.label}</span>
+                            <span class="overview-value">{field.value}</span>
+                        </div>
+                    </template>
+                </div>
+
+                <template if:true={previewSummary.lastActionComments}>
+                    <div class="comments-box">
+                        <span class="field-label">
+                            Last Approval Comments
+                        </span>
+                        <lightning-formatted-text
+                            value={previewSummary.lastActionComments}>
+                        </lightning-formatted-text>
+                    </div>
+                </template>
+            </section>
+
+            <section class="overview-section selected-activity-section">
+                <div class="section-heading">
+                    <lightning-icon
+                        icon-name="standard:task"
+                        size="small">
+                    </lightning-icon>
+                    <span>Selected Activity Details</span>
+                </div>
+
+                <div class="overview-field-grid">
+                    <template for:each={activityOverviewFields} for:item="field">
+                        <div key={field.key} class="overview-field">
+                            <span class="field-label">{field.label}</span>
+                            <span class="overview-value">{field.value}</span>
+                        </div>
+                    </template>
+                </div>
+            </section>
+
+            <section class="overview-section">
+                <div class="section-heading heading-between">
+                    <div class="heading-left">
+                        <lightning-icon
+                            icon-name="standard:people"
+                            size="small">
+                        </lightning-icon>
+                        <span>All Assigned Persons for This Activity</span>
+                    </div>
+                    <span class="section-hint">
+                        Tap eligible rows to include or remove them from this team submission.
+                    </span>
+                </div>
+
+                <template if:true={hasAssignedPersons}>
+                    <div class="assigned-table-wrap">
+                        <table class="slds-table slds-table_cell-buffer slds-table_bordered assigned-table">
+                            <thead>
+                                <tr>
+                                    <th class="preview-selection-column">Select</th>
+                                    <th>Assigned Person</th>
+                                    <th>Executive</th>
+                                    <th>Team</th>
+                                    <th>Store</th>
+                                    <th>Target Date</th>
+                                    <th>Actual Date</th>
+                                    <th>Location</th>
+                                    <th>Attendance</th>
+                                    <th>Approval Status</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <template
+                                    for:each={assignedPersonRows}
+                                    for:item="assignment">
+
+                                    <tr
+                                        key={assignment.key}
+                                        class={assignment.rowClass}
+                                        data-id={assignment.dateRecordId}
+                                        title={assignment.selectionTitle}
+                                        onclick={handlePreviewAssignmentClick}>
+                                        <td class="preview-selection-cell">
+                                            <template if:true={assignment.isSelectable}>
+                                                <lightning-icon
+                                                    icon-name={assignment.selectionIcon}
+                                                    size="x-small">
+                                                </lightning-icon>
+                                            </template>
+                                            <template if:false={assignment.isSelectable}>
+                                                <span class="blank-value">—</span>
+                                            </template>
+                                        </td>
+                                        <td>
+                                            <span class="primary-value">
+                                                {assignment.displayName}
+                                            </span>
+                                            <span class="secondary-value">
+                                                {assignment.dateRecordNo}
+                                            </span>
+                                        </td>
+                                        <td>{assignment.executiveName}</td>
+                                        <td>{assignment.teamName}</td>
+                                        <td>{assignment.storeName}</td>
+                                        <td>{assignment.formattedTargetDate}</td>
+                                        <td>{assignment.formattedActualDate}</td>
+                                        <td>{assignment.location}</td>
+                                        <td>{assignment.attendanceDisplay}</td>
+                                        <td>
+                                            <span class={assignment.statusClass}>
+                                                {assignment.displayStatus}
+                                            </span>
+                                        </td>
+                                    </tr>
+                                </template>
+                            </tbody>
+                        </table>
+                    </div>
+                </template>
+
+                <template if:false={hasAssignedPersons}>
+                    <div class="section-empty">
+                        No assigned person information is available.
+                    </div>
+                </template>
+            </section>
+
+            <template if:true={canManageReturnedManpower}>
+                <section class="manpower-action-section">
+                    <div class="manpower-action-copy">
+                        <div class="manpower-action-title">Returned Activity Manpower</div>
+                        <div class="manpower-action-subtitle">
+                            Replace one returned manpower record without overwriting history, or add new manpower before resubmission.
+                        </div>
+                        <template if:true={disableChangeManpower}>
+                            <div class="manpower-action-help">
+                                Keep exactly one returned row selected to enable Change Manpower.
+                            </div>
+                        </template>
+                    </div>
+                    <div class="manpower-action-buttons">
+                        <lightning-button
+                            label="Change Manpower"
+                            icon-name="utility:replace"
+                            disabled={disableChangeManpower}
+                            onclick={handleOpenChangeManpower}>
+                        </lightning-button>
+                        <lightning-button
+                            class="slds-m-left_small"
+                            label="Add Manpower"
+                            icon-name="utility:adduser"
+                            onclick={handleOpenAddManpower}>
+                        </lightning-button>
+                    </div>
+                </section>
+            </template>
+
+            <section class="overview-section">
+                <div class="section-heading">
+                    <lightning-icon
+                        icon-name="utility:summary"
+                        size="small">
+                    </lightning-icon>
+                    <span>Supporting Information</span>
+                </div>
+
+                <div class="supporting-grid">
+                    <template for:each={supportingCards} for:item="card">
+                        <div key={card.key} class="supporting-card">
+                            <lightning-icon
+                                icon-name={card.icon}
+                                size="small">
+                            </lightning-icon>
+                            <div>
+                                <span class="supporting-value">
+                                    {card.value}
+                                </span>
+                                <span class="supporting-label">
+                                    {card.label}
+                                </span>
+                            </div>
+                        </div>
+                    </template>
+                </div>
+            </section>
+
+            <template if:true={previewCanDrop}>
+                <section class="preview-drop-reason-panel">
+                    <div class="drop-reason-heading">
+                        <lightning-icon
+                            icon-name="utility:delete"
+                            size="small">
+                        </lightning-icon>
+                        <div>
+                            <div class="drop-reason-title">
+                                Drop Reason
+                            </div>
+                            <div class="drop-reason-subtitle">
+                                Required before dropping the selected returned activity records.
+                            </div>
+                        </div>
+                    </div>
+
+                    <lightning-textarea
+                        data-id="previewDropReason"
+                        label="Reason for dropping the selected record(s)"
+                        placeholder="Enter the reason for permanently dropping the selected returned activity records..."
+                        value={previewDropReason}
+                        maxlength="32768"
+                        required
+                        message-when-value-missing="Drop reason is required."
+                        onchange={handlePreviewDropReason}>
+                    </lightning-textarea>
+
+                    <div class="drop-reason-help">
+                        This reason will be saved in the approval transaction and approval history.
+                    </div>
+                </section>
+            </template>
+
+            <div class="detail-toggle-panel">
+                <div>
+                    <div class="detail-toggle-title">
+                        Need every field and related record?
+                    </div>
+                    <div class="detail-toggle-subtitle">
+                        Full details are loaded only when requested.
+                    </div>
+                </div>
+
+                <lightning-button
+                    label={detailButtonLabel}
+                    icon-name={detailButtonIcon}
+                    onclick={handleToggleFullDetails}>
+                </lightning-button>
+            </div>
+
+            <template if:true={showFullDetails}>
+                <div class="full-details-heading">
+                    Complete Record Details
+                </div>
+
+                <template for:each={detailedSections} for:item="section">
+                    <section key={section.key} class="detail-section">
+                        <div class="section-heading heading-between">
+                            <span>{section.title}</span>
+                            <span class="record-count">
+                                {section.recordCount} record(s)
+                            </span>
+                        </div>
+
+                        <template if:true={section.hasRecords}>
+                            <template for:each={section.records} for:item="record">
+                                <article key={record.key} class="record-card">
+                                    <div class="record-title">
+                                        {record.title}
+                                    </div>
+
+                                    <div class="field-grid">
+                                        <template
+                                            for:each={record.fields}
+                                            for:item="field">
+
+                                            <div
+                                                key={field.key}
+                                                class={field.containerClass}>
+
+                                                <span class="field-label">
+                                                    {field.label}
+                                                </span>
+
+                                                <template if:true={field.hasValue}>
+                                                    <lightning-formatted-text
+                                                        value={field.displayValue}>
+                                                    </lightning-formatted-text>
+                                                </template>
+
+                                                <template if:false={field.hasValue}>
+                                                    <span class="blank-value">—</span>
+                                                </template>
+                                            </div>
+                                        </template>
+                                    </div>
+                                </article>
+                            </template>
+                        </template>
+
+                        <template if:false={section.hasRecords}>
+                            <div class="section-empty">
+                                No related information is available.
+                            </div>
+                        </template>
+                    </section>
+                </template>
+
+                <section class="detail-section">
+                    <div class="section-heading heading-between">
+                        <span>Salesforce Files</span>
+                        <span class="record-count">
+                            {detailedFileCount} file(s)
+                        </span>
+                    </div>
+
+                    <template if:true={hasDetailedFiles}>
+                        <div class="file-list">
+                            <template for:each={detailedFiles} for:item="file">
+                                <a
+                                    key={file.key}
+                                    href={file.url}
+                                    target="_blank"
+                                    class="file-card">
+                                    <lightning-icon
+                                        icon-name="doctype:attachment"
+                                        size="small">
+                                    </lightning-icon>
+                                    <div>
+                                        <div class="file-title">
+                                            {file.title}
+                                        </div>
+                                        <div class="file-meta">
+                                            {file.fileType}
+                                            &nbsp;•&nbsp;
+                                            {file.formattedCreatedDate}
+                                        </div>
+                                    </div>
+                                </a>
+                            </template>
+                        </div>
+                    </template>
+
+                    <template if:false={hasDetailedFiles}>
+                        <div class="section-empty">
+                            No Salesforce File is attached.
+                        </div>
+                    </template>
+                </section>
+            </template>
+        </template>
+
+        <template if:true={showManpowerPanel}>
+            <div class="manpower-modal-backdrop"></div>
+            <section class="manpower-modal" role="dialog" aria-modal="true">
+                <header class="manpower-modal-header">
+                    <div>
+                        <h2>{manpowerPanelTitle}</h2>
+                        <p>Only active manpower from the same store is listed. On replacement, the old assignment is deactivated and a new record is created with the same planning details.</p>
+                    </div>
+                    <lightning-button-icon
+                        icon-name="utility:close"
+                        alternative-text="Close"
+                        title="Close"
+                        onclick={handleCloseManpowerPanel}>
+                    </lightning-button-icon>
+                </header>
+
+                <div class="manpower-modal-body">
+                    <lightning-input
+                        type="search"
+                        label="Search Manpower"
+                        placeholder="Search by name, team or employee code..."
+                        value={manpowerSearchKey}
+                        onchange={handleManpowerSearch}>
+                    </lightning-input>
+
+                    <div class="manpower-selection-count">
+                        {selectedManpowerCount} selected
+                    </div>
+
+                    <template if:true={hasManpowerRows}>
+                        <div class="manpower-options">
+                            <template for:each={filteredManpowerRows} for:item="manpower">
+                                <div
+                                    key={manpower.executiveId}
+                                    class={manpower.rowClass}
+                                    data-id={manpower.executiveId}
+                                    onclick={handleManpowerRowClick}>
+                                    <lightning-input
+                                        type="checkbox"
+                                        variant="label-hidden"
+                                        data-id={manpower.executiveId}
+                                        checked={manpower.isSelected}
+                                        onchange={handleManpowerSelection}>
+                                    </lightning-input>
+                                    <lightning-icon icon-name="standard:people" size="small"></lightning-icon>
+                                    <div class="manpower-option-details">
+                                        <span class="manpower-option-name">{manpower.executiveName}</span>
+                                        <span class="manpower-option-meta">
+                                            {manpower.teamName} {manpower.employeeCode}
+                                        </span>
+                                    </div>
+                                </div>
+                            </template>
+                        </div>
+                    </template>
+
+                    <template if:false={hasManpowerRows}>
+                        <div class="manpower-empty-state">
+                            No eligible manpower is available for this store.
+                        </div>
+                    </template>
+
+                    <template if:true={isChangeManpowerMode}>
+                        <lightning-textarea
+                            class="slds-m-top_medium"
+                            label="Replacement Reason"
+                            placeholder="Add remarks explaining the manpower replacement..."
+                            value={manpowerChangeReason}
+                            maxlength="32768"
+                            onchange={handleManpowerReason}>
+                        </lightning-textarea>
+                    </template>
+                </div>
+
+                <footer class="manpower-modal-footer">
+                    <lightning-button
+                        label="Cancel"
+                        onclick={handleCloseManpowerPanel}>
+                    </lightning-button>
+                    <lightning-button
+                        class="slds-m-left_small"
+                        label={manpowerSaveLabel}
+                        variant="brand"
+                        disabled={disableSaveManpower}
+                        onclick={handleSaveManpower}>
+                    </lightning-button>
+                </footer>
+            </section>
+        </template>
+
+        <div slot="footer">
+            <template if:false={isPreviewMode}>
+                <lightning-button label="Cancel" onclick={handleClose}></lightning-button>
+
+                <template if:true={showDropButton}>
+                    <lightning-button
+                        class="slds-m-left_small"
+                        label={dropButtonLabel}
+                        variant="destructive-text"
+                        icon-name="utility:delete"
+                        disabled={isLoading}
+                        onclick={handleDrop}>
+                    </lightning-button>
+                </template>
+
+                <lightning-button
+                    class="slds-m-left_small"
+                    label={submitButtonLabel}
+                    variant="brand"
+                    icon-name="utility:send"
+                    disabled={disableSubmit}
+                    onclick={handleSubmit}>
+                </lightning-button>
+            </template>
+
+            <template if:true={isPreviewMode}>
+                <lightning-button
+                    label="Back to Activities"
+                    icon-name="utility:back"
+                    onclick={handleBackFromPreview}>
+                </lightning-button>
+
+                <template if:true={previewCanDrop}>
+                    <lightning-button
+                        class="slds-m-left_small"
+                        label={previewDropLabel}
+                        variant="destructive-text"
+                        icon-name="utility:delete"
+                        disabled={isLoading}
+                        onclick={handleDropFromPreview}>
+                    </lightning-button>
+                </template>
+
+                <lightning-button
+                    class="slds-m-left_small"
+                    label={previewSubmitLabel}
+                    variant="brand"
+                    icon-name="utility:send"
+                    disabled={disablePreviewSubmit}
+                    onclick={handleSubmitFromPreview}>
+                </lightning-button>
+            </template>
+        </div>
+    </lightning-quick-action-panel>
+</template>

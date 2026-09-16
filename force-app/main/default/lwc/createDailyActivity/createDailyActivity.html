@@ -1,0 +1,223 @@
+<template>
+    <lightning-card>
+        <div class="form-scroll">
+
+            <div class="section-title">Basic Details</div>
+            <div class="form-grid padded">
+                <lightning-combobox label="Store" placeholder="Select Store" options={storeOptions} value={form.store}
+                    onchange={updateField} data-field="store" data-required="true" disabled={isStoreDisabled}>
+                </lightning-combobox>
+
+                <lightning-combobox label="Sales Executive" placeholder="Select Sales Executive"
+                    options={salesExecutiveOptions} value={form.salesExecutive} onchange={updateField}
+                    data-field="salesExecutive" data-required="true" disabled={isSalesExecutiveDisabled} required>
+                </lightning-combobox>
+
+                <lightning-input type="date" label="Date" value={form.activityDate} onchange={updateField}
+                    data-field="activityDate" data-required="true" disabled>
+                </lightning-input>
+
+                <lightning-input type="time" label="Time" value={form.activityTime} onchange={updateField}
+                    data-field="activityTime" data-required="true" disabled>
+                </lightning-input>
+            </div>
+
+            <div class="section-title">Customer Search</div>
+            <div class="form-grid padded">
+                <lightning-input type="tel" label="Phone Number" value={form.phone} onchange={updateField}
+                    data-field="phone" maxlength="10" placeholder="Search customer by phone number">
+                </lightning-input>
+
+                <template if:true={matchedAccounts.length}>
+                    <div class="customer-result">
+                        <div class="result-header">
+                            Matching Customers Found
+                        </div>
+
+                        <template for:each={matchedAccounts} for:item="acc">
+                            <div key={acc.Id} class="customer-card" data-id={acc.Id} onclick={selectAccount}>
+
+                                <div class="customer-avatar">
+                                    <lightning-icon icon-name="standard:avatar" size="small"
+                                        alternative-text="Customer">
+                                    </lightning-icon>
+                                </div>
+
+                                <div class="customer-info">
+                                    <div class="customer-name">{acc.Name}</div>
+
+                                    <div class="customer-phone">
+                                        <template if:true={acc.Phone}>
+                                            {acc.Phone}
+                                        </template>
+                                        <template if:false={acc.Phone}>
+                                            {acc.Whatsapp_Number__c}
+                                        </template>
+                                    </div>
+                                </div>
+
+                                <div class="select-text">Select</div>
+                            </div>
+                        </template>
+                    </div>
+                </template>
+            </div>
+
+            <div class="section-title">Customer Details</div>
+            <div class="form-grid padded">
+                <lightning-input type="text" label="Customer Name" value={form.customer} onchange={updateField}
+                    data-field="customer">
+                </lightning-input>
+                <lightning-input type="text" label="Purpose Search" value={form.purposeSearch} onchange={updateField}
+                    data-field="purposeSearch" placeholder="Search purpose">
+                </lightning-input>
+
+                <template if:true={purposeResults.length}>
+                    <div class="purpose-dropdown">
+                        <template for:each={purposeResults} for:item="pur">
+                            <div key={pur.Id} class="purpose-row" data-id={pur.Id} onclick={selectPurpose}>
+                                <div class="purpose-level1">{pur.Purpose_Level_1__c}</div>
+                                <div class="purpose-level2">{pur.Purpose_Level_2__c}</div>
+                                <div class="purpose-level3">{pur.Purpose_Level_3__c}</div>
+                            </div>
+                        </template>
+                    </div>
+                </template>
+
+                <div class="multiselect-container slds-form-element">
+                    <label class="slds-form-element__label">Category</label>
+                    <div class="slds-form-element__control">
+                        <lightning-combobox variant="label-hidden" placeholder="Select Categories..."
+                            options={availableCategoryOptions} value="" onchange={handleCategorySelect}
+                            class="category-input">
+                        </lightning-combobox>
+                    </div>
+                    <div class="pill-container">
+                        <template for:each={selectedCategories} for:item="cat">
+                            <lightning-pill key={cat} label={cat} name={cat} onremove={handleCategoryRemove}>
+                            </lightning-pill>
+                        </template>
+                    </div>
+                    <template if:true={categoryError}>
+                        <div class="slds-text-color_error slds-form-element__help" style="margin-top: 4px;">
+                            {categoryError}</div>
+                    </template>
+                </div>
+
+                <div class="multiselect-container slds-form-element">
+                    <label class="slds-form-element__label">Sub Category</label>
+                    <div class="slds-form-element__control">
+                        <lightning-combobox variant="label-hidden" placeholder="Select Sub Categories..."
+                            options={availableSubCategoryOptions} value="" onchange={handleSubCategorySelect}
+                            disabled={isSubCategoryDisabled} class="subcategory-input">
+                        </lightning-combobox>
+                    </div>
+                    <div class="pill-container">
+                        <template for:each={selectedSubCategories} for:item="sub">
+                            <lightning-pill key={sub} label={sub} name={sub} onremove={handleSubCategoryRemove}>
+                            </lightning-pill>
+                        </template>
+                    </div>
+                    <template if:true={subCategoryError}>
+                        <div class="slds-text-color_error slds-form-element__help" style="margin-top: 4px;">
+                            {subCategoryError}</div>
+                    </template>
+                </div>
+
+                <lightning-input type="text" label="Net Weight" maxlength="10" value={form.netWeight} onchange={updateField}
+                    data-field="netWeight" placeholder="Enter net weight">
+                </lightning-input>
+
+                <lightning-input type="number" label="Budget" maxlength="15" value={form.budget} onchange={updateField}
+                    data-field="budget" formatter="currency" step="0.01" placeholder="Enter budget">
+                </lightning-input>
+
+                <lightning-textarea label="Description" value={form.description} onchange={updateField}
+                    data-field="description">
+                </lightning-textarea>
+            </div>
+
+          <div class="form-grid padded">
+    <div class="design-upload-box">
+        <div class="upload-header">
+            <lightning-icon icon-name="utility:attach" size="x-small"></lightning-icon>
+            <span>Design Upload</span>
+        </div>
+
+        <div class="upload-help-text">
+            Maximum allowed file size: 5 MB
+        </div>
+
+        <template if:true={isFileReading}>
+            <div class="upload-spinner-box">
+                <lightning-spinner
+                    alternative-text="Uploading file..."
+                    size="small">
+                </lightning-spinner>
+                <span class="uploading-text">Reading file, please wait...</span>
+            </div>
+        </template>
+
+        <lightning-input
+            class="design-file-input"
+            type="file"
+            variant="label-hidden"
+            accept=".png,.jpg,.jpeg,.pdf,.doc,.docx"
+            multiple
+            onchange={handleDesignFileUpload}
+            disabled={isFileReading}>
+        </lightning-input>
+
+        <template if:true={designFiles.length}>
+            <template for:each={designFiles} for:item="file" for:index="index">
+                <div key={file.fileName} class="file-name">
+                    <span>{file.fileName}</span>
+                    <button
+                        class="remove-file-btn"
+                        data-index={index}
+                        onclick={removeDesignFile}
+                        disabled={isFileReading}>
+                        Remove
+                    </button>
+                </div>
+            </template>
+        </template>
+    </div>
+</div>
+        </div>
+        <template if:true={isSaving}>
+    <div class="saving-overlay">
+        <lightning-spinner
+            alternative-text="Saving..."
+            size="medium">
+        </lightning-spinner>
+        <div class="saving-text">Saving record, please wait...</div>
+    </div>
+</template>
+
+     <div class="footer-buttons">
+    <lightning-button
+        label="Save"
+        variant="brand"
+        onclick={saveRecord}
+        disabled={isSaving}>
+    </lightning-button>
+
+    <lightning-button
+        label="Save & New"
+        variant="brand"
+        onclick={saveAndNew}
+        disabled={isSaving}>
+    </lightning-button>
+
+    <lightning-button
+        label="Cancel"
+        variant="neutral"
+        onclick={handleCancel}
+        disabled={isSaving}>
+    </lightning-button>
+</div>
+
+        <div class="spacer"></div>
+    </lightning-card>
+</template>

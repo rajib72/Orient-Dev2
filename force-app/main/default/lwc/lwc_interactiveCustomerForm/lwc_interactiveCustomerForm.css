@@ -1,0 +1,468 @@
+.formPage {
+    padding: 18px;
+    background: #f3f4f6;
+    min-height: auto;
+}
+
+.formTopBar {
+    margin-bottom: 14px;
+}
+
+.interactiveCard {
+    background: #ffffff;
+    border: 1px solid #dddbda;
+    border-radius: 6px;
+    padding: 18px;
+    max-width: 100%;
+    margin: 0 auto;
+}
+
+.interactiveHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    padding-bottom: 16px;
+    border-bottom: 1px solid #ecebea;
+    margin-bottom: 18px;
+}
+
+.formIdentity {
+    display: flex;
+    gap: 12px;
+    align-items: flex-start;
+}
+
+.formIcon {
+    width: 44px;
+    height: 44px;
+    border-radius: 6px;
+    background: #eef4ff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.formIdentity span {
+    font-size: 11px;
+    color: #706e6b;
+    font-weight: 700;
+    text-transform: uppercase;
+}
+
+.formIdentity h2 {
+    margin: 2px 0;
+    font-size: 22px;
+    font-weight: 700;
+    color: #181818;
+}
+
+.formIdentity p {
+    margin: 0;
+    font-size: 13px;
+    color: #3e3e3c;
+}
+
+.questionSummary {
+    background: #f3f6f9;
+    border: 1px solid #d8dde6;
+    border-radius: 4px;
+    padding: 10px 14px;
+    min-width: 130px;
+}
+
+.questionSummary span {
+    display: block;
+    font-size: 11px;
+    color: #706e6b;
+    font-weight: 700;
+    text-transform: uppercase;
+}
+
+.questionSummary strong {
+    display: block;
+    font-size: 22px;
+    color: #0176d3;
+    line-height: 1;
+    margin-top: 4px;
+}
+
+/* Customer Details Main Box */
+.customerInfoBox {
+    background: #ffffff;
+    border: 1px solid #dddbda;
+    border-radius: 6px;
+    padding: 14px;
+    margin-bottom: 14px;
+}
+
+.customerInfoTitle {
+    font-size: 14px;
+    font-weight: 700;
+    color: #181818;
+    margin-bottom: 12px;
+}
+
+.customerInfoGrid {
+    display: grid;
+    grid-template-columns: minmax(220px, 320px) minmax(220px, 1fr);
+    gap: 16px;
+    align-items: end;
+}
+
+.locationStatus {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: #f3f6f9;
+    border: 1px solid #d8dde6;
+    border-radius: 5px;
+    padding: 10px;
+    color: #3e3e3c;
+    font-size: 13px;
+    min-height: 42px;
+}
+
+.customerSearchBox {
+    margin-top: 12px;
+    min-height: 38px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    color: #0176d3;
+    font-size: 13px;
+    font-weight: 600;
+}
+
+.noCustomerBox {
+    margin-top: 12px;
+    background: #fff7ed;
+    border: 1px solid #fed7aa;
+    color: #9a3412;
+    border-radius: 6px;
+    padding: 10px 12px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-weight: 700;
+}
+
+/* Compact Customer Preview */
+.customerMiniCard {
+    margin-top: 12px;
+    background: linear-gradient(135deg, #f8fbff, #ffffff);
+    border: 1px solid #bfdbfe;
+    border-radius: 10px;
+    padding: 12px;
+}
+
+.customerMiniHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid #e0ecff;
+    margin-bottom: 10px;
+}
+
+.customerMiniLeft {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.customerMiniAvatar {
+    width: 34px;
+    height: 34px;
+    min-width: 34px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #2563eb, #38bdf8);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.customerMiniAvatar lightning-icon {
+    --slds-c-icon-color-foreground-default: #ffffff;
+}
+
+.customerMiniHeader h3 {
+    margin: 0;
+    font-size: 15px;
+    font-weight: 800;
+    color: #111827;
+    line-height: 1.2;
+}
+
+.customerMiniHeader p {
+    margin: 2px 0 0 0;
+    font-size: 11px;
+    color: #15803d;
+    font-weight: 700;
+}
+
+.customerFoundBadge {
+    background: #dcfce7;
+    color: #15803d;
+    border: 1px solid #bbf7d0;
+    border-radius: 999px;
+    padding: 4px 10px;
+    font-size: 11px;
+    font-weight: 800;
+    text-transform: uppercase;
+}
+
+.customerMiniGrid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 8px;
+    margin-bottom: 10px;
+}
+
+.miniInfoItem {
+    background: #ffffff;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    padding: 8px 10px;
+    min-height: 48px;
+}
+
+.miniInfoItem span,
+.miniAddressGrid span {
+    display: block;
+    font-size: 10px;
+    color: #64748b;
+    font-weight: 800;
+    text-transform: uppercase;
+    margin-bottom: 3px;
+}
+
+.miniInfoItem strong,
+.miniAddressGrid strong {
+    display: block;
+    font-size: 12px;
+    color: #111827;
+    font-weight: 700;
+    line-height: 1.25;
+    word-break: break-word;
+}
+
+.miniAddressBox {
+    background: #f8fafc;
+    border: 1px dashed #cbd5e1;
+    border-radius: 8px;
+    padding: 10px;
+}
+
+.miniAddressTitle {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    color: #1d4ed8;
+    font-size: 12px;
+    font-weight: 800;
+    margin-bottom: 8px;
+}
+
+.miniAddressTitle lightning-icon {
+    --slds-c-icon-color-foreground-default: #1d4ed8;
+}
+
+.miniAddressGrid {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 8px;
+}
+
+.miniAddressGrid div {
+    background: #ffffff;
+    border: 1px solid #e5e7eb;
+    border-radius: 7px;
+    padding: 7px 8px;
+    min-height: 44px;
+}
+
+/* Question Section */
+.questionSectionTitle {
+    font-size: 15px;
+    font-weight: 700;
+    color: #181818;
+    padding: 11px 13px;
+    background: #f3f3f3;
+    border: 1px solid #dddbda;
+    border-radius: 4px;
+    margin-bottom: 12px;
+}
+
+.customerInformationDisabled {
+    opacity: 0.55;
+}
+
+.customerInformationEnabled {
+    opacity: 1;
+}
+
+.disabledCustomerMessage {
+    margin-bottom: 12px;
+    background: #fef2f2;
+    border: 1px solid #fecaca;
+    color: #991b1b;
+    border-radius: 6px;
+    padding: 10px 12px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-weight: 700;
+    font-size: 13px;
+}
+
+.questionList {
+    border: 1px solid #dddbda;
+    border-radius: 4px;
+    overflow: hidden;
+}
+
+.questionRow {
+    display: block;
+    padding: 16px;
+    border-bottom: 1px solid #ecebea;
+}
+
+.questionRow:last-child {
+    border-bottom: none;
+}
+
+.questionRow:hover {
+    background: #f7f9fb;
+}
+
+.questionText {
+    margin-bottom: 10px;
+}
+
+.questionText strong {
+    display: block;
+    font-size: 14px;
+    color: #181818;
+    line-height: 1.45;
+    margin-bottom: 4px;
+}
+
+.questionText span {
+    display: inline-block;
+    font-size: 11px;
+    color: #706e6b;
+    background: #f3f6f9;
+    border: 1px solid #d8dde6;
+    border-radius: 12px;
+    padding: 2px 8px;
+}
+
+.requiredStar {
+    color: #c23934;
+    margin-left: 4px;
+    font-weight: 700;
+}
+
+.answerInput {
+    width: 100%;
+    max-width: 620px;
+}
+
+.formActions {
+    display: flex;
+    justify-content: flex-end;
+    padding-top: 16px;
+}
+
+.emptyState {
+    background: #ffffff;
+    border: 1px solid #dddbda;
+    border-radius: 4px;
+    text-align: center;
+    padding: 34px 20px;
+}
+
+.emptyIcon {
+    width: 46px;
+    height: 46px;
+    border-radius: 4px;
+    background: #f3f6f9;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 14px;
+}
+
+.emptyState h3 {
+    font-size: 16px;
+    font-weight: 700;
+    color: #181818;
+    margin: 0;
+}
+
+.emptyState p {
+    color: #706e6b;
+    margin-top: 6px;
+    font-size: 13px;
+}
+
+.spinnerOverlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 9999;
+    background: rgba(255, 255, 255, 0.6);
+}
+
+/* Responsive */
+@media only screen and (max-width: 900px) {
+    .customerMiniGrid {
+        grid-template-columns: 1fr;
+    }
+
+    .miniAddressGrid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+
+@media only screen and (max-width: 768px) {
+    .formPage {
+        padding: 12px;
+    }
+
+    .interactiveHeader {
+        flex-direction: column;
+        gap: 12px;
+    }
+
+    .questionSummary {
+        width: 100%;
+    }
+
+    .customerInfoGrid {
+        grid-template-columns: 1fr;
+    }
+
+    .answerInput {
+        max-width: 100%;
+    }
+
+    .formActions {
+        flex-direction: column;
+        gap: 10px;
+    }
+}
+
+@media only screen and (max-width: 600px) {
+    .customerMiniHeader {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+
+    .miniAddressGrid {
+        grid-template-columns: 1fr;
+    }
+}

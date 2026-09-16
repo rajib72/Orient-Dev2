@@ -1,0 +1,61 @@
+<template>
+    <lightning-quick-action-panel header="Request To Change Locked Details">
+        <div if:true={isLoading} class="slds-is-relative slds-p-around_large">
+            <lightning-spinner alternative-text="Loading" size="medium"></lightning-spinner>
+        </div>
+
+        <div if:true={lockedFields}>
+            <template if:true={hasFields}>
+                <table class="slds-table slds-table_cell-buffer slds-table_bordered slds-table_fixed-layout">
+                    <thead>
+                        <tr class="slds-line-height_reset">
+                            <th scope="col" style="width: 10%;"><div class="slds-truncate" title="Select">Select</div></th>
+                            <th scope="col" style="width: 30%;"><div class="slds-truncate" title="Field Name">Field Name</div></th>
+                            <th scope="col" style="width: 30%;"><div class="slds-truncate" title="Current Value">Current Value</div></th>
+                            <th scope="col" style="width: 30%;"><div class="slds-truncate" title="Requested Value">Requested Value</div></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <template for:each={lockedFields} for:item="field" for:index="index">
+                            <tr key={field.accountFieldApiName} class={field.rowClass}>
+                                <td class="vertical-center">
+                                    <lightning-input type="checkbox" data-index={index} onchange={handleCheckboxChange}></lightning-input>
+                                </td>
+                                <td class="vertical-center">
+                                    <div class="slds-truncate field-label" title={field.fieldLabel}>{field.fieldLabel}</div>
+                                </td>
+                                <td class="vertical-center">
+                                    <div class="slds-truncate old-value-badge" title={field.oldValue}>{field.oldValue}</div>
+                                </td>
+                                <td class="vertical-center slds-p-vertical_x-small">
+                                    <lightning-input 
+                                        type={field.inputType} 
+                                        data-index={index} 
+                                        onchange={handleValueChange} 
+                                        disabled={field.inputDisabled} 
+                                        variant="label-hidden" 
+                                        placeholder="Enter new value...">
+                                    </lightning-input>
+                                </td>
+                            </tr>
+                        </template>
+                    </tbody>
+                </table>
+            </template>
+            
+            <template if:false={hasFields}>
+                <div class="slds-illustration slds-illustration_small slds-p-around_large slds-text-align_center">
+                    <div class="slds-text-longform">
+                        <h3 class="slds-text-heading_medium">No Locked Fields</h3>
+                        <p class="slds-text-body_regular slds-m-top_small">There are no locked fields on this account currently requiring approval to change.</p>
+                    </div>
+                </div>
+            </template>
+        </div>
+
+        <div slot="footer">
+            <lightning-button variant="neutral" label="Cancel" onclick={closeAction} class="slds-m-right_x-small"></lightning-button>
+            <lightning-button variant="brand" label="Submit Request" onclick={submitRequest} disabled={isSubmitDisabled}></lightning-button>
+        </div>
+    </lightning-quick-action-panel>
+</template>

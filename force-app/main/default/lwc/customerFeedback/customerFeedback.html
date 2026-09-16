@@ -1,0 +1,120 @@
+<template>
+    <!-- WELCOME -->
+    <template if:true={isWelcomeScreen}>
+        <c-fdb-welcome-screen
+            onstart={handleStartFeedback}
+            onhelp={handleHelp}>
+        </c-fdb-welcome-screen>
+    </template>
+
+    <!-- SEARCH -->
+    <template if:true={showSearchScreen}>
+        <c-fdb-search-screen
+            is-searching={isSearching}
+            search-error={searchError}
+            show-search-table={showSearchTable}
+            visit-list={visitList}
+            columns={columns}
+            onsearch={handleSearch}
+            onclearerror={handleClearSearchError}
+            onselectvisit={handleSelectVisit}
+            onback={handleSearchBack}
+            onhelp={handleHelp}>
+        </c-fdb-search-screen>
+    </template>
+
+    <!-- CUSTOMER NOT FOUND -->
+    <template if:true={isNotFoundScreen}>
+        <c-fdb-not-found-screen
+            onsearchagain={handleSearchAgain}
+            onhelp={handleHelp}>
+        </c-fdb-not-found-screen>
+    </template>
+
+    <!-- NO SHOWROOM VISIT TODAY -->
+    <template if:true={isNoVisitScreen}>
+        <c-fdb-no-visit-screen
+            onupdateprofile={handleUpdateProfileFromNoVisit}
+            onsearchagain={handleSearchAgain}
+            onhelp={handleHelp}>
+        </c-fdb-no-visit-screen>
+    </template>
+
+    <!-- PROFILE / VISIT SUMMARY -->
+    <template if:true={isProfileScreen}>
+        <c-fdb-profile-screen
+            visit={selectedVisit}
+            edit-mode={profileUpdateMode}
+            oncontinue={handleProfileContinue}
+            onback={handleProfileBack}
+            onhelp={handleHelp}>
+        </c-fdb-profile-screen>
+    </template>
+
+    <!-- OTP CHALLENGE for profile changes -->
+    <template if:true={showOtpModal}>
+        <c-fdb-otp-modal
+            masked-destination={otpMaskedDestination}
+            is-busy={isOtpBusy}
+            error={otpError}
+            onverify={handleOtpVerify}
+            onresend={handleOtpResend}
+            oncancel={handleOtpCancel}>
+        </c-fdb-otp-modal>
+    </template>
+
+    <!-- FEEDBACK -->
+    <template if:true={isFeedbackScreen}>
+        <c-fdb-feedback-screen
+            is-submitting={isSubmittingFeedback}
+            onsubmit={handleFeedbackSubmit}
+            onincomplete={handleFeedbackIncomplete}
+            onback={handleBackToProfile}
+            onhelp={handleHelp}>
+        </c-fdb-feedback-screen>
+    </template>
+
+    <!-- FEEDBACK SUBMITTED -->
+    <template if:true={isDoneScreen}>
+        <c-fdb-feedback-done-screen
+            onupdateprofile={handleUpdateProfileAfterFeedback}
+            onrequestinvoice={handleRequestInvoice}
+            onclose={handleCloseFeedback}
+            onhelp={handleHelp}>
+        </c-fdb-feedback-done-screen>
+    </template>
+
+    <!-- FEEDBACK ALREADY SUBMITTED -->
+    <template if:true={isAlreadySubmittedScreen}>
+        <c-fdb-feedback-closed-screen
+            visit={selectedVisit}
+            onrequestinvoice={handleRequestInvoice}
+            onsearchagain={handleSearchAgain}
+            onclose={handleCloseFeedback}
+            onhelp={handleHelp}>
+        </c-fdb-feedback-closed-screen>
+    </template>
+
+    <!-- INVOICE REQUEST -->
+    <template if:true={isInvoiceScreen}>
+        <c-fdb-invoice-screen
+            account-id={accountId}
+            default-email={customerEmail}
+            gate-otp-reference={invoiceGateOtpReference}
+            is-raising={isRaiseInvoiceLoading}
+            onraise={handleRaiseInvoice}
+            onskip={handleSkipInvoice}
+            onback={handleBackFromInvoice}
+            onhelp={handleHelp}>
+        </c-fdb-invoice-screen>
+    </template>
+
+    <!-- INVOICE REQUEST RAISED -->
+    <template if:true={isInvoiceDoneScreen}>
+        <c-fdb-invoice-done-screen
+            email={invoiceRequestedEmail}
+            onclose={handleCloseInvoiceDone}
+            onhelp={handleHelp}>
+        </c-fdb-invoice-done-screen>
+    </template>
+</template>

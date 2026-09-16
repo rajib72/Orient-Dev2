@@ -1,0 +1,715 @@
+<template>
+    <div class="formPage">
+
+        <template if:true={isLoading}>
+            <div class="spinnerOverlay">
+                <lightning-spinner
+                    alternative-text="Loading..."
+                    size="medium">
+                </lightning-spinner>
+            </div>
+        </template>
+
+        <template if:false={isModalView}>
+            <div class="formTopBar">
+                <lightning-button
+                    label="Back to Dashboard"
+                    icon-name="utility:back"
+                    variant="neutral"
+                    onclick={handleBack}>
+                </lightning-button>
+            </div>
+        </template>
+
+        <div class="interactiveCard">
+
+            <div class="interactiveHeader">
+                <div class="formIdentity">
+                    <div class="formIcon">
+                        <lightning-icon
+                            icon-name="standard:record"
+                            size="small">
+                        </lightning-icon>
+                    </div>
+
+                    <div>
+                        <span>Final Customize Form</span>
+                        <h2>{selectedFormNo}</h2>
+                        <p>{selectedFormName}</p>
+                    </div>
+                </div>
+
+                <div class="questionSummary">
+                    <span>Total Questions</span>
+                    <strong>{questionCount}</strong>
+                </div>
+            </div>
+
+            <div class="customerInfoBox">
+                <div class="customerInfoTitle">
+                    Customer Details
+                </div>
+
+                <div class="customerInfoGrid">
+                    <lightning-input
+                        data-phone-input="true"
+                        type="tel"
+                        inputmode="numeric"
+                        label="Phone No"
+                        value={phoneNo}
+                        onkeydown={handlePhoneKeyDown}
+                        onchange={handlePhoneChange}
+                        onblur={handlePhoneBlur}
+                        maxlength="13"
+                        pattern="^(\+91)?[6-9][0-9]{9}$"
+                        message-when-value-missing="Please enter Phone No."
+                        message-when-pattern-mismatch="Enter exactly 10 numeric digits starting with 6, 7, 8, or 9. You may optionally prefix +91."
+                        message-when-too-long="Phone No cannot exceed 13 characters including +91."
+                        required>
+                    </lightning-input>
+
+                    <div class="locationStatus">
+                        <lightning-icon
+                            icon-name="utility:checkin"
+                            size="x-small">
+                        </lightning-icon>
+
+                        <span>{locationMessage}</span>
+                    </div>
+                </div>
+
+                <template if:true={isCustomerSearchLoading}>
+                    <div class="customerSearchBox">
+                        <lightning-spinner
+                            alternative-text="Checking customer..."
+                            size="small">
+                        </lightning-spinner>
+
+                        <span>Checking customer record...</span>
+                    </div>
+                </template>
+
+                <template if:true={showCustomerNotFound}>
+                    <div class="noCustomerBox">
+                        <lightning-icon
+                            icon-name="utility:warning"
+                            size="x-small">
+                        </lightning-icon>
+
+                        <span>No customer record found</span>
+                    </div>
+                </template>
+
+                <template if:true={showCustomerDetails}>
+                    <div class="customerMiniCard">
+
+                        <div class="customerMiniHeader">
+                            <div class="customerMiniLeft">
+                                <div class="customerMiniAvatar">
+                                    <lightning-icon
+                                        icon-name="standard:individual"
+                                        size="small">
+                                    </lightning-icon>
+                                </div>
+
+                                <div>
+                                    <h3>{customerDetails.customerName}</h3>
+                                    <p>Existing customer record found</p>
+                                </div>
+                            </div>
+
+                            <div class="customerFoundBadge">
+                                Found
+                            </div>
+                        </div>
+
+                        <div class="customerMiniGrid">
+                            <div class="miniInfoItem">
+                                <span>Phone</span>
+                                <strong>{customerDetails.phone}</strong>
+                            </div>
+
+                            <div class="miniInfoItem">
+                                <span>DOB</span>
+                                <strong>{customerDetails.dob}</strong>
+                            </div>
+
+                            <div class="miniInfoItem">
+                                <span>BC Customer No</span>
+                                <strong>{customerDetails.bcCustomerNo}</strong>
+                            </div>
+                        </div>
+
+                        <div class="miniAddressBox">
+                            <div class="miniAddressTitle">
+                                <lightning-icon
+                                    icon-name="utility:location"
+                                    size="xx-small">
+                                </lightning-icon>
+
+                                <span>Address Details</span>
+                            </div>
+
+                            <div class="miniAddressGrid">
+                                <div>
+                                    <span>Address Line 1</span>
+                                    <strong>{customerDetails.addressLine1}</strong>
+                                </div>
+
+                                <div>
+                                    <span>Address Line 2</span>
+                                    <strong>{customerDetails.addressLine2}</strong>
+                                </div>
+
+                                <div>
+                                    <span>Village / PO</span>
+                                    <strong>{customerDetails.villagePo}</strong>
+                                </div>
+
+                                <div>
+                                    <span>Residential City</span>
+                                    <strong>{customerDetails.residentialCity}</strong>
+                                </div>
+
+                                <div>
+                                    <span>District</span>
+                                    <strong>{customerDetails.district}</strong>
+                                </div>
+
+                                <div>
+                                    <span>State / Province</span>
+                                    <strong>{customerDetails.stateProvince}</strong>
+                                </div>
+
+                                <div>
+                                    <span>Pin Code</span>
+                                    <strong>{customerDetails.pinCode}</strong>
+                                </div>
+
+                                <div>
+                                    <span>Country</span>
+                                    <strong>{customerDetails.country}</strong>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </template>
+            </div>
+
+            <div class="questionSectionTitle">
+                Customer Information
+            </div>
+
+            <div class={customerInformationClass}>
+                <template if:true={isCustomerInfoDisabled}>
+                    <div class="disabledCustomerMessage">
+                        <lightning-icon
+                            icon-name="utility:lock"
+                            size="x-small">
+                        </lightning-icon>
+
+                        <span>
+                            Please enter a valid 10-digit Phone No to enable Customer Information.
+                        </span>
+                    </div>
+                </template>
+
+                <template if:true={hasQuestions}>
+                    <div class="questionList">
+                        <template for:each={selectedQuestions} for:item="q">
+                            <div
+                                class="questionRow"
+                                key={q.lineItemId}>
+
+                                <div class="questionText">
+                                    <strong>
+                                        {q.serialNo}. {q.question}
+
+                                        <template if:true={q.isRequired}>
+                                            <span class="requiredStar">*</span>
+                                        </template>
+                                    </strong>
+
+                                    <span>{q.answerType}</span>
+                                </div>
+
+                                <div class="answerInput">
+
+                                    <template if:true={q.isText}>
+                                        <lightning-input
+                                            type="text"
+                                            label="Answer"
+                                            placeholder="Enter answer"
+                                            data-id={q.lineItemId}
+                                            value={q.value}
+                                            onchange={handleAnswerChange}
+                                            disabled={q.isDisabled}
+                                            required={q.isRequired}>
+                                        </lightning-input>
+                                    </template>
+
+                                    <template if:true={q.isNumber}>
+                                        <lightning-input
+                                            type="number"
+                                            label="Answer"
+                                            placeholder="Enter number"
+                                            data-id={q.lineItemId}
+                                            value={q.value}
+                                            onchange={handleAnswerChange}
+                                            disabled={q.isDisabled}
+                                            required={q.isRequired}>
+                                        </lightning-input>
+                                    </template>
+
+                                    <template if:true={q.isDate}>
+                                        <lightning-input
+                                            type="date"
+                                            label="Answer"
+                                            data-id={q.lineItemId}
+                                            value={q.value}
+                                            onchange={handleAnswerChange}
+                                            disabled={q.isDisabled}
+                                            required={q.isRequired}>
+                                        </lightning-input>
+                                    </template>
+
+                                    <template if:true={q.isDateTime}>
+                                        <lightning-input
+                                            type="datetime"
+                                            label="Answer"
+                                            data-id={q.lineItemId}
+                                            value={q.value}
+                                            onchange={handleAnswerChange}
+                                            disabled={q.isDisabled}
+                                            required={q.isRequired}>
+                                        </lightning-input>
+                                    </template>
+
+                                    <template if:true={q.isPicklist}>
+                                        <lightning-combobox
+                                            label="Answer"
+                                            placeholder="Select answer"
+                                            data-id={q.lineItemId}
+                                            value={q.value}
+                                            options={q.options}
+                                            onchange={handleAnswerChange}
+                                            disabled={q.isDisabled}
+                                            required={q.isRequired}>
+                                        </lightning-combobox>
+                                    </template>
+
+                                    <template if:true={q.isMultiPicklist}>
+                                        <lightning-dual-listbox
+                                            label="Answer"
+                                            source-label="Available"
+                                            selected-label="Selected"
+                                            data-id={q.lineItemId}
+                                            value={q.selectedValues}
+                                            options={q.options}
+                                            onchange={handleMultiPicklistChange}
+                                            disabled={q.isDisabled}
+                                            required={q.isRequired}>
+                                        </lightning-dual-listbox>
+                                    </template>
+
+                                </div>
+                            </div>
+                        </template>
+                    </div>
+                </template>
+
+                <template if:false={hasQuestions}>
+                    <div class="emptyState">
+                        <div class="emptyIcon">
+                            <lightning-icon
+                                icon-name="utility:question"
+                                size="medium">
+                            </lightning-icon>
+                        </div>
+
+                        <h3>No questions found</h3>
+
+                        <p>
+                            No Final Customize Form Line Item records are available for this form.
+                        </p>
+                    </div>
+                </template>
+            </div>
+
+            <div class="formActions">
+                <lightning-button
+                    label="Reset"
+                    variant="neutral"
+                    onclick={handleResetAnswers}>
+                </lightning-button>
+
+                <lightning-button
+                    class="slds-m-left_small"
+                    label="Save Answers"
+                    variant="brand"
+                    onclick={handleSaveAnswers}>
+                </lightning-button>
+            </div>
+
+        </div>
+    </div>
+</template>
+
+<!-- <template>
+    <div class="formPage">
+
+        <template if:true={isLoading}>
+            <div class="spinnerOverlay">
+                <lightning-spinner
+                    alternative-text="Loading..."
+                    size="medium">
+                </lightning-spinner>
+            </div>
+        </template>
+
+        <template if:false={isModalView}>
+            <div class="formTopBar">
+                <lightning-button
+                    label="Back to Dashboard"
+                    icon-name="utility:back"
+                    variant="neutral"
+                    onclick={handleBack}>
+                </lightning-button>
+            </div>
+        </template>
+
+        <div class="interactiveCard">
+
+            <div class="interactiveHeader">
+                <div class="formIdentity">
+                    <div class="formIcon">
+                        <lightning-icon
+                            icon-name="standard:record"
+                            size="small">
+                        </lightning-icon>
+                    </div>
+
+                    <div>
+                        <span>Final Customize Form</span>
+                        <h2>{selectedFormNo}</h2>
+                        <p>{selectedFormName}</p>
+                    </div>
+                </div>
+
+                <div class="questionSummary">
+                    <span>Total Questions</span>
+                    <strong>{questionCount}</strong>
+                </div>
+            </div>
+
+            <div class="customerInfoBox">
+                <div class="customerInfoTitle">
+                    Customer Details
+                </div>
+
+                <div class="customerInfoGrid">
+                    <lightning-input
+                        data-phone-input="true"
+                        type="tel"
+                        inputmode="numeric"
+                        label="Phone No"
+                        value={phoneNo}
+                        onkeydown={handlePhoneKeyDown}
+                        onchange={handlePhoneChange}
+                        onblur={handlePhoneBlur}
+                        maxlength="13"
+                        pattern="^(\+91)?[6-9][0-9]{9}$"
+                        message-when-value-missing="Please enter Phone No."
+                        message-when-pattern-mismatch="Enter exactly 10 numeric digits starting with 6, 7, 8, or 9. You may optionally prefix +91."
+                        message-when-too-long="Phone No cannot exceed 13 characters including +91."
+                        required>
+                    </lightning-input>
+
+                    <div class="locationStatus">
+                        <lightning-icon
+                            icon-name="utility:checkin"
+                            size="x-small">
+                        </lightning-icon>
+
+                        <span>{locationMessage}</span>
+                    </div>
+                </div>
+
+                <template if:true={isCustomerSearchLoading}>
+                    <div class="customerSearchBox">
+                        <lightning-spinner
+                            alternative-text="Checking customer..."
+                            size="small">
+                        </lightning-spinner>
+
+                        <span>Checking customer record...</span>
+                    </div>
+                </template>
+
+                <template if:true={showCustomerNotFound}>
+                    <div class="noCustomerBox">
+                        <lightning-icon
+                            icon-name="utility:warning"
+                            size="x-small">
+                        </lightning-icon>
+
+                        <span>No customer record found</span>
+                    </div>
+                </template>
+
+                <template if:true={showCustomerDetails}>
+                    <div class="customerMiniCard">
+
+                        <div class="customerMiniHeader">
+                            <div class="customerMiniLeft">
+                                <div class="customerMiniAvatar">
+                                    <lightning-icon
+                                        icon-name="standard:individual"
+                                        size="small">
+                                    </lightning-icon>
+                                </div>
+
+                                <div>
+                                    <h3>{customerDetails.customerName}</h3>
+                                    <p>Existing customer record found</p>
+                                </div>
+                            </div>
+
+                            <div class="customerFoundBadge">
+                                Found
+                            </div>
+                        </div>
+
+                        <div class="customerMiniGrid">
+                            <div class="miniInfoItem">
+                                <span>Phone</span>
+                                <strong>{customerDetails.phone}</strong>
+                            </div>
+
+                            <div class="miniInfoItem">
+                                <span>DOB</span>
+                                <strong>{customerDetails.dob}</strong>
+                            </div>
+
+                            <div class="miniInfoItem">
+                                <span>BC Customer No</span>
+                                <strong>{customerDetails.bcCustomerNo}</strong>
+                            </div>
+                        </div>
+
+                        <div class="miniAddressBox">
+                            <div class="miniAddressTitle">
+                                <lightning-icon
+                                    icon-name="utility:location"
+                                    size="xx-small">
+                                </lightning-icon>
+
+                                <span>Address Details</span>
+                            </div>
+
+                            <div class="miniAddressGrid">
+                                <div>
+                                    <span>Address Line 1</span>
+                                    <strong>{customerDetails.addressLine1}</strong>
+                                </div>
+
+                                <div>
+                                    <span>Address Line 2</span>
+                                    <strong>{customerDetails.addressLine2}</strong>
+                                </div>
+
+                                <div>
+                                    <span>Village / PO</span>
+                                    <strong>{customerDetails.villagePo}</strong>
+                                </div>
+
+                                <div>
+                                    <span>Residential City</span>
+                                    <strong>{customerDetails.residentialCity}</strong>
+                                </div>
+
+                                <div>
+                                    <span>District</span>
+                                    <strong>{customerDetails.district}</strong>
+                                </div>
+
+                                <div>
+                                    <span>State / Province</span>
+                                    <strong>{customerDetails.stateProvince}</strong>
+                                </div>
+
+                                <div>
+                                    <span>Pin Code</span>
+                                    <strong>{customerDetails.pinCode}</strong>
+                                </div>
+
+                                <div>
+                                    <span>Country</span>
+                                    <strong>{customerDetails.country}</strong>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </template>
+            </div>
+
+            <div class="questionSectionTitle">
+                Customer Information
+            </div>
+
+            <div class={customerInformationClass}>
+                <template if:true={isCustomerInfoDisabled}>
+                    <div class="disabledCustomerMessage">
+                        <lightning-icon
+                            icon-name="utility:lock"
+                            size="x-small">
+                        </lightning-icon>
+
+                        <span>
+                            Please enter a valid 10-digit Phone No to enable Customer Information.
+                        </span>
+                    </div>
+                </template>
+
+                <template if:true={hasQuestions}>
+                    <div class="questionList">
+                        <template for:each={selectedQuestions} for:item="q">
+                            <div
+                                class="questionRow"
+                                key={q.lineItemId}>
+
+                                <div class="questionText">
+                                    <strong>
+                                        {q.serialNo}. {q.question}
+
+                                        <template if:true={q.isRequired}>
+                                            <span class="requiredStar">*</span>
+                                        </template>
+                                    </strong>
+
+                                    <span>{q.answerType}</span>
+                                </div>
+
+                                <div class="answerInput">
+
+                                    <template if:true={q.isText}>
+                                        <lightning-input
+                                            type="text"
+                                            label="Answer"
+                                            placeholder="Enter answer"
+                                            data-id={q.lineItemId}
+                                            value={q.value}
+                                            onchange={handleAnswerChange}
+                                            disabled={q.isDisabled}
+                                            required={q.isRequired}>
+                                        </lightning-input>
+                                    </template>
+
+                                    <template if:true={q.isNumber}>
+                                        <lightning-input
+                                            type="number"
+                                            label="Answer"
+                                            placeholder="Enter number"
+                                            data-id={q.lineItemId}
+                                            value={q.value}
+                                            onchange={handleAnswerChange}
+                                            disabled={q.isDisabled}
+                                            required={q.isRequired}>
+                                        </lightning-input>
+                                    </template>
+
+                                    <template if:true={q.isDate}>
+                                        <lightning-input
+                                            type="date"
+                                            label="Answer"
+                                            data-id={q.lineItemId}
+                                            value={q.value}
+                                            onchange={handleAnswerChange}
+                                            disabled={q.isDisabled}
+                                            required={q.isRequired}>
+                                        </lightning-input>
+                                    </template>
+
+                                    <template if:true={q.isDateTime}>
+                                        <lightning-input
+                                            type="datetime"
+                                            label="Answer"
+                                            data-id={q.lineItemId}
+                                            value={q.value}
+                                            onchange={handleAnswerChange}
+                                            disabled={q.isDisabled}
+                                            required={q.isRequired}>
+                                        </lightning-input>
+                                    </template>
+
+                                    <template if:true={q.isPicklist}>
+                                        <lightning-combobox
+                                            label="Answer"
+                                            placeholder="Select answer"
+                                            data-id={q.lineItemId}
+                                            value={q.value}
+                                            options={q.options}
+                                            onchange={handleAnswerChange}
+                                            disabled={q.isDisabled}
+                                            required={q.isRequired}>
+                                        </lightning-combobox>
+                                    </template>
+
+                                    <template if:true={q.isMultiPicklist}>
+                                        <lightning-dual-listbox
+                                            label="Answer"
+                                            source-label="Available"
+                                            selected-label="Selected"
+                                            data-id={q.lineItemId}
+                                            value={q.selectedValues}
+                                            options={q.options}
+                                            onchange={handleMultiPicklistChange}
+                                            disabled={q.isDisabled}
+                                            required={q.isRequired}>
+                                        </lightning-dual-listbox>
+                                    </template>
+
+                                </div>
+                            </div>
+                        </template>
+                    </div>
+                </template>
+
+                <template if:false={hasQuestions}>
+                    <div class="emptyState">
+                        <div class="emptyIcon">
+                            <lightning-icon
+                                icon-name="utility:question"
+                                size="medium">
+                            </lightning-icon>
+                        </div>
+
+                        <h3>No questions found</h3>
+
+                        <p>
+                            No Final Customize Form Line Item records are available for this form.
+                        </p>
+                    </div>
+                </template>
+            </div>
+
+            <div class="formActions">
+                <lightning-button
+                    label="Reset"
+                    variant="neutral"
+                    onclick={handleResetAnswers}>
+                </lightning-button>
+
+                <lightning-button
+                    class="slds-m-left_small"
+                    label="Save Answers"
+                    variant="brand"
+                    onclick={handleSaveAnswers}>
+                </lightning-button>
+            </div>
+
+        </div>
+    </div>
+</template> -->

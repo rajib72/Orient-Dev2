@@ -1,0 +1,68 @@
+<template>
+    <lightning-quick-action-panel title="Reassign Sales Executive">
+
+        <!-- Loading State -->
+        <template if:true={isLoading}>
+            <div class="slds-is-relative slds-p-around_xlarge">
+                <lightning-spinner alternative-text="Loading Sales Executives" size="medium"></lightning-spinner>
+            </div>
+        </template>
+
+        <!-- Main Content -->
+        <template if:false={isLoading}>
+
+            <!-- Polished SLDS Header -->
+            <div class="slds-page-header slds-theme_shade slds-m-bottom_medium slds-border_bottom">
+                <div class="slds-page-header__row">
+                    <div class="slds-page-header__col-title">
+                        <div class="slds-media slds-media_center">
+                            <div class="slds-media__figure">
+                                <lightning-icon icon-name="action:change_owner" size="medium"
+                                    alternative-text="Reassign Icon">
+                                </lightning-icon>
+                            </div>
+                            <div class="slds-media__body">
+                                <div class="slds-page-header__name">
+                                    <div class="slds-page-header__name-title">
+                                        <h1>
+                                            <span class="slds-page-header__title slds-truncate" title="Hand Handoff Visit">
+                                                Transfer Showroom Visit
+                                            </span>
+                                        </h1>
+                                    </div>
+                                </div>
+                                <p class="slds-page-header__name-meta">
+                                    Select an available executive from your store location to take over.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Form Section with better spacing -->
+            <div class="slds-p-horizontal_medium slds-p-bottom_large">
+                <lightning-combobox name="salesExecutive" label="Assign To" value={selectedSalesExecId}
+                    placeholder="Search and select a Sales Person..." options={salesExecOptions} onchange={handleChange}
+                    dropdown-alignment="auto" required>
+                </lightning-combobox>
+            </div>
+
+        </template>
+
+        <!-- Footer Buttons -->
+        <div slot="footer">
+            <lightning-button label="Cancel" onclick={handleCancel} class="slds-m-right_small">
+            </lightning-button>
+            <lightning-button variant="brand" label="Confirm Reassignment" onclick={handleSave} disabled={isSaving}>
+            </lightning-button>
+        </div>
+
+        <!-- Saving Overlay -->
+        <template if:true={isSaving}>
+            <lightning-spinner alternative-text="Reassigning Executive" size="medium" variant="brand">
+            </lightning-spinner>
+        </template>
+
+    </lightning-quick-action-panel>
+</template>

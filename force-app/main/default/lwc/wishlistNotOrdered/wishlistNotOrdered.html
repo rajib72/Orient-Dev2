@@ -1,0 +1,138 @@
+<template>
+    <!-- HEADER -->
+    <div class="summary-header">
+        Mark Wishlist Items as Not Ordered
+    </div>
+
+    <!-- ================= DESKTOP VIEW ================= -->
+    <div class="desktop-only slds-p-around_medium">
+
+        <div class="table-scroll">
+            <table class="slds-table slds-table_bordered slds-table_cell-buffer">
+                <thead>
+                    <tr>
+                        <th style="width:65px;">Select</th>
+                        <th style="width:100px;">Barcode</th>
+                        <th style="width:280px;">Description</th>
+                        <th style="width:100px;">Wishlist No</th>
+                        <th style="width:100px;">Status</th>
+                        <th style="width:190px;">Reason Not Ordered</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    <template for:each={wishlistItems} for:item="wi">
+                        <tr key={wi.id}>
+                            <td class="slds-text-align_center">
+                                <lightning-input type="checkbox" data-id={wi.id} checked={wi.selected}
+                                    disabled={wi.isDisabled} onchange={handleCheckbox}>
+                                </lightning-input>
+                            </td>
+
+                            <td>{wi.barcode}</td>
+
+                            <td class="wrap-text desc-cell">
+                                {wi.description}
+                            </td>
+
+                            <td>{wi.name}</td>
+
+                            <td>
+                                <span class={wi.statusClassName}>
+                                    {wi.status}
+                                </span>
+
+                            </td>
+
+                            <td>
+                                <div class="reason-picker" data-id={wi.id} onclick={openReasonPopup}>
+                                    {wi.displayReason}
+                                </div>
+                            </td>
+
+                        </tr>
+                    </template>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="slds-align_absolute-center slds-m-top_medium">
+            <lightning-button label="Save" variant="brand" class="save-btn" onclick={handleSave}>
+            </lightning-button>
+        </div>
+    </div>
+
+    <!-- ================= MOBILE / TABLET VIEW ================= -->
+    <div class="mobile-only slds-p-around_small">
+
+        <template for:each={wishlistItems} for:item="wi">
+            <div key={wi.id} class="mobile-card">
+
+                <div class="mobile-header">
+                    <lightning-input type="checkbox" data-id={wi.id} checked={wi.selected} disabled={wi.isDisabled}
+                        onchange={handleCheckbox}>
+                    </lightning-input>
+
+                    <span class={wi.statusClassName}>
+                        {wi.status}
+                    </span>
+
+                </div>
+
+                <div class="mobile-field">
+                    <span class="label">Barcode</span>
+                    <span class="value">{wi.barcode}</span>
+                </div>
+
+                <div class="mobile-field">
+                    <span class="label">Wishlist No</span>
+                    <span class="value">{wi.name}</span>
+                </div>
+
+                <div class="mobile-field">
+                    <span class="label">Description</span>
+                    <span class="value wrap-text">{wi.description}</span>
+                </div>
+
+                <div class="mobile-field">
+                    <span class="label">Reason Not Ordered</span>
+
+                    <div class="reason-picker" data-id={wi.id} onclick={openReasonPopup}>
+                        {wi.displayReason}
+                    </div>
+
+                </div>
+
+            </div>
+        </template>
+
+        <div class="slds-align_absolute-center slds-m-top_medium">
+            <lightning-button label="Save" variant="brand" class="save-btn" onclick={handleSave}>
+            </lightning-button>
+        </div>
+    </div>
+
+    <!-- ================= MODAL ================= -->
+    <template if:true={showReasonModal}>
+        <section role="dialog" class="slds-modal slds-fade-in-open">
+            <div class="slds-modal__container">
+                <header class="slds-modal__header">
+                    <h2 class="slds-text-heading_medium">Select Reason</h2>
+                </header>
+
+                <div class="slds-modal__content slds-p-around_medium">
+                    <lightning-combobox value={selectedReason} options={reasonOptions} placeholder="Select Reason"
+                        onchange={handlePopupReasonChange}>
+                    </lightning-combobox>
+                </div>
+
+                <footer class="slds-modal__footer">
+                    <lightning-button label="Cancel" onclick={closeReasonPopup}>
+                    </lightning-button>
+                </footer>
+            </div>
+        </section>
+
+        <div class="slds-backdrop slds-backdrop_open"></div>
+    </template>
+</template>

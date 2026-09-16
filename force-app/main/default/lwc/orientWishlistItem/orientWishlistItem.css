@@ -1,0 +1,965 @@
+/* =========================
+   HEADER / BRANDING
+========================= */
+.header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px;
+    border-bottom: 1px solid #eee;
+}
+
+.logo {
+    height: 42px;
+}
+
+.brand-name {
+    font-size: 20px;
+    font-weight: 600;
+    color: #9b1c1c;
+}
+
+
+/* =========================
+   MAIN LAYOUT
+========================= */
+.container {
+    display: flex;
+    gap: 30px;
+    padding: 20px;
+    overflow: visible;
+}
+
+
+/* =========================
+   LEFT : IMAGE / CAROUSEL
+========================= */
+.image-section {
+    width: 60%;
+    overflow: visible;
+}
+
+.carousel-wrapper {
+    padding: 0 24px;
+}
+
+.product-image {
+    width: 100%;
+    border-radius: 8px;
+    margin-bottom: 12px;
+    border: 1px solid #ddd;
+}
+
+
+/* =========================
+   RIGHT : PRODUCT DETAILS
+========================= */
+.details-section {
+    width: 65%;
+}
+
+/* Product Name */
+.product-name {
+    font-size: 22px;
+    font-weight: 700;
+    margin-bottom: 18px;
+}
+
+
+/* =========================
+   PRICE / CODE ALIGNMENT FIX
+   All values start from same line
+========================= */
+
+/* Product Price / Tax Amount row */
+.price {
+    display: flex;
+    align-items: flex-start;
+    gap: 16px;
+    margin-top: 16px;
+    font-size: 20px;
+}
+
+/* Product Price / Tax Amount label */
+.price-label {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    min-width: 190px;
+    max-width: 190px;
+    font-size: 20px;
+    font-weight: 600;
+    color: #000;
+    line-height: 1.2;
+    margin-right: 0;
+    flex-shrink: 0;
+}
+
+/* Including GST / Excluding GST text */
+.gst-text {
+    display: block;
+    font-size: 13px;
+    font-weight: 500;
+    color: #777;
+    margin-top: 4px;
+}
+
+/* Product Price / Tax Amount value */
+.price-value {
+    font-size: 20px;
+    font-weight: 700;
+    color: #c4161c;
+    line-height: 1.2;
+    align-self: flex-start;
+    white-space: nowrap;
+}
+
+
+/* Product Code row */
+.barcode {
+    display: flex;
+    align-items: flex-start;
+    gap: 6px;
+    margin-top: 22px;
+    margin-bottom: 18px;
+    font-size: 20px;
+    color: #000;
+}
+
+/* Product Code label */
+.barcode b {
+    min-width: 190px;
+    max-width: 190px;
+    flex-shrink: 0;
+    font-size: 20px;
+    font-weight: 600;
+    color: #000;
+    line-height: 1.2;
+}
+
+/* Product Code value */
+.barcode {
+    font-weight: 400;
+}
+
+
+/* Design Code row */
+.design-code {
+    display: flex;
+    align-items: flex-start;
+    gap: 6px;
+    margin-top: 18px;
+    font-size: 20px;
+    color: #000;
+}
+
+/* Design Code label */
+.design-code b {
+    min-width: 190px;
+    max-width: 190px;
+    flex-shrink: 0;
+    font-size: 20px;
+    font-weight: 600;
+    color: #000;
+    line-height: 1.2;
+}
+
+/* Design Code value - not bold */
+.design-code span {
+    font-size: 20px;
+    font-weight: 400 !important;
+    color: #000;
+    line-height: 1.2;
+}
+
+
+/* =========================
+   ADD TO CART BUTTON
+========================= */
+.cart-btn {
+    margin-top: 15px;
+    padding: 14px 36px;
+    font-size: 18px;
+    font-weight: 600;
+    border-radius: 28px;
+    min-width: 180px;
+}
+
+
+/* =========================
+   METAL / ACCORDION SECTION
+========================= */
+.metal-section {
+    margin-top: 25px;
+    padding: 25px 15px;
+    background: #fffaf2;
+    border-radius: 12px;
+    border: 1px solid #f0e2c3;
+}
+
+/* Accordion spacing cleanup */
+.product-accordion {
+    --slds-c-accordion-section-spacing-block-start: 14px;
+    --slds-c-accordion-section-spacing-block-end: 14px;
+    --slds-c-accordion-heading-font-size: 18px;
+    --slds-c-accordion-heading-font-weight: 700;
+}
+
+/* Remove inner white card effect */
+.product-accordion lightning-accordion-section {
+    background: transparent;
+}
+
+/* Accordion text */
+.accordion-text {
+    font-size: 20px;
+    color: #555;
+    padding: 8px 4px;
+}
+
+
+/* =========================
+   METAL DETAILS GRID
+========================= */
+.metal-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 24px;
+}
+
+.metal-item {
+    text-align: center;
+}
+
+.metal-value {
+    font-size: 18px;
+    font-weight: 700;
+    color: #333;
+}
+
+.metal-label {
+    font-size: 12px;
+    color: #777;
+    margin-top: 6px;
+    white-space: nowrap;
+}
+
+
+/* =========================
+   NO DATA STATE
+========================= */
+.no-data {
+    padding: 30px;
+    text-align: center;
+    color: #999;
+}
+
+
+/* =========================
+   MOBILE VIEW - STACKED
+========================= */
+@media only screen and (max-width: 768px) {
+
+    .container {
+        flex-direction: column;
+        padding: 12px;
+        gap: 16px;
+    }
+
+    .image-section,
+    .details-section {
+        width: 100%;
+    }
+
+    .carousel-wrapper {
+        padding: 0;
+    }
+
+    lightning-carousel {
+        --slds-c-carousel-image-height: 260px;
+    }
+
+    .product-name {
+        font-size: 20px;
+        margin-top: 8px;
+    }
+
+    .price {
+        gap: 10px;
+        margin-top: 12px;
+        font-size: 18px;
+    }
+
+    .price-label {
+        min-width: 145px;
+        max-width: 145px;
+        font-size: 18px;
+        font-weight: 600;
+    }
+
+    .gst-text {
+        font-size: 11px;
+    }
+
+    .price-value {
+        font-size: 20px;
+        white-space: normal;
+        word-break: break-word;
+    }
+
+    .barcode,
+    .design-code {
+        gap: 6px;
+        margin-top: 14px;
+        font-size: 18px;
+    }
+
+    .barcode b,
+    .design-code b {
+        min-width: 145px;
+        max-width: 145px;
+        font-size: 18px;
+        font-weight: 600;
+    }
+
+    .design-code span {
+        font-size: 18px;
+        font-weight: 400 !important;
+        word-break: break-word;
+    }
+
+    .barcode,
+    .cart-btn {
+        margin-top: 12px;
+    }
+
+    .cart-btn lightning-button {
+        width: 100%;
+    }
+
+    .metal-section {
+        margin-top: 16px;
+    }
+
+    .metal-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 12px;
+    }
+
+    .metal-item {
+        padding: 10px;
+        border-radius: 10px;
+    }
+
+    .metal-value {
+        font-size: 16px;
+    }
+
+    .metal-label {
+        font-size: 12px;
+    }
+}
+
+
+/* =========================
+   PHONE ONLY FIX - ≤ 480PX
+========================= */
+@media only screen and (max-width: 480px) {
+
+    .container {
+        padding: 8px 6px;
+        width: 100%;
+        margin: 0 auto;
+    }
+
+    .image-section,
+    .details-section {
+        width: 100%;
+        max-width: 100%;
+    }
+
+    .details-section {
+        text-align: left;
+        padding: 0 6px;
+    }
+
+    .product-name {
+        font-size: 18px;
+        line-height: 1.3;
+        margin-bottom: 8px;
+    }
+
+    .price {
+        gap: 8px;
+        margin-top: 10px;
+        font-size: 16px;
+    }
+
+    .price-label {
+        min-width: 125px;
+        max-width: 125px;
+        font-size: 16px;
+        font-weight: 600;
+    }
+
+    .gst-text {
+        font-size: 10px;
+    }
+
+    .price-value {
+        font-size: 18px;
+        white-space: normal;
+        word-break: break-word;
+    }
+
+    .barcode,
+    .design-code {
+        display: flex;
+        align-items: flex-start;
+        gap: 6px;
+        font-size: 16px;
+        margin-top: 12px;
+    }
+
+    .barcode b,
+    .design-code b {
+        min-width: 125px;
+        max-width: 125px;
+        font-size: 16px;
+        font-weight: 600;
+        flex-shrink: 0;
+    }
+
+    .design-code span {
+        font-size: 16px;
+        font-weight: 400 !important;
+        word-break: break-word;
+    }
+
+    .barcode {
+        margin-bottom: 14px;
+    }
+
+    .cart-btn {
+        width: 100%;
+        padding: 14px 0;
+        font-size: 16px;
+        border-radius: 24px;
+    }
+
+    .metal-section {
+        padding: 16px 10px;
+        margin-top: 14px;
+    }
+
+    .metal-grid {
+        grid-template-columns: 1fr;
+        gap: 14px;
+    }
+
+    .metal-item {
+        padding: 4px 0;
+    }
+
+    .metal-value {
+        font-size: 12px;
+    }
+
+    .metal-label {
+        font-size: 11px;
+        white-space: normal;
+    }
+
+    .accordion-text {
+        font-size: 14px;
+    }
+
+    lightning-carousel {
+        --slds-c-carousel-image-height: 220px;
+    }
+}
+
+
+/* =========================
+   TABLET LANDSCAPE FIX
+========================= */
+@media only screen and (min-width: 769px) and (max-width: 1024px) and (orientation: landscape) {
+
+    .container {
+        gap: 24px;
+    }
+
+    .image-section {
+        width: 70%;
+    }
+
+    .details-section {
+        width: 30%;
+    }
+
+    lightning-carousel {
+        --slds-c-carousel-image-height: 420px;
+    }
+
+    .product-name {
+        font-size: 22px;
+    }
+
+    .price {
+        gap: 10px;
+        font-size: 18px;
+    }
+
+    .price-label {
+        min-width: 140px;
+        max-width: 140px;
+        font-size: 18px;
+        font-weight: 600;
+    }
+
+    .price-value {
+        font-size: 20px;
+        white-space: normal;
+        word-break: break-word;
+    }
+
+    .barcode,
+    .design-code {
+        font-size: 18px;
+    }
+
+    .barcode b,
+    .design-code b {
+        min-width: 140px;
+        max-width: 140px;
+        font-size: 18px;
+    }
+
+    .design-code span {
+        font-size: 18px;
+        font-weight: 400 !important;
+        word-break: break-word;
+    }
+
+    .metal-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 16px;
+    }
+
+    .metal-value {
+        font-size: 16px;
+    }
+
+    .metal-label {
+        font-size: 12px;
+    }
+
+    .cart-btn {
+        padding: 12px 28px;
+        font-size: 16px;
+    }
+}
+
+
+/* =========================
+   TABLET PORTRAIT FIX
+========================= */
+@media only screen and (min-width: 768px) and (max-width: 1024px) and (orientation: portrait) {
+
+    .container {
+        flex-direction: column;
+        gap: 20px;
+        padding: 16px;
+    }
+
+    .image-section,
+    .details-section {
+        width: 100%;
+        max-width: 100%;
+    }
+
+    .price {
+        gap: 12px;
+        font-size: 20px;
+    }
+
+    .price-label {
+        min-width: 165px;
+        max-width: 165px;
+        font-size: 20px;
+        font-weight: 600;
+    }
+
+    .gst-text {
+        font-size: 12px;
+    }
+
+    .price-value {
+        font-size: 22px;
+        white-space: normal;
+        word-break: break-word;
+    }
+
+    .barcode,
+    .design-code {
+        font-size: 20px;
+        gap: 6px;
+    }
+
+    .barcode b,
+    .design-code b {
+        min-width: 165px;
+        max-width: 165px;
+        font-size: 20px;
+        font-weight: 600;
+    }
+
+    .design-code span {
+        font-size: 20px;
+        font-weight: 400 !important;
+        word-break: break-word;
+    }
+
+    .metal-section {
+        margin-top: 20px;
+        width: 100%;
+        box-sizing: border-box;
+    }
+
+    .metal-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 14px;
+    }
+}
+
+
+/* =========================
+   IMAGE ZOOM MODAL
+========================= */
+.zoom-backdrop {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.85);
+    z-index: 9999;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.zoom-image {
+    max-width: 90%;
+    max-height: 90%;
+    object-fit: contain;
+    cursor: zoom-out;
+    touch-action: pinch-zoom;
+}
+
+
+/* =========================
+   TABLE
+========================= */
+.table-title {
+    font-size: 16px;
+    font-weight: 700;
+    color: #333;
+    margin-bottom: 10px;
+}
+
+.scm-space {
+    margin-top: 22px;
+}
+
+.table-wrapper {
+    width: 100%;
+    overflow-x: auto;
+}
+
+.info-table {
+    width: 100%;
+    border-collapse: collapse;
+    background: #fff;
+    border: 1px solid #eadfc7;
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.info-table th,
+.info-table td {
+    border: 1px solid #eadfc7;
+    padding: 10px 12px;
+    text-align: left;
+    font-size: 13px;
+    white-space: nowrap;
+}
+
+.info-table th {
+    background: #e41f1c;
+    font-weight: 700;
+    color: #fffaf2;
+}
+
+.info-table td {
+    color: #555;
+}
+
+@media only screen and (max-width: 768px) {
+
+    .info-table th,
+    .info-table td {
+        font-size: 12px;
+        padding: 8px;
+    }
+}
+
+
+/* =========================
+   LOADING SPINNER
+========================= */
+.spinner-backdrop {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(255, 255, 255, 0.65);
+    z-index: 999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.main-wrapper {
+    position: relative;
+}
+
+.loading-box {
+    text-align: center;
+}
+
+.loading-text {
+    margin-top: 55px;
+    font-size: 14px;
+    color: #555;
+    font-weight: 600;
+}
+
+
+/* =========================
+   QUESTIONS SECTION
+========================= */
+.questions-wrapper {
+    padding: 8px 4px;
+}
+
+.question-row {
+    margin-bottom: 12px;
+}
+
+.update-btn-container {
+    margin-top: 16px;
+    display: flex;
+    justify-content: flex-start;
+}
+
+@media only screen and (max-width: 768px) {
+    .update-btn-container lightning-button {
+        width: 100%;
+    }
+}
+
+/* =========================
+   CUSTOM CAROUSEL (IMAGES & VIDEO)
+========================= */
+.custom-carousel-container {
+    position: relative;
+    width: 100%;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    background: #fff;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+}
+
+.carousel-content {
+    position: relative;
+    width: 100%;
+    height: 480px; /* Increased Height */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #fff; /* Changed from #f3f3f3 to #fff to remove grey boxes */
+}
+
+.product-media {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+}
+
+.image-media {
+    cursor: zoom-in;
+}
+
+/* Custom Navigation Buttons */
+.nav-btn {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    background: rgba(255, 255, 255, 0.95);
+    border: 1px solid #c9c7c5;
+    border-radius: 50%;
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.15);
+    z-index: 10;
+    transition: all 0.2s ease;
+}
+
+.nav-btn:hover {
+    background: #f3f3f3;
+}
+
+.prev-btn { left: 10px; }
+.next-btn { right: 10px; }
+
+/* Custom Dots (Indicators) */
+.carousel-indicators {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 0;
+    background: #fff;
+    border-top: 1px solid #f3f3f3;
+}
+
+.indicator {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: #ecebea;
+    cursor: pointer;
+    border: 1px solid #c9c7c5;
+    transition: all 0.2s ease;
+}
+
+.indicator.active {
+    background: #0176d3;
+    border-color: #0176d3;
+}
+
+
+/* =========================
+   ENHANCED IMAGE ZOOM MODAL
+========================= */
+.zoom-backdrop {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.85);
+    z-index: 9999;
+}
+
+.zoom-image-container {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.zoom-image {
+    max-width: 95vw;
+    max-height: 95vh;
+    object-fit: contain;
+    transition: transform 0.3s ease-in-out;
+}
+
+/* Toggle Zoom Classes */
+.zoomed-out {
+    transform: scale(1);
+    cursor: zoom-in;
+}
+
+.zoomed-in {
+    transform: scale(2.5);
+    cursor: zoom-out;
+}
+
+
+/* =========================
+   MEDIA QUERY CAROUSEL HEIGHT FIXES
+========================= */
+@media only screen and (max-width: 768px) {
+    .carousel-content {
+        height: 380px; /* Scaled up for Tablets */
+    }
+}
+@media only screen and (max-width: 480px) {
+    .carousel-content {
+        height: 300px; /* Scaled up for Mobile Phones */
+    }
+}
+@media only screen and (min-width: 769px) and (max-width: 1024px) and (orientation: landscape) {
+    .carousel-content {
+        height: 480px; 
+    }
+}
+/* =========================
+   CUSTOM VIDEO PLAY/PAUSE CONTROLS
+========================= */
+.video-container {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.video-media {
+    cursor: pointer; /* Indicates it can be tapped/clicked */
+}
+
+.play-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(0, 0, 0, 0.25); /* Slight dimming to focus on the play button */
+    cursor: pointer;
+    z-index: 5;
+    border-radius: 8px; /* Matches carousel edges */
+}
+
+.play-circle {
+    background: rgba(0, 0, 0, 0.7);
+    border-radius: 50%;
+    width: 64px;
+    height: 64px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding-left: 4px; /* Visually aligns the triangle to the center */
+    box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+    transition: transform 0.2s ease;
+}
+
+.play-circle:active {
+    transform: scale(0.9);
+}

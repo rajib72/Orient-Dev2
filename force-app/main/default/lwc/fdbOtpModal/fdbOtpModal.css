@@ -1,0 +1,94 @@
+/* The dialog card, its foil cap, mark, title and body text are shared with
+   the profile-update notice and live in c/fdbStyles. What is below is only
+   what belongs to the passcode challenge itself. */
+@import 'c/fdbStyles';
+
+/* The destination is a masked number or address - it must not be broken
+   across lines, which is particular to this dialog. */
+.ojo__text strong { white-space: nowrap; }
+
+/* ---------------- CODE FIELD ---------------- */
+.ojo__input {
+    display: block;
+    width: 100%;
+    max-width: 260px;
+    margin: 18px auto 0 auto;
+    padding: 14px 16px;
+    box-sizing: border-box;
+    border: 1.5px solid var(--oj-line);
+    border-radius: 12px;
+    background: #fff;
+    color: var(--oj-ink);
+    font-family: inherit;
+    font-size: 26px;
+    font-weight: 800;
+    letter-spacing: 10px;
+    text-align: center;
+    outline: none;
+    box-shadow: inset 0 1px 3px rgba(84, 50, 24, 0.08);
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.ojo__input::placeholder {
+    color: #d2c4ad;
+    letter-spacing: 10px;
+}
+
+.ojo__input:focus {
+    border-color: var(--oj-gold);
+    box-shadow: 0 0 0 3px rgba(201, 162, 77, 0.25);
+}
+
+.ojo__error {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    margin: 12px 0 0 0;
+    padding: 9px 12px;
+    border: 1px solid #f0c4c4;
+    border-radius: 8px;
+    background: #fdf0f0;
+    color: #a0161c;
+    font-size: 12px;
+    line-height: 1.45;
+    text-align: left;
+}
+
+.ojo__error svg { width: 16px; height: 16px; flex: 0 0 auto; }
+
+.ojo__cta { margin-top: 18px; }
+
+/* ---------------- FOOTER LINKS ---------------- */
+.ojo__foot {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    margin-top: 16px;
+}
+
+.ojo__link {
+    border: none;
+    background: transparent;
+    padding: 4px 2px;
+    color: var(--oj-gold-dk);
+    font-family: inherit;
+    font-size: 12.5px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: color 0.2s ease;
+}
+
+.ojo__link:hover:not(:disabled) { color: var(--oj-maroon-ink); }
+
+.ojo__link:disabled {
+    color: #a89684;
+    cursor: default;
+}
+
+.ojo__sep { color: rgba(201, 162, 77, 0.7); }
+
+@media only screen and (min-width: 768px) {
+    .ojo__input { font-size: 30px; max-width: 300px; }
+}

@@ -1,0 +1,108 @@
+<template>
+    <div class="mappingContainer">
+
+        <template if:true={isLoading}>
+            <div class="spinnerOverlay">
+                <lightning-spinner
+                    alternative-text="Loading..."
+                    size="medium">
+                </lightning-spinner>
+            </div>
+        </template>
+
+        <div class="headerSection">
+            <div class="headerLeft">
+                <div class="iconWrap">
+                    <lightning-icon
+                        icon-name="standard:account"
+                        size="small"
+                        class="headerIcon">
+                    </lightning-icon>
+                </div>
+
+                <div>
+                    <h2>Account Field Mapping</h2>
+                    <p>Select an Account field and store its API name in BTL Question.</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="bodySection">
+
+            <div class="searchCard">
+                <div class="sectionMiniTitle">Search Field</div>
+
+                <lightning-input
+                    type="search"
+                    label="Search Account Field"
+                    placeholder="Search by field label or API name..."
+                    value={searchKey}
+                    onchange={handleSearchChange}>
+                </lightning-input>
+
+                <template if:true={searchKey}>
+                    <div class="searchMeta">
+                        <lightning-badge label={filteredFieldCountText}></lightning-badge>
+                    </div>
+                </template>
+            </div>
+
+            <div class="fieldCard">
+                <div class="sectionMiniTitle">Field Selection</div>
+
+                <lightning-combobox
+                    label="Customer Field Name"
+                    placeholder="Select Account Field"
+                    value={selectedAccountFieldApiName}
+                    options={filteredAccountFieldOptions}
+                    onchange={handleAccountFieldChange}
+                    required>
+                </lightning-combobox>
+
+                <template if:true={showNoResult}>
+                    <div class="noResultBox">
+                        <lightning-icon
+                            icon-name="utility:warning"
+                            size="x-small"
+                            class="msgIcon">
+                        </lightning-icon>
+                        <span>No Account field found for your search.</span>
+                    </div>
+                </template>
+            </div>
+
+            <template if:true={selectedAccountFieldApiName}>
+                <div class="selectedPreviewCard">
+                    <div class="previewHeader">
+                        <lightning-icon
+                            icon-name="utility:success"
+                            size="x-small"
+                            class="previewIcon">
+                        </lightning-icon>
+                        <span>Selected Field Mapping</span>
+                    </div>
+
+                    <div class="previewGrid">
+                        <div class="previewItem">
+                            <div class="previewLabel">Stored API Name</div>
+                            <div class="previewValue">{selectedAccountFieldApiName}</div>
+                        </div>
+                    </div>
+                </div>
+            </template>
+
+            <div class="noteBox">
+                <lightning-icon
+                    icon-name="utility:info"
+                    size="x-small"
+                    class="msgIcon">
+                </lightning-icon>
+                <span>
+                    The selected Account field API name will be saved into
+                    <strong>BTL_Questions__c.Customer_Field_Name__c</strong>.
+                </span>
+            </div>
+
+        </div>
+    </div>
+</template>

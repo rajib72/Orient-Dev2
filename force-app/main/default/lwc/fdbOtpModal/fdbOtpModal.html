@@ -1,0 +1,68 @@
+<template>
+    <div class="ojo__backdrop"></div>
+
+    <div class="ojo" role="dialog" aria-modal="true" aria-labelledby="otp-title">
+        <div class="ojo__card">
+
+            <span class="ojo__mark">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"
+                     stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                    <rect x="4.5" y="10" width="15" height="10.5" rx="2.2"></rect>
+                    <path d="M8.2 10V7.2a3.8 3.8 0 0 1 7.6 0V10"></path>
+                    <path d="M12 14v2.6"></path>
+                </svg>
+            </span>
+
+            <h2 id="otp-title" class="ojo__title">Verify Your Request</h2>
+
+            <div class="oj-orn oj-orn_sm">
+                <span class="oj-orn__line"></span>
+                <span class="oj-orn__diamond"></span>
+                <span class="oj-orn__line"></span>
+            </div>
+
+            <p class="ojo__text">
+                We have sent a 6-digit verification code to
+                <strong>{maskedDestination}</strong>.
+            </p>
+
+            <input
+                class="ojo__input"
+                type="tel"
+                inputmode="numeric"
+                autocomplete="one-time-code"
+                maxlength="6"
+                placeholder="------"
+                value={code}
+                oninput={handleCodeInput}
+                onkeydown={handleKeyDown} />
+
+            <template if:true={errorMessage}>
+                <p class="ojo__error">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                         stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                        <circle cx="12" cy="12" r="9"></circle>
+                        <path d="M12 7.6v5.2"></path>
+                        <path d="M12 16.4h.01"></path>
+                    </svg>
+                    <span>{errorMessage}</span>
+                </p>
+            </template>
+
+            <button class="ojp__cta ojo__cta" type="button"
+                    disabled={isVerifyDisabled} onclick={handleVerify}>
+                <span>{verifyLabel}</span>
+            </button>
+
+            <div class="ojo__foot">
+                <button class="ojo__link" type="button"
+                        disabled={isResendDisabled} onclick={handleResend}>
+                    {resendLabel}
+                </button>
+                <span class="ojo__sep">|</span>
+                <button class="ojo__link" type="button" onclick={handleCancel}>Cancel</button>
+            </div>
+
+        </div>
+    </div>
+</template>

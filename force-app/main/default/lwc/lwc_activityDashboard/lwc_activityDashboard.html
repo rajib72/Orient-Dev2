@@ -1,0 +1,340 @@
+<template>
+    <div class="pageWrapper">
+
+        <template if:true={isLoading}>
+            <div class="spinnerOverlay">
+                <lightning-spinner alternative-text="Loading..." size="medium"></lightning-spinner>
+            </div>
+        </template>
+
+        <!-- DASHBOARD SCREEN -->
+        <template if:true={showDashboard}>
+            <div class="topBar">
+                <div>
+                    <h1>Activity Dashboard</h1>
+                </div>
+
+                <div class="topSearch">
+                    <lightning-input
+                        type="search"
+                        variant="label-hidden"
+                        placeholder="Search activities, forms, stores..."
+                        value={searchKey}
+                        onchange={handleSearchTyping}>
+                    </lightning-input>
+                </div>
+            </div>
+
+            <div class="mainContent">
+
+                <div class="leftContent">
+
+                    <div class="pageHeader">
+                        <div>
+                            <h2>Date Wise Activities</h2>
+                            <p>View activities and open related forms</p>
+                        </div>
+
+                        <div class="totalCard">
+                            <div class="totalIcon">
+                                <lightning-icon icon-name="utility:event" size="small"></lightning-icon>
+                            </div>
+                            <div>
+                                <span>Total Activities</span>
+                                <strong>{totalActivities}</strong>
+                                <p>{fromDateDisplay} to {toDateDisplay}</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="filterCard">
+                        <div class="filterGrid">
+
+                            <div>
+                                <label>Date From</label>
+                                <lightning-input
+                                    type="date"
+                                    variant="label-hidden"
+                                    value={fromDate}
+                                    onchange={handleFromDateChange}>
+                                </lightning-input>
+                            </div>
+
+                            <div>
+                                <label>Date To</label>
+                                <lightning-input
+                                    type="date"
+                                    variant="label-hidden"
+                                    value={toDate}
+                                    onchange={handleToDateChange}>
+                                </lightning-input>
+                            </div>
+
+                            <div>
+                                <label>Assigned Store</label>
+                                <lightning-combobox
+                                    variant="label-hidden"
+                                    value={selectedStoreId}
+                                    options={storeOptions}
+                                    onchange={handleStoreChange}>
+                                </lightning-combobox>
+                            </div>
+
+                            <div class="searchBox">
+                                <label>Search</label>
+                                <lightning-input
+                                    type="search"
+                                    variant="label-hidden"
+                                    placeholder="Search location, form name..."
+                                    value={searchKey}
+                                    onchange={handleSearchTyping}>
+                                </lightning-input>
+                            </div>
+
+                            <div class="btnBox">
+                                <lightning-button
+                                    label="Clear Filters"
+                                    variant="neutral"
+                                    onclick={handleClearFilters}>
+                                </lightning-button>
+
+                                <lightning-button
+                                    class="slds-m-left_small"
+                                    label="Apply Filters"
+                                    variant="brand"
+                                    onclick={loadActivities}>
+                                </lightning-button>
+                            </div>
+
+                        </div>
+                    </div>
+
+                    <template if:true={hasGroupedActivities}>
+                        <template for:each={groupedActivities} for:item="group">
+                            <div class="dateCard" key={group.dateKey}>
+
+                                <div
+                                    class="dateHeader"
+                                    data-date={group.dateKey}
+                                    onclick={toggleGroup}>
+
+                                    <div class="dateTitle">
+                                        <div class="calendarIcon">
+                                            <lightning-icon icon-name="utility:event" size="x-small"></lightning-icon>
+                                        </div>
+
+                                        <h3>{group.displayDate}</h3>
+
+                                        <span class="countBadge">
+                                            {group.count} Activities
+                                        </span>
+                                    </div>
+
+                                    <lightning-icon
+                                        icon-name={group.iconName}
+                                        size="x-small">
+                                    </lightning-icon>
+                                </div>
+
+                                <template if:true={group.expanded}>
+                                    <div class="tableWrapper">
+                                        <table class="activityTable">
+                                            <thead>
+                                                <tr>
+                                                    <th>Activity Date</th>
+                                                    <th>Activity Location</th>
+                                                    <th>Assigned Store</th>
+                                                    <th>Form Name</th>
+                                                    <th class="actionCol">Actions</th>
+                                                </tr>
+                                            </thead>
+
+                                            <tbody>
+                                                <template for:each={group.records} for:item="act">
+                                                    <tr key={act.activityId}>
+
+                                                        <td>
+                                                            <div class="cellWithIcon">
+                                                                <lightning-icon icon-name="utility:event" size="xx-small"></lightning-icon>
+                                                                <span>{act.activityDateDisplay}</span>
+                                                            </div>
+                                                        </td>
+
+                                                        <td>
+                                                            <div class="cellWithIcon">
+                                                                <lightning-icon icon-name="utility:location" size="xx-small"></lightning-icon>
+                                                                <span>{act.activityLocation}</span>
+                                                            </div>
+                                                        </td>
+
+                                                        <td>
+                                                            <div class="storeCell">
+                                                                <lightning-icon icon-name="utility:store" size="xx-small"></lightning-icon>
+                                                                <b>{act.storeName}</b>
+                                                            </div>
+                                                        </td>
+
+                                                        <td>
+                                                            <template if:true={act.finalCustomizeFormId}>
+                                                                <a
+                                                                    href="javascript:void(0);"
+                                                                    data-id={act.finalCustomizeFormId}
+                                                                    data-activity-id={act.activityId}
+                                                                    onclick={openFormRecord}>
+                                                                    {act.formName}
+                                                                </a>
+                                                            </template>
+
+                                                            <template if:false={act.finalCustomizeFormId}>
+                                                                <span>{act.formName}</span>
+                                                            </template>
+                                                        </td>
+
+                                                        <td class="actionCol">
+                                                            <lightning-button
+                                                                label="Open Form"
+                                                                variant="brand-outline"
+                                                                icon-name="utility:chevronright"
+                                                                icon-position="right"
+                                                                data-id={act.finalCustomizeFormId}
+                                                                data-activity-id={act.activityId}
+                                                                onclick={openFormRecord}>
+                                                            </lightning-button>
+                                                        </td>
+                                                    </tr>
+                                                </template>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </template>
+
+                            </div>
+                        </template>
+                    </template>
+
+                    <template if:false={hasGroupedActivities}>
+                        <div class="emptyState">
+                            <div class="emptyIcon">
+                                <lightning-icon icon-name="utility:description" size="medium"></lightning-icon>
+                            </div>
+                            <h3>No activities found</h3>
+                            <p>Try selecting a different date range or store.</p>
+                        </div>
+                    </template>
+
+                </div>
+
+                <div class="rightInfo">
+                    <div class="capturePanel">
+
+                        <div class="panelTop">
+                            <div class="panelIcon">
+                                <lightning-icon
+                                    icon-name="standard:record"
+                                    size="small">
+                                </lightning-icon>
+                            </div>
+
+                            <div>
+                                <h3>Customer Information Capture</h3>
+                                <p>Open the related form and collect responses question-wise.</p>
+                            </div>
+                        </div>
+
+                        <div class="processBox">
+                            <div class="processItem">
+                                <span class="stepNo">1</span>
+                                <div>
+                                    <strong>Select Activity</strong>
+                                    <p>Choose an activity from the date-wise list.</p>
+                                </div>
+                            </div>
+
+                            <div class="processLine"></div>
+
+                            <div class="processItem">
+                                <span class="stepNo">2</span>
+                                <div>
+                                    <strong>Open Form</strong>
+                                    <p>Click Open Form against the selected activity.</p>
+                                </div>
+                            </div>
+
+                            <div class="processLine"></div>
+
+                            <div class="processItem">
+                                <span class="stepNo">3</span>
+                                <div>
+                                    <strong>Capture Answers</strong>
+                                    <p>Fill customer information and submit responses.</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="panelFooter">
+                            <lightning-icon
+                                icon-name="utility:info"
+                                size="xx-small">
+                            </lightning-icon>
+                            <span>Forms are loaded from the linked Final Customize Form.</span>
+                        </div>
+
+                    </div>
+                </div>
+
+            </div>
+        </template>
+
+        <!-- MODAL CHILD FORM SCREEN -->
+        <template if:true={showInteractiveForm}>
+            <section
+                role="dialog"
+                tabindex="-1"
+                aria-modal="true"
+                aria-labelledby="modal-heading-01"
+                class="slds-modal slds-fade-in-open customModal">
+
+                <div class="slds-modal__container customModalContainer">
+
+                    <header class="slds-modal__header customModalHeader">
+                        <button
+                            class="slds-button slds-button_icon slds-modal__close slds-button_icon-inverse"
+                            title="Close"
+                            onclick={handleBackToDashboard}>
+
+                            <lightning-icon
+                                icon-name="utility:close"
+                                alternative-text="Close"
+                                variant="inverse"
+                                size="small">
+                            </lightning-icon>
+
+                            <span class="slds-assistive-text">Close</span>
+                        </button>
+
+                        <h2 id="modal-heading-01" class="slds-modal__title slds-hyphenate">
+                            Customer Information Capture
+                        </h2>
+
+                        <p class="modalSubtitle">
+                            Capture customer responses for selected form.
+                        </p>
+                    </header>
+
+                    <div class="slds-modal__content customModalBody">
+                        <c-lwc_interactive-customer-form
+                            form-id={selectedFormId}
+                            activity-id={selectedActivityId}
+                            is-modal-view="true"
+                            onbacktodashboard={handleBackToDashboard}>
+                        </c-lwc_interactive-customer-form>
+                    </div>
+
+                </div>
+            </section>
+
+            <div class="slds-backdrop slds-backdrop_open customBackdrop"></div>
+        </template>
+
+    </div>
+</template>

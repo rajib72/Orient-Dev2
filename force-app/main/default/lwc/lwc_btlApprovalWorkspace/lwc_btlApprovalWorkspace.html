@@ -1,0 +1,1554 @@
+<template>
+    <lightning-card>
+        <div class="workspace">
+            <template if:true={isLoading}>
+                <div class="spinner-overlay">
+                    <lightning-spinner
+                        alternative-text="Loading approvals"
+                        size="medium">
+                    </lightning-spinner>
+                </div>
+            </template>
+
+            <template if:true={errorMessage}>
+                <div class="error-banner">
+                    <lightning-icon
+                        icon-name="utility:error"
+                        size="x-small">
+                    </lightning-icon>
+                    <span>{errorMessage}</span>
+                </div>
+            </template>
+
+            <template if:false={isPreviewMode}>
+                <header class="page-header">
+                    <div class="header-icon">
+                        <lightning-icon
+                            icon-name="standard:approval"
+                            size="medium">
+                        </lightning-icon>
+                    </div>
+
+                    <div>
+                        <h1>BTL Approval Workspace</h1>
+                        <p>
+                            Review activities and complete approval actions.
+                        </p>
+                    </div>
+
+                    <div class="user-context">
+                        <span>{currentUserName}</span>
+                        <small>{currentProfileName}</small>
+                    </div>
+                </header>
+
+                <div class="summary-grid">
+                    <div class="summary-card pending-metric">
+                        <span class="summary-label">
+                            Pending With Me
+                        </span>
+                        <span class="summary-value">
+                            {pendingCount}
+                        </span>
+                    </div>
+
+                    <div class="summary-card submitted-metric">
+                        <span class="summary-label">
+                            My Submitted
+                        </span>
+                        <span class="summary-value">
+                            {submittedCount}
+                        </span>
+                    </div>
+
+                    <div class="summary-card action-metric">
+                        <span class="summary-label">
+                            My Actions
+                        </span>
+                        <span class="summary-value">
+                            {actionedCount}
+                        </span>
+                    </div>
+
+                    <template if:true={isAdmin}>
+                        <div class="summary-card admin-card admin-metric">
+                            <span class="summary-label">
+                                All Approvals
+                            </span>
+                            <span class="summary-value">
+                                {adminCount}
+                            </span>
+                        </div>
+                    </template>
+                </div>
+
+                <div class="toolbar">
+                    <div class="search-container">
+                        <lightning-input
+                            type="search"
+                            label="Search approvals"
+                            variant="label-hidden"
+                            placeholder="Search activity, store, executive, approver..."
+                            value={searchKey}
+                            onchange={handleSearch}>
+                        </lightning-input>
+                    </div>
+
+                    <template if:true={showAdminStatusFilter}>
+                        <div class="filter-container">
+                            <lightning-combobox
+                                label="Approval Status"
+                                variant="label-hidden"
+                                value={adminStatusFilter}
+                                options={adminStatusOptions}
+                                onchange={handleAdminStatusFilter}>
+                            </lightning-combobox>
+                        </div>
+                    </template>
+
+                    <lightning-button-icon
+                        icon-name="utility:refresh"
+                        alternative-text="Refresh"
+                        title="Refresh"
+                        onclick={handleRefresh}>
+                    </lightning-button-icon>
+                </div>
+
+                <lightning-tabset active-tab-value={activeTab}>
+                    <lightning-tab
+                        label={pendingTabLabel}
+                        value="pending"
+                        onactive={handleTabActive}>
+
+                        <div class="tab-information">
+                            <lightning-icon
+                                icon-name="utility:info"
+                                size="x-small">
+                            </lightning-icon>
+                            <span>
+                                Approvals are grouped by activity, store, date, team and activity location.
+                                Use Group Preview when multiple people belong to the same execution group.
+                            </span>
+                        </div>
+
+                        <template if:true={showPendingBulkActionPanel}>
+                            <section class="bulk-action-panel">
+                                <div class="bulk-action-heading">
+                                    <div class="bulk-action-title">
+                                        <lightning-icon icon-name="utility:multi_select_checkbox" size="small"></lightning-icon>
+                                        <div>
+                                            <strong>Multiple Activity Action</strong>
+                                            <span>{bulkSelectionSummary}</span>
+                                        </div>
+                                    </div>
+                                    <lightning-button label="Clear Selection" onclick={handleClearBulkSelection}></lightning-button>
+                                </div>
+
+                                <lightning-textarea
+                                    label="Bulk Comments / Rejection Reason"
+                                    value={bulkActionComments}
+                                    placeholder="Optional for approval; mandatory for rejection."
+                                    maxlength="32768"
+                                    onchange={handleBulkActionComments}>
+                                </lightning-textarea>
+
+                                <div class="bulk-action-buttons">
+                                    <lightning-button
+                                        label={bulkRejectLabel}
+                                        variant="destructive"
+                                        icon-name="utility:close"
+                                        disabled={isLoading}
+                                        onclick={handleBulkReject}>
+                                    </lightning-button>
+                                    <lightning-button
+                                        label={bulkApproveLabel}
+                                        variant="brand"
+                                        icon-name="utility:check"
+                                        disabled={isLoading}
+                                        onclick={handleBulkApprove}>
+                                    </lightning-button>
+                                </div>
+                            </section>
+                        </template>
+
+                        <template if:true={hasPendingRows}>
+                            <div class="approval-group-list pending-group-list">
+                                <template
+                                    for:each={filteredPendingGroups}
+                                    for:item="group">
+
+                                    <section
+                                        key={group.key}
+                                        class={group.cardClass}>
+
+                                        <div class="approval-group-header">
+                                            <div class="group-bulk-select">
+                                                <lightning-input
+                                                    type="checkbox"
+                                                    variant="label-hidden"
+                                                    label={group.bulkSelectionLabel}
+                                                    checked={group.isBulkSelected}
+                                                    disabled={group.bulkSelectionDisabled}
+                                                    data-key={group.key}
+                                                    data-source="pending"
+                                                    onchange={handleGroupBulkSelection}>
+                                                </lightning-input>
+                                            </div>
+
+                                            <div class="group-icon">
+                                                <lightning-icon
+                                                    icon-name="standard:people"
+                                                    size="small">
+                                                </lightning-icon>
+                                            </div>
+
+                                            <div class="group-main">
+                                                <div class="group-title-row">
+                                                    <a
+                                                        href={group.activityUrl}
+                                                        target="_blank"
+                                                        class="group-activity-link">
+                                                        {group.activityNo}
+                                                    </a>
+                                                    <span class="group-activity-name">
+                                                        {group.activityName}
+                                                    </span>
+                                                </div>
+
+                                                <div class="group-meta">
+                                                    <span>
+                                                        Form:
+                                                        <a
+                                                            href={group.finalFormUrl}
+                                                            target="_blank"
+                                                            class="record-link">
+                                                            {group.finalCustomizeFormNo}
+                                                        </a>
+                                                    </span>
+                                                    <span>Store: {group.storeName}</span>
+                                                    <span>Team: {group.teamName}</span>
+                                                    <span>Location: {group.activityLocation}</span>
+                                                    <span>Date: {group.formattedTargetDate}</span>
+                                                </div>
+                                            </div>
+
+                                            <div class="group-summary">
+                                                <div class="group-counts">
+                                                    <span class="people-count-badge">
+                                                        {group.peopleLabel}
+                                                    </span>
+                                                    <span class="approval-count">
+                                                        {group.approvalLabel}
+                                                    </span>
+                                                </div>
+
+                                                <div class="group-status-list">
+                                                    <template
+                                                        for:each={group.statusItems}
+                                                        for:item="statusItem">
+
+                                                        <span
+                                                            key={statusItem.key}
+                                                            class={statusItem.className}>
+                                                            {statusItem.label}
+                                                        </span>
+                                                    </template>
+                                                </div>
+                                            </div>
+
+                                            <div class="group-actions">
+                                                <lightning-button
+                                                    class="preview-action"
+                                                    label={group.previewLabel}
+                                                    icon-name="utility:preview"
+                                                    data-key={group.key}
+                                                    data-id={group.firstTransactionId}
+                                                    data-source="pending"
+                                                    onclick={handleGroupPreview}>
+                                                </lightning-button>
+
+                                                <lightning-button-icon
+                                                    class="group-toggle"
+                                                    icon-name={group.toggleIcon}
+                                                    alternative-text={group.toggleTitle}
+                                                    title={group.toggleTitle}
+                                                    data-key={group.key}
+                                                    data-source="pending"
+                                                    onclick={handleGroupToggle}>
+                                                </lightning-button-icon>
+                                            </div>
+                                        </div>
+
+                                        <template if:true={group.isExpanded}>
+                                            <div class="group-member-table-wrap">
+                                                <table class="slds-table slds-table_cell-buffer group-member-table pending-member-table">
+                                                    <thead>
+                                                        <tr>
+                                                            <th>Assigned Person</th>
+                                                            <th>Date Record</th>
+                                                            <th>Activity Location</th>
+                                                            <th>Approval</th>
+                                                            <th>Submitted By</th>
+                                                            <th>Submitted On</th>
+                                                            <th>Current Level</th>
+                                                            <th>Pending With</th>
+                                                            <th>Status</th>
+                                                            <th>Preview</th>
+                                                        </tr>
+                                                    </thead>
+
+                                                    <tbody>
+                                                        <template
+                                                            for:each={group.rows}
+                                                            for:item="row">
+
+                                                            <tr
+                                                                key={row.transactionId}
+                                                                class="group-member-row">
+                                                                <td>
+                                                                    <span class="member-name">
+                                                                        {row.executiveName}
+                                                                    </span>
+                                                                    <span class="secondary-value">
+                                                                        {row.teamName}
+                                                                    </span>
+                                                                </td>
+                                                                <td>
+                                                                    <a
+                                                                        href={row.dateRecordUrl}
+                                                                        target="_blank"
+                                                                        class="record-link">
+                                                                        {row.assignedPersonDateNo}
+                                                                    </a>
+                                                                </td>
+                                                                <td>{row.activityLocation}</td>
+                                                                <td>
+                                                                    <a
+                                                                        href={row.transactionUrl}
+                                                                        target="_blank"
+                                                                        class="record-link">
+                                                                        {row.transactionNo}
+                                                                    </a>
+                                                                    <span class="secondary-value">
+                                                                        Cycle {row.submissionCycle}
+                                                                    </span>
+                                                                </td>
+                                                                <td>{row.submittedBy}</td>
+                                                                <td>{row.formattedSubmittedDateTime}</td>
+                                                                <td>{row.currentLevelDisplay}</td>
+                                                                <td>{row.pendingWithDisplay}</td>
+                                                                <td>
+                                                                    <span class={row.statusClass}>
+                                                                        {row.displayStatus}
+                                                                    </span>
+                                                                </td>
+                                                                <td>
+                                                                    <lightning-button
+                                                                        class="preview-action"
+                                                                        label="Preview"
+                                                                        icon-name="utility:preview"
+                                                                        data-id={row.transactionId}
+                                                                        onclick={handlePreview}>
+                                                                    </lightning-button>
+                                                                </td>
+                                                            </tr>
+                                                        </template>
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        </template>
+                                    </section>
+                                </template>
+                            </div>
+                        </template>
+
+                        <template if:false={hasPendingRows}>
+                            <div class="empty-state tab-empty-state">
+                                <lightning-icon
+                                    icon-name="utility:success"
+                                    size="small">
+                                </lightning-icon>
+                                <h3>No pending approval</h3>
+                                <p>No approval is waiting for your action.</p>
+                            </div>
+                        </template>
+                    </lightning-tab>
+
+                    <lightning-tab
+                        label={submittedTabLabel}
+                        value="submitted"
+                        onactive={handleTabActive}>
+
+                        <div class="tab-information">
+                            <lightning-icon
+                                icon-name="utility:preview"
+                                size="x-small">
+                            </lightning-icon>
+                            <span>
+                                This is a read-only view of approvals submitted by you. Records are consolidated by activity, store, date, team and activity location.
+                            </span>
+                        </div>
+
+                        <template if:true={hasSubmittedRows}>
+                            <div class="approval-group-list">
+                                <template
+                                    for:each={filteredSubmittedGroups}
+                                    for:item="group">
+
+                                    <section
+                                        key={group.key}
+                                        class="approval-group-card">
+
+                                        <div class="approval-group-header">
+                                            <div class="group-bulk-select"></div>
+
+                                            <div class="group-icon">
+                                                <lightning-icon
+                                                    icon-name="standard:people"
+                                                    size="small">
+                                                </lightning-icon>
+                                            </div>
+
+                                            <div class="group-main">
+                                                <div class="group-title-row">
+                                                    <a
+                                                        href={group.activityUrl}
+                                                        target="_blank"
+                                                        class="group-activity-link">
+                                                        {group.activityNo}
+                                                    </a>
+                                                    <span class="group-activity-name">
+                                                        {group.activityName}
+                                                    </span>
+                                                </div>
+
+                                                <div class="group-meta">
+                                                    <span>
+                                                        Form:
+                                                        <a
+                                                            href={group.finalFormUrl}
+                                                            target="_blank"
+                                                            class="record-link">
+                                                            {group.finalCustomizeFormNo}
+                                                        </a>
+                                                    </span>
+                                                    <span>Store: {group.storeName}</span>
+                                                    <span>Team: {group.teamName}</span>
+                                                    <span>Location: {group.activityLocation}</span>
+                                                    <span>Date: {group.formattedTargetDate}</span>
+                                                </div>
+                                            </div>
+
+                                            <div class="group-summary">
+                                                <div class="group-counts">
+                                                    <span class="people-count-badge">
+                                                        {group.peopleLabel}
+                                                    </span>
+                                                    <span class="approval-count">
+                                                        {group.approvalLabel}
+                                                    </span>
+                                                </div>
+
+                                                <div class="group-status-list">
+                                                    <template
+                                                        for:each={group.statusItems}
+                                                        for:item="statusItem">
+
+                                                        <span
+                                                            key={statusItem.key}
+                                                            class={statusItem.className}>
+                                                            {statusItem.label}
+                                                        </span>
+                                                    </template>
+                                                </div>
+                                            </div>
+
+                                            <div class="group-actions">
+                                                <lightning-button
+                                                    class="preview-action"
+                                                    label={group.previewLabel}
+                                                    icon-name="utility:preview"
+                                                    data-key={group.key}
+                                                    data-id={group.firstTransactionId}
+                                                    data-source="submitted"
+                                                    onclick={handleGroupPreview}>
+                                                </lightning-button>
+
+                                                <lightning-button-icon
+                                                    class="group-toggle"
+                                                    icon-name={group.toggleIcon}
+                                                    alternative-text={group.toggleTitle}
+                                                    title={group.toggleTitle}
+                                                    data-key={group.key}
+                                                    data-source="submitted"
+                                                    onclick={handleGroupToggle}>
+                                                </lightning-button-icon>
+                                            </div>
+                                        </div>
+
+                                        <template if:true={group.isExpanded}>
+                                            <div class="group-member-table-wrap">
+                                                <table class="slds-table slds-table_cell-buffer group-member-table">
+                                                    <thead>
+                                                        <tr>
+                                                            <th>Assigned Person</th>
+                                                            <th>Date Record</th>
+                                                            <th>Activity Location</th>
+                                                            <th>Approval</th>
+                                                            <th>Submitted On</th>
+                                                            <th>Current Level</th>
+                                                            <th>Pending With</th>
+                                                            <th>Status</th>
+                                                            <th>Last Action</th>
+                                                            <th>Preview</th>
+                                                        </tr>
+                                                    </thead>
+
+                                                    <tbody>
+                                                        <template
+                                                            for:each={group.rows}
+                                                            for:item="row">
+
+                                                            <tr
+                                                                key={row.transactionId}
+                                                                class="group-member-row">
+                                                                <td>
+                                                                    <span class="member-name">
+                                                                        {row.executiveName}
+                                                                    </span>
+                                                                    <span class="secondary-value">
+                                                                        {row.teamName}
+                                                                    </span>
+                                                                </td>
+                                                                <td>
+                                                                    <a
+                                                                        href={row.dateRecordUrl}
+                                                                        target="_blank"
+                                                                        class="record-link">
+                                                                        {row.assignedPersonDateNo}
+                                                                    </a>
+                                                                </td>
+                                                                <td>{row.activityLocation}</td>
+                                                                <td>
+                                                                    <a
+                                                                        href={row.transactionUrl}
+                                                                        target="_blank"
+                                                                        class="record-link">
+                                                                        {row.transactionNo}
+                                                                    </a>
+                                                                    <span class="secondary-value">
+                                                                        Cycle {row.submissionCycle}
+                                                                    </span>
+                                                                </td>
+                                                                <td>{row.formattedSubmittedDateTime}</td>
+                                                                <td>{row.currentLevelDisplay}</td>
+                                                                <td>{row.pendingWithDisplay}</td>
+                                                                <td>
+                                                                    <span class={row.statusClass}>
+                                                                        {row.displayStatus}
+                                                                    </span>
+                                                                </td>
+                                                                <td>
+                                                                    <span class={row.lastActionClass}>
+                                                                        {row.lastAction}
+                                                                    </span>
+                                                                    <span class="secondary-value">
+                                                                        {row.formattedLastActionDateTime}
+                                                                    </span>
+                                                                </td>
+                                                                <td>
+                                                                    <lightning-button
+                                                                        class="preview-action"
+                                                                        label="Preview"
+                                                                        icon-name="utility:preview"
+                                                                        data-id={row.transactionId}
+                                                                        data-source="submitted"
+                                                                        onclick={handlePreview}>
+                                                                    </lightning-button>
+                                                                </td>
+                                                            </tr>
+                                                        </template>
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        </template>
+                                    </section>
+                                </template>
+                            </div>
+                        </template>
+
+                        <template if:false={hasSubmittedRows}>
+                            <div class="empty-state tab-empty-state">
+                                <lightning-icon
+                                    icon-name="utility:info"
+                                    size="small">
+                                </lightning-icon>
+                                <h3>No submitted approval</h3>
+                                <p>You have not submitted any BTL approval yet.</p>
+                            </div>
+                        </template>
+                    </lightning-tab>
+
+                    <lightning-tab
+                        label={actionedTabLabel}
+                        value="actioned"
+                        onactive={handleTabActive}>
+
+                        <div class="tab-information">
+                            <lightning-icon
+                                icon-name="utility:info"
+                                size="x-small">
+                            </lightning-icon>
+                            <span>
+                                Your completed approval actions are consolidated by activity, store, date, team and activity location.
+                            </span>
+                        </div>
+
+                        <template if:true={hasActionedRows}>
+                            <div class="approval-group-list">
+                                <template
+                                    for:each={filteredActionedGroups}
+                                    for:item="group">
+
+                                    <section
+                                        key={group.key}
+                                        class="approval-group-card">
+
+                                        <div class="approval-group-header">
+                                            <div class="group-bulk-select"></div>
+
+                                            <div class="group-icon">
+                                                <lightning-icon
+                                                    icon-name="standard:people"
+                                                    size="small">
+                                                </lightning-icon>
+                                            </div>
+
+                                            <div class="group-main">
+                                                <div class="group-title-row">
+                                                    <a
+                                                        href={group.activityUrl}
+                                                        target="_blank"
+                                                        class="group-activity-link">
+                                                        {group.activityNo}
+                                                    </a>
+                                                    <span class="group-activity-name">
+                                                        {group.activityName}
+                                                    </span>
+                                                </div>
+
+                                                <div class="group-meta">
+                                                    <span>
+                                                        Form:
+                                                        <a
+                                                            href={group.finalFormUrl}
+                                                            target="_blank"
+                                                            class="record-link">
+                                                            {group.finalCustomizeFormNo}
+                                                        </a>
+                                                    </span>
+                                                    <span>Store: {group.storeName}</span>
+                                                    <span>Team: {group.teamName}</span>
+                                                    <span>Location: {group.activityLocation}</span>
+                                                    <span>Date: {group.formattedTargetDate}</span>
+                                                </div>
+                                            </div>
+
+                                            <div class="group-summary">
+                                                <div class="group-counts">
+                                                    <span class="people-count-badge">
+                                                        {group.peopleLabel}
+                                                    </span>
+                                                    <span class="approval-count">
+                                                        {group.approvalLabel}
+                                                    </span>
+                                                </div>
+
+                                                <div class="group-status-list">
+                                                    <template
+                                                        for:each={group.statusItems}
+                                                        for:item="statusItem">
+
+                                                        <span
+                                                            key={statusItem.key}
+                                                            class={statusItem.className}>
+                                                            {statusItem.label}
+                                                        </span>
+                                                    </template>
+                                                </div>
+                                            </div>
+
+                                            <div class="group-actions">
+                                                <lightning-button
+                                                    class="preview-action"
+                                                    label={group.previewLabel}
+                                                    icon-name="utility:preview"
+                                                    data-key={group.key}
+                                                    data-id={group.firstTransactionId}
+                                                    data-source="actioned"
+                                                    onclick={handleGroupPreview}>
+                                                </lightning-button>
+
+                                                <lightning-button-icon
+                                                    class="group-toggle"
+                                                    icon-name={group.toggleIcon}
+                                                    alternative-text={group.toggleTitle}
+                                                    title={group.toggleTitle}
+                                                    data-key={group.key}
+                                                    data-source="actioned"
+                                                    onclick={handleGroupToggle}>
+                                                </lightning-button-icon>
+                                            </div>
+                                        </div>
+
+                                        <template if:true={group.isExpanded}>
+                                            <div class="group-member-table-wrap">
+                                                <table class="slds-table slds-table_cell-buffer group-member-table">
+                                                    <thead>
+                                                        <tr>
+                                                            <th>Assigned Person</th>
+                                                            <th>Date Record</th>
+                                                            <th>Activity Location</th>
+                                                            <th>Approval</th>
+                                                            <th>Action Level</th>
+                                                            <th>My Action</th>
+                                                            <th>Action Date</th>
+                                                            <th>Assigned To</th>
+                                                            <th>Current Status</th>
+                                                            <th>Comments</th>
+                                                            <th>Preview</th>
+                                                        </tr>
+                                                    </thead>
+
+                                                    <tbody>
+                                                        <template
+                                                            for:each={group.rows}
+                                                            for:item="row">
+
+                                                            <tr
+                                                                key={row.historyId}
+                                                                class="group-member-row">
+                                                                <td>
+                                                                    <span class="member-name">
+                                                                        {row.executiveName}
+                                                                    </span>
+                                                                    <span class="secondary-value">
+                                                                        {row.teamName}
+                                                                    </span>
+                                                                </td>
+                                                                <td>
+                                                                    <a
+                                                                        href={row.dateRecordUrl}
+                                                                        target="_blank"
+                                                                        class="record-link">
+                                                                        {row.assignedPersonDateNo}
+                                                                    </a>
+                                                                </td>
+                                                                <td>{row.activityLocation}</td>
+                                                                <td>
+                                                                    <a
+                                                                        href={row.transactionUrl}
+                                                                        target="_blank"
+                                                                        class="record-link">
+                                                                        {row.transactionNo}
+                                                                    </a>
+                                                                    <span class="secondary-value">
+                                                                        Cycle {row.submissionCycle}
+                                                                    </span>
+                                                                </td>
+                                                                <td>{row.actionLevel}</td>
+                                                                <td>
+                                                                    <span class={row.actionClass}>
+                                                                        {row.action}
+                                                                    </span>
+                                                                </td>
+                                                                <td>{row.formattedActionDateTime}</td>
+                                                                <td>{row.assignedTo}</td>
+                                                                <td>
+                                                                    <span class={row.statusClass}>
+                                                                        {row.displayStatus}
+                                                                    </span>
+                                                                </td>
+                                                                <td>
+                                                                    <span class="comment-cell">
+                                                                        {row.comments}
+                                                                    </span>
+                                                                </td>
+                                                                <td>
+                                                                    <lightning-button
+                                                                        class="preview-action"
+                                                                        label="Preview"
+                                                                        icon-name="utility:preview"
+                                                                        data-id={row.transactionId}
+                                                                        data-source="actioned"
+                                                                        onclick={handlePreview}>
+                                                                    </lightning-button>
+                                                                </td>
+                                                            </tr>
+                                                        </template>
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        </template>
+                                    </section>
+                                </template>
+                            </div>
+                        </template>
+
+                        <template if:false={hasActionedRows}>
+                            <div class="empty-state tab-empty-state">
+                                <lightning-icon
+                                    icon-name="utility:info"
+                                    size="small">
+                                </lightning-icon>
+                                <h3>No action history</h3>
+                                <p>You have not completed an approval action yet.</p>
+                            </div>
+                        </template>
+                    </lightning-tab>
+
+                    <template if:true={isAdmin}>
+                        <lightning-tab
+                            label={adminTabLabel}
+                            value="admin"
+                            onactive={handleTabActive}>
+
+                            <div class="admin-information">
+                                <lightning-icon
+                                    icon-name="utility:info"
+                                    size="x-small">
+                                </lightning-icon>
+                                <span>
+                                    This view shows every approval and its current owner. As an administrator, you can approve or reject any pending approval even when it is assigned to another user.
+                                </span>
+                            </div>
+
+                            <template if:true={showAdminBulkActionPanel}>
+                                <section class="bulk-action-panel admin-bulk-action-panel">
+                                    <div class="bulk-action-heading">
+                                        <div class="bulk-action-title">
+                                            <lightning-icon icon-name="utility:multi_select_checkbox" size="small"></lightning-icon>
+                                            <div>
+                                                <strong>Administrator Bulk Action</strong>
+                                                <span>{bulkSelectionSummary}</span>
+                                            </div>
+                                        </div>
+                                        <lightning-button label="Clear Selection" onclick={handleClearBulkSelection}></lightning-button>
+                                    </div>
+
+                                    <lightning-textarea
+                                        label="Bulk Comments / Rejection Reason"
+                                        value={bulkActionComments}
+                                        placeholder="Optional for approval; mandatory for rejection."
+                                        maxlength="32768"
+                                        onchange={handleBulkActionComments}>
+                                    </lightning-textarea>
+
+                                    <div class="bulk-action-buttons">
+                                        <lightning-button
+                                            label={bulkRejectLabel}
+                                            variant="destructive"
+                                            icon-name="utility:close"
+                                            disabled={isLoading}
+                                            onclick={handleBulkReject}>
+                                        </lightning-button>
+                                        <lightning-button
+                                            label={bulkApproveLabel}
+                                            variant="brand"
+                                            icon-name="utility:check"
+                                            disabled={isLoading}
+                                            onclick={handleBulkApprove}>
+                                        </lightning-button>
+                                    </div>
+                                </section>
+                            </template>
+
+                            <template if:true={hasAdminRows}>
+                                <div class="admin-group-list">
+                                    <template
+                                        for:each={filteredAdminGroups}
+                                        for:item="group">
+
+                                        <section
+                                            key={group.key}
+                                            class={group.cardClass}>
+
+                                            <div class="approval-group-header">
+                                                <div class="group-bulk-select">
+                                                    <lightning-input
+                                                        type="checkbox"
+                                                        variant="label-hidden"
+                                                        label={group.bulkSelectionLabel}
+                                                        checked={group.isBulkSelected}
+                                                        disabled={group.bulkSelectionDisabled}
+                                                        data-key={group.key}
+                                                        data-source="admin"
+                                                        onchange={handleGroupBulkSelection}>
+                                                    </lightning-input>
+                                                </div>
+
+                                                <div class="group-icon">
+                                                    <lightning-icon
+                                                        icon-name="standard:people"
+                                                        size="small">
+                                                    </lightning-icon>
+                                                </div>
+
+                                                <div class="group-main">
+                                                    <div class="group-title-row">
+                                                        <a
+                                                            href={group.activityUrl}
+                                                            target="_blank"
+                                                            class="group-activity-link">
+                                                            {group.activityNo}
+                                                        </a>
+                                                        <span class="group-activity-name">
+                                                            {group.activityName}
+                                                        </span>
+                                                    </div>
+
+                                                    <div class="group-meta">
+                                                        <span>
+                                                            Form:
+                                                            <a
+                                                                href={group.finalFormUrl}
+                                                                target="_blank"
+                                                                class="record-link">
+                                                                {group.finalCustomizeFormNo}
+                                                            </a>
+                                                        </span>
+                                                        <span>Store: {group.storeName}</span>
+                                                        <span>Team: {group.teamName}</span>
+                                                        <span>Location: {group.activityLocation}</span>
+                                                        <span>Date: {group.formattedTargetDate}</span>
+                                                    </div>
+                                                </div>
+
+                                                <div class="group-summary">
+                                                    <div class="group-counts">
+                                                        <span class="people-count-badge">
+                                                            {group.peopleLabel}
+                                                        </span>
+                                                        <span class="approval-count">
+                                                            {group.approvalLabel}
+                                                        </span>
+                                                    </div>
+
+                                                    <div class="group-status-list">
+                                                        <template
+                                                            for:each={group.statusItems}
+                                                            for:item="statusItem">
+
+                                                            <span
+                                                                key={statusItem.key}
+                                                                class={statusItem.className}>
+                                                                {statusItem.label}
+                                                            </span>
+                                                        </template>
+                                                    </div>
+                                                </div>
+
+                                                <div class="group-actions">
+                                                    <lightning-button
+                                                        class="preview-action"
+                                                        label={group.previewLabel}
+                                                        icon-name="utility:preview"
+                                                        data-key={group.key}
+                                                        data-id={group.firstTransactionId}
+                                                        data-source="admin"
+                                                        onclick={handleGroupPreview}>
+                                                    </lightning-button>
+
+                                                    <lightning-button-icon
+                                                        class="group-toggle"
+                                                        icon-name={group.toggleIcon}
+                                                        alternative-text={group.toggleTitle}
+                                                        title={group.toggleTitle}
+                                                        data-key={group.key}
+                                                        data-source="admin"
+                                                        onclick={handleGroupToggle}>
+                                                    </lightning-button-icon>
+                                                </div>
+                                            </div>
+
+                                            <template if:true={group.isExpanded}>
+                                                <div class="group-member-table-wrap">
+                                                    <table class="slds-table slds-table_cell-buffer group-member-table">
+                                                        <thead>
+                                                            <tr>
+                                                                <th>Assigned Person</th>
+                                                                <th>Date Record</th>
+                                                                <th>Activity Location</th>
+                                                                <th>Approval</th>
+                                                                <th>Submitted By</th>
+                                                                <th>Current Level</th>
+                                                                <th>Pending With</th>
+                                                                <th>Status</th>
+                                                                <th>Last Action</th>
+                                                                <th>Last Action On</th>
+                                                                <th>Preview</th>
+                                                            </tr>
+                                                        </thead>
+
+                                                        <tbody>
+                                                            <template
+                                                                for:each={group.rows}
+                                                                for:item="row">
+
+                                                                <tr
+                                                                    key={row.transactionId}
+                                                                    class="group-member-row">
+                                                                    <td>
+                                                                        <span class="member-name">
+                                                                            {row.executiveName}
+                                                                        </span>
+                                                                        <span class="secondary-value">
+                                                                            {row.teamName}
+                                                                        </span>
+                                                                    </td>
+                                                                    <td>
+                                                                        <a
+                                                                            href={row.dateRecordUrl}
+                                                                            target="_blank"
+                                                                            class="record-link">
+                                                                            {row.assignedPersonDateNo}
+                                                                        </a>
+                                                                    </td>
+                                                                    <td>{row.activityLocation}</td>
+                                                                    <td>
+                                                                        <a
+                                                                            href={row.transactionUrl}
+                                                                            target="_blank"
+                                                                            class="record-link">
+                                                                            {row.transactionNo}
+                                                                        </a>
+                                                                        <span class="secondary-value">
+                                                                            Cycle {row.submissionCycle}
+                                                                        </span>
+                                                                    </td>
+                                                                    <td>{row.submittedBy}</td>
+                                                                    <td>{row.currentLevelDisplay}</td>
+                                                                    <td>{row.pendingWithDisplay}</td>
+                                                                    <td>
+                                                                        <span class={row.statusClass}>
+                                                                            {row.displayStatus}
+                                                                        </span>
+                                                                    </td>
+                                                                    <td>
+                                                                        <span class={row.lastActionClass}>
+                                                                            {row.lastAction}
+                                                                        </span>
+                                                                        <span class="secondary-value">
+                                                                            {row.returnedFromLevel}
+                                                                        </span>
+                                                                    </td>
+                                                                    <td>{row.formattedLastActionDateTime}</td>
+                                                                    <td>
+                                                                        <lightning-button
+                                                                            class="preview-action"
+                                                                            label="Preview"
+                                                                            icon-name="utility:preview"
+                                                                            data-id={row.transactionId}
+                                                                            onclick={handlePreview}>
+                                                                        </lightning-button>
+                                                                    </td>
+                                                                </tr>
+                                                            </template>
+                                                        </tbody>
+                                                    </table>
+                                                </div>
+                                            </template>
+                                        </section>
+                                    </template>
+                                </div>
+                            </template>
+
+                            <template if:false={hasAdminRows}>
+                                <div class="empty-state admin-empty-state">
+                                    <lightning-icon
+                                        icon-name="utility:info"
+                                        size="small">
+                                    </lightning-icon>
+                                    <h3>No approval found</h3>
+                                    <p>
+                                        No approval matches the current
+                                        search and status filters.
+                                    </p>
+                                </div>
+                            </template>
+                        </lightning-tab>
+                    </template>
+                </lightning-tabset>
+            </template>
+
+            <template if:true={isPreviewMode}>
+                <div class="preview-header">
+                    <div>
+                        <h1>{previewSummary.activityNo}</h1>
+                        <p>
+                            {previewSummary.activityName}
+                            &nbsp;•&nbsp;
+                            {previewSummary.storeName}
+                            &nbsp;•&nbsp;
+                            {previewSummary.formattedTargetDate}
+                        </p>
+                    </div>
+                    <span class={previewSummary.statusClass}>
+                        {previewSummary.displayStatus}
+                    </span>
+                </div>
+
+                <template if:true={isReadOnlyPreview}>
+                    <div class="read-only-banner">
+                        <lightning-icon
+                            icon-name="utility:preview"
+                            size="x-small">
+                        </lightning-icon>
+                        <span>
+                            Read-only preview. The action belongs to another
+                            user or has already been completed.
+                        </span>
+                    </div>
+                </template>
+
+                <template if:true={hasPreviewWarnings}>
+                    <div class="warning-container">
+                        <template for:each={previewWarnings} for:item="warning">
+                            <div key={warning.key} class="warning-message">
+                                <lightning-icon
+                                    icon-name="utility:warning"
+                                    size="x-small">
+                                </lightning-icon>
+                                <span>{warning.message}</span>
+                            </div>
+                        </template>
+                    </div>
+                </template>
+
+                <section class="overview-section approval-section">
+                    <div class="section-heading">
+                        <lightning-icon
+                            icon-name="standard:approval"
+                            size="small">
+                        </lightning-icon>
+                        <span>Approval Overview</span>
+                    </div>
+
+                    <div class="overview-field-grid">
+                        <template for:each={approvalSummaryFields} for:item="field">
+                            <div key={field.key} class="overview-field">
+                                <span class="field-label">{field.label}</span>
+                                <span class={field.valueClass}>{field.value}</span>
+                            </div>
+                        </template>
+                    </div>
+
+                    <template if:true={previewSummary.lastActionComments}>
+                        <div class="comments-box">
+                            <span class="field-label">
+                                Last Approval Comments
+                            </span>
+                            <lightning-formatted-text
+                                value={previewSummary.lastActionComments}>
+                            </lightning-formatted-text>
+                        </div>
+                    </template>
+                </section>
+
+                <section class="overview-section selected-activity-section">
+                    <div class="section-heading">
+                        <lightning-icon
+                            icon-name="standard:task"
+                            size="small">
+                        </lightning-icon>
+                        <span>Selected Activity Details</span>
+                    </div>
+
+                    <div class="overview-field-grid">
+                        <template for:each={activityOverviewFields} for:item="field">
+                            <div key={field.key} class="overview-field">
+                                <span class="field-label">{field.label}</span>
+                                <span class="overview-value">{field.value}</span>
+                            </div>
+                        </template>
+                    </div>
+                </section>
+
+                <template if:true={isGroupPreview}>
+                    <section class="overview-section team-scope-overview-section">
+                        <div class="section-heading heading-between">
+                            <div class="heading-left">
+                                <lightning-icon
+                                    icon-name="standard:people"
+                                    size="small">
+                                </lightning-icon>
+                                <span>Team Activity Approval Scope</span>
+                            </div>
+                            <span class="section-hint">
+                                {previewGroupCount} approval record(s) in this team activity
+                            </span>
+                        </div>
+
+                        <template if:true={hasPreviewGroupRows}>
+                            <div class="team-scope-table-wrap">
+                                <table class="slds-table slds-table_cell-buffer slds-table_bordered team-scope-table">
+                                    <thead>
+                                        <tr>
+                                            <th>Assigned Person</th>
+                                            <th>Date Record</th>
+                                            <th>Current Level</th>
+                                            <th>Pending With</th>
+                                            <th>Status</th>
+                                            <th>Last Action</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <template for:each={previewGroupRows} for:item="row">
+                                            <tr key={row.transactionId}>
+                                                <td>{row.scopeAssignedPerson}</td>
+                                                <td>
+                                                    <a
+                                                        href={row.dateRecordUrl}
+                                                        target="_blank"
+                                                        class="record-link">
+                                                        {row.assignedPersonDateNo}
+                                                    </a>
+                                                </td>
+                                                <td>{row.currentLevelDisplay}</td>
+                                                <td>{row.pendingWithDisplay}</td>
+                                                <td>
+                                                    <span class={row.statusClass}>
+                                                        {row.displayStatus}
+                                                    </span>
+                                                </td>
+                                                <td><span class={row.lastActionClass}>{row.lastAction}</span></td>
+                                            </tr>
+                                        </template>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </template>
+                    </section>
+                </template>
+
+                <section class={assignedPersonsSectionClass}>
+                    <div class="section-heading heading-between">
+                        <div class="heading-left">
+                            <lightning-icon
+                                icon-name="standard:people"
+                                size="small">
+                            </lightning-icon>
+                            <span>All Assigned Persons for This Activity</span>
+                        </div>
+                        <span class="section-hint">
+                            {assignedPersonSelectionHint}
+                        </span>
+                    </div>
+
+                    <template if:true={hasAssignedPersons}>
+                        <div class="assigned-table-wrap">
+                            <table class="slds-table slds-table_cell-buffer slds-table_bordered assigned-table">
+                                <thead>
+                                    <tr>
+                                        <th>Assigned Person</th>
+                                        <th>Executive</th>
+                                        <th>Team</th>
+                                        <th>Store</th>
+                                        <th>Target Date</th>
+                                        <th>Actual Date</th>
+                                        <th>Location</th>
+                                        <th>Attendance</th>
+                                        <th>Approval Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <template
+                                        for:each={assignedPersonRows}
+                                        for:item="assignment">
+
+                                        <tr
+                                            key={assignment.key}
+                                            class={assignment.rowClass}
+                                            data-transaction-id={assignment.transactionId}
+                                            tabindex={assignment.rowTabIndex}
+                                            aria-label={assignment.selectionAriaLabel}
+                                            onclick={handleAssignedPersonSelection}
+                                            onkeydown={handleAssignedPersonKeydown}>
+                                            <td>
+                                                <div class="assignment-person-cell">
+                                                    <template if:true={assignment.showSelectionMarker}>
+                                                        <span class={assignment.selectionIndicatorClass}>
+                                                            <template if:true={assignment.showSelectedIcon}>
+                                                                <lightning-icon
+                                                                    icon-name="utility:check"
+                                                                    size="xx-small">
+                                                                </lightning-icon>
+                                                            </template>
+                                                        </span>
+                                                    </template>
+
+                                                    <div>
+                                                        <span class="primary-value">
+                                                            {assignment.displayName}
+                                                        </span>
+                                                        <span class="secondary-value">
+                                                            {assignment.dateRecordNo}
+                                                        </span>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <td>{assignment.executiveName}</td>
+                                            <td>{assignment.teamName}</td>
+                                            <td>{assignment.storeName}</td>
+                                            <td>{assignment.formattedTargetDate}</td>
+                                            <td>{assignment.formattedActualDate}</td>
+                                            <td>{assignment.location}</td>
+                                            <td>{assignment.attendanceDisplay}</td>
+                                            <td>
+                                                <span class={assignment.statusClass}>
+                                                    {assignment.displayStatus}
+                                                </span>
+                                            </td>
+                                        </tr>
+                                    </template>
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <template if:true={isGroupPreview}>
+                            <div class={teamSelectionNoteClass}>
+                                <lightning-icon
+                                    icon-name={teamSelectionNoteIcon}
+                                    size="x-small">
+                                </lightning-icon>
+                                <div>
+                                    <span class="selection-feedback-summary">
+                                        {previewGroupSelectionSummary}
+                                    </span>
+                                    <span>{teamSelectionMessage}</span>
+                                </div>
+                            </div>
+                        </template>
+                    </template>
+
+                    <template if:false={hasAssignedPersons}>
+                        <div class="section-empty">
+                            No assigned person information is available.
+                        </div>
+                    </template>
+                </section>
+
+                <section class="overview-section">
+                    <div class="section-heading">
+                        <lightning-icon
+                            icon-name="utility:summary"
+                            size="small">
+                        </lightning-icon>
+                        <span>Supporting Information</span>
+                    </div>
+
+                    <div class="supporting-grid">
+                        <template for:each={supportingCards} for:item="card">
+                            <div key={card.key} class="supporting-card">
+                                <lightning-icon
+                                    icon-name={card.icon}
+                                    size="small">
+                                </lightning-icon>
+                                <div>
+                                    <span class="supporting-value">
+                                        {card.value}
+                                    </span>
+                                    <span class="supporting-label">
+                                        {card.label}
+                                    </span>
+                                </div>
+                            </div>
+                        </template>
+                    </div>
+                </section>
+
+                <div class="detail-toggle-panel">
+                    <div>
+                        <div class="detail-toggle-title">
+                            Need every field and related record?
+                        </div>
+                        <div class="detail-toggle-subtitle">
+                            Full details are loaded only when requested.
+                        </div>
+                    </div>
+
+                    <lightning-button
+                        label={detailButtonLabel}
+                        icon-name={detailButtonIcon}
+                        onclick={handleToggleFullDetails}>
+                    </lightning-button>
+                </div>
+
+                <template if:true={showFullDetails}>
+                    <div class="full-details-heading">
+                        Complete Record Details
+                    </div>
+
+                    <template for:each={detailedSections} for:item="section">
+                        <section key={section.key} class="detail-section">
+                            <div class="section-heading heading-between">
+                                <span>{section.title}</span>
+                                <span class="record-count">
+                                    {section.recordCount} record(s)
+                                </span>
+                            </div>
+
+                            <template if:true={section.hasRecords}>
+                                <template for:each={section.records} for:item="record">
+                                    <article key={record.key} class="record-card">
+                                        <div class="record-title">
+                                            {record.title}
+                                        </div>
+
+                                        <div class="field-grid">
+                                            <template
+                                                for:each={record.fields}
+                                                for:item="field">
+
+                                                <div
+                                                    key={field.key}
+                                                    class={field.containerClass}>
+
+                                                    <span class="field-label">
+                                                        {field.label}
+                                                    </span>
+
+                                                    <template if:true={field.hasValue}>
+                                                        <lightning-formatted-text
+                                                            value={field.displayValue}>
+                                                        </lightning-formatted-text>
+                                                    </template>
+
+                                                    <template if:false={field.hasValue}>
+                                                        <span class="blank-value">—</span>
+                                                    </template>
+                                                </div>
+                                            </template>
+                                        </div>
+                                    </article>
+                                </template>
+                            </template>
+
+                            <template if:false={section.hasRecords}>
+                                <div class="section-empty">
+                                    No related information is available.
+                                </div>
+                            </template>
+                        </section>
+                    </template>
+
+                    <section class="detail-section">
+                        <div class="section-heading heading-between">
+                            <span>Salesforce Files</span>
+                            <span class="record-count">
+                                {detailedFileCount} file(s)
+                            </span>
+                        </div>
+
+                        <template if:true={hasDetailedFiles}>
+                            <div class="file-list">
+                                <template for:each={detailedFiles} for:item="file">
+                                    <a
+                                        key={file.key}
+                                        href={file.url}
+                                        target="_blank"
+                                        class="file-card">
+                                        <lightning-icon
+                                            icon-name="doctype:attachment"
+                                            size="small">
+                                        </lightning-icon>
+                                        <div>
+                                            <div class="file-title">
+                                                {file.title}
+                                            </div>
+                                            <div class="file-meta">
+                                                {file.fileType}
+                                                &nbsp;•&nbsp;
+                                                {file.formattedCreatedDate}
+                                            </div>
+                                        </div>
+                                    </a>
+                                </template>
+                            </div>
+                        </template>
+
+                        <template if:false={hasDetailedFiles}>
+                            <div class="section-empty">
+                                No Salesforce File is attached.
+                            </div>
+                        </template>
+                    </section>
+                </template>
+
+                <template if:true={canAct}>
+                    <section class="action-section">
+                        <lightning-textarea
+                            label="Approval Comments / Rejection Reason"
+                            value={actionComments}
+                            placeholder="Optional for approval; mandatory for rejection."
+                            maxlength="32768"
+                            onchange={handleActionComments}>
+                        </lightning-textarea>
+                    </section>
+                </template>
+
+                <div class="preview-footer">
+                    <lightning-button
+                        label="Back to Workspace"
+                        icon-name="utility:back"
+                        onclick={handleBackFromPreview}>
+                    </lightning-button>
+
+                    <template if:true={showGroupRejectButton}>
+                        <lightning-button
+                            class="slds-m-left_small"
+                            label={groupRejectLabel}
+                            variant="destructive"
+                            icon-name="utility:close"
+                            disabled={isLoading}
+                            onclick={handleRejectGroupSelection}>
+                        </lightning-button>
+                    </template>
+
+                    <template if:true={showStandardRejectButton}>
+                        <lightning-button
+                            class="slds-m-left_small"
+                            label="Reject"
+                            variant="destructive"
+                            icon-name="utility:close"
+                            disabled={isLoading}
+                            onclick={handleReject}>
+                        </lightning-button>
+                    </template>
+
+                    <template if:true={showGroupApproveButton}>
+                        <lightning-button
+                            class="slds-m-left_small"
+                            label={groupApproveLabel}
+                            variant="brand"
+                            icon-name="utility:check"
+                            disabled={isLoading}
+                            onclick={handleApproveGroupSelection}>
+                        </lightning-button>
+                    </template>
+
+                    <template if:true={showStandardApproveButton}>
+                        <lightning-button
+                            class="slds-m-left_small"
+                            label="Approve"
+                            variant="brand"
+                            icon-name="utility:check"
+                            disabled={isLoading}
+                            onclick={handleApprove}>
+                        </lightning-button>
+                    </template>
+                </div>
+            </template>
+        </div>
+    </lightning-card>
+</template>

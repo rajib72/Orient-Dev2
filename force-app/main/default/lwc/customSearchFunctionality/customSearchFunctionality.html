@@ -1,0 +1,105 @@
+<template>
+    <div class="customer-search-wrapper">
+
+        <!-- SEARCH CARD -->
+        <div class="search-card">
+            <div class="search-header">
+                <div class="search-icon">
+                    <lightning-icon icon-name="utility:search" size="small"></lightning-icon>
+                </div>
+
+                <div>
+                    <h2>Search By Phone or WhatsApp</h2>
+                    <p>Enter customer phone or WhatsApp number to search existing customer</p>
+                </div>
+            </div>
+
+            <div class="search-input-area">
+                <lightning-input
+                    type="tel"
+                    label="Phone / WhatsApp Number"
+                    value={searchKey}
+                    oninput={restrictToNumbers}
+                    onkeydown={allowOnlyNumbers}
+                    onpaste={handlePaste}
+                    onchange={handleSearch}
+                    maxlength="10"
+                    message-when-pattern-mismatch="Only numbers are allowed"
+                    placeholder="Enter phone or whatsapp number">
+                </lightning-input>
+            </div>
+        </div>
+
+        <!-- SUGGESTIONS TABLE -->
+        <template if:true={showSearchTable}>
+            <div class="result-card">
+                <div class="result-header">
+                    <h3>Matching Customers</h3>
+                    <span>{accountList.length} Result(s)</span>
+                </div>
+
+                <div class="table-scroll">
+                    <lightning-datatable 
+                        key-field="Id"
+                        data={accountList}
+                        columns={columns}
+                        hide-checkbox-column="true"
+                        onrowaction={handleRowAction}>
+                    </lightning-datatable>
+                </div>
+            </div>
+        </template>
+
+        <!-- NO RECORD FOUND / SHOW CREATE -->
+        <template if:true={showNoRecordCard}>
+            <div class="no-record-card">
+                <div class="warning-icon">
+                    <lightning-icon icon-name="utility:warning" size="medium"></lightning-icon>
+                </div>
+
+                <h3>No Records Found</h3>
+                <p>No customer found with this Phone / WhatsApp number.</p>
+                
+
+                <div class="slds-m-top_medium">
+                    <lightning-button 
+                        variant="brand"
+                        label="Create New Customer"
+                        onclick={openCreateModal}>
+                    </lightning-button>
+                </div>
+            </div>
+        </template>
+
+        <!-- MODAL POPUP FOR CHILD COMPONENT - SAME AS YOUR PREVIOUS LOGIC -->
+        <template if:true={showCreateModal}>
+            <section role="dialog" tabindex="-1" class="slds-modal slds-fade-in-open custom-create-modal">
+                <div class="slds-modal__container custom-modal-container">
+
+                    <!-- HEADER -->
+                    <header class="slds-modal__header custom-modal-header">
+                        <button class="slds-button slds-button_icon slds-modal__close custom-close-btn"
+                                title="Close"
+                                onclick={closeCreateModal}>
+                            <lightning-icon icon-name="utility:close" size="small"></lightning-icon>
+                        </button>
+
+                        <h2 class="slds-text-heading_medium slds-hyphenate">
+                            Create New Customer
+                        </h2>
+                    </header>
+
+                    <!-- BODY -->
+                    <div class="slds-modal__content modal-body-fixed">
+                        <c-customer-enrollment-form></c-customer-enrollment-form>
+                    </div>
+
+                </div>
+            </section>
+
+            <!-- BACKDROP -->
+            <div class="slds-backdrop slds-backdrop_open"></div>
+        </template>
+
+    </div>
+</template>

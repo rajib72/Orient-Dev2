@@ -1,0 +1,82 @@
+<template>
+    <lightning-quick-action-panel header="Add Family Member">
+
+        <template if:true={isLoading}>
+            <lightning-spinner alternative-text="Loading..." size="medium"></lightning-spinner>
+        </template>
+
+        <div class="premiumWrapper">
+
+            <div class="headerSection">
+                <div class="iconCircle">👨‍👩‍👧</div>
+                <div>
+                    <h2>Add Family Member</h2>
+                    <p>Search or create a family member and maintain reverse relationship automatically.</p>
+                </div>
+            </div>
+
+            <div class="formCard">
+
+                <lightning-combobox label="Current Account Gender" value={currentAccountGender} options={genderOptions}
+                    onchange={handleGenderChange} required>
+                </lightning-combobox>
+
+                <lightning-input class="inputGap" label="Phone Number" type="tel" value={phone}
+                    onchange={handlePhoneChange} maxlength="10" required>
+                </lightning-input>
+
+                <template if:true={phoneError}>
+                    <div class="errorText">{phoneError}</div>
+                </template>
+
+                <template if:true={showNameInput}>
+                    <lightning-input class="inputGap" label="Family Member Name" value={familyMemberName}
+                        onchange={handleNameChange} required>
+                    </lightning-input>
+                </template>
+
+                <template if:true={showExistingAccounts}>
+                    <div class="existingBox">
+                        <div class="sectionTitle">Existing Account Found</div>
+                        <div class="infoText">
+                            Select an existing account. Name will auto-fill from selected account.
+                        </div>
+
+                        <template for:each={existingAccounts} for:item="acc">
+                            <div key={acc.accountId} class={acc.rowClass} data-id={acc.accountId} data-name={acc.name}
+                                onclick={handleSelectAccount}>
+
+                                <div class="accountLeft">
+                                    <div class="avatar">{acc.initial}</div>
+                                    <div>
+                                        <div class="accName">{acc.name}</div>
+                                        <div class="accPhone">{acc.phone}</div>
+                                    </div>
+                                </div>
+
+                                <template if:true={acc.isSelected}>
+                                    <div class="selectedTick">✓</div>
+                                </template>
+                            </div>
+                        </template>
+                    </div>
+                </template>
+
+                <lightning-combobox class="inputGap" label="Relationship Type" value={relationshipType}
+                    options={relationshipOptions} onchange={handleRelationChange} required>
+                </lightning-combobox>
+
+            </div>
+        </div>
+
+        <div slot="footer" class="footerActions">
+            <lightning-button variant="neutral" label="Cancel" onclick={handleCancel}>
+            </lightning-button>
+
+            <lightning-button class="slds-m-left_small" variant="brand" label="Save Family Member" onclick={handleSave}
+                disabled={disableSave}>
+            </lightning-button>
+        </div>
+
+    </lightning-quick-action-panel>
+</template>

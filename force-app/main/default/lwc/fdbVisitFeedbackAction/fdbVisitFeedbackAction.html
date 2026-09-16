@@ -1,0 +1,67 @@
+<template>
+
+    <!-- OPENING: the feedback record is claimed before the questions show,
+         so two people cannot fill in the same visit at once. -->
+    <template if:true={isBusy}>
+        <div class="ojq__state">
+            <lightning-spinner alternative-text="Opening feedback" size="small"></lightning-spinner>
+        </div>
+    </template>
+
+    <!-- ALREADY COMPLETED -->
+    <template if:true={isCompleted}>
+        <div class="ojq__state">
+            <span class="ojq__mark ojq__mark_done">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6"
+                     stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                    <path d="M6 12.5l4 4 8-8.5"></path>
+                </svg>
+            </span>
+
+            <h2 class="ojq__title">Feedback Already Submitted</h2>
+
+            <div class="oj-orn oj-orn_sm">
+                <span class="oj-orn__line"></span>
+                <span class="oj-orn__diamond"></span>
+                <span class="oj-orn__line"></span>
+            </div>
+
+            <p class="ojq__text">
+                The feedback for this showroom visit is complete.
+                One response is recorded per visit, so it cannot be filled in again.
+            </p>
+
+            <button class="ojo__btn ojo__btn_ghost ojq__btn" type="button" onclick={handleClose}>
+                <span>Close</span>
+            </button>
+        </div>
+    </template>
+
+    <!-- SOMETHING WENT WRONG -->
+    <template if:true={errorMessage}>
+        <div class="ojq__state">
+            <span class="ojq__mark ojq__mark_warn">
+                <lightning-icon icon-name="utility:warning" size="small"></lightning-icon>
+            </span>
+
+            <h2 class="ojq__title">Could Not Open Feedback</h2>
+            <p class="ojq__text">{errorMessage}</p>
+
+            <button class="ojo__btn ojo__btn_ghost ojq__btn" type="button" onclick={handleClose}>
+                <span>Close</span>
+            </button>
+        </div>
+    </template>
+
+    <!-- THE QUESTIONS -->
+    <template if:true={showForm}>
+        <c-fdb-feedback-screen
+            variant="modal"
+            is-submitting={isSubmitting}
+            onsubmit={handleSubmit}
+            onincomplete={handleIncomplete}
+            onhelp={handleHelp}>
+        </c-fdb-feedback-screen>
+    </template>
+
+</template>

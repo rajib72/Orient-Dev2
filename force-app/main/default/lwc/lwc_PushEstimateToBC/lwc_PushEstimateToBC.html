@@ -1,0 +1,147 @@
+<template>
+    <div class="slds-is-relative slds-p-around_medium" style="min-height: 250px;">
+
+        <div class="theme-header-card slds-m-bottom_small slds-grid slds-grid_align-spread slds-grid_vertical-align-center slds-p-around_small">
+            <div class="slds-grid slds-grid_vertical-align-center">
+                <div class="theme-icon-container slds-m-right_medium slds-align_absolute-center">
+                    <lightning-icon icon-name="utility:cart" size="small" variant="inverse"></lightning-icon>
+                </div>
+                <h2 class="theme-main-title">Push Estimation Line Items</h2>
+                
+                <template if:true={isProcessing}>
+                    <span class="slds-m-left_medium slds-text-color_success slds-text-title_bold">
+                        Processing APIs...
+                    </span>
+                </template>
+            </div>
+
+            <div>
+                <lightning-button-icon 
+                    icon-name="utility:refresh" 
+                    variant="border-filled" 
+                    alternative-text="Refresh Data" 
+                    title="Refresh Data" 
+                    onclick={handleRefresh} 
+                    class="rounded-refresh-btn slds-m-right_xx-small">
+                </lightning-button-icon>
+            </div>
+        </div>
+
+        <div class="theme-sub-banner slds-m-bottom_medium slds-grid slds-grid_align-spread slds-grid_vertical-align-center slds-p-horizontal_medium slds-p-vertical_small">
+            <div class="slds-grid slds-grid_vertical-align-center">
+                <span class="theme-sub-title slds-m-right_small">Available Estimation Line Items</span>
+                <span class="theme-badge slds-align_absolute-center">{lineItems.length}</span>
+            </div>
+            <div>
+                <span class="theme-instruction">Please select one or more Line items before processing.</span>
+            </div>
+        </div>
+
+
+        <template if:true={isLoading}>
+            <lightning-spinner alternative-text="Loading items" size="medium"></lightning-spinner>
+        </template>
+        <template if:true={isProcessing}>
+            <lightning-spinner alternative-text="Processing items" size="medium"></lightning-spinner>
+        </template>
+
+        <template if:true={hasResults}>
+            <div class="slds-card slds-scrollable_y table-container slds-p-around_none">
+                <table class="slds-table slds-table_cell-buffer slds-table_bordered slds-table_fixed-layout">
+                    <thead>
+                        <tr class="slds-line-height_reset custom-header-row">
+                            <th scope="col" style="width: 5%; vertical-align: middle;">
+                                <div title="Select All" class="slds-align_absolute-center">
+                                    <lightning-input type="checkbox" variant="label-hidden" checked={selectAll} onchange={handleSelectAll}></lightning-input>
+                                </div>
+                            </th>
+                            <th scope="col" style="width: 17%;">
+                                <div class="slds-cell-wrap" title="Barcode">Barcode</div>
+                            </th>
+                            <th scope="col" style="width: 9%;">
+                                <div class="slds-truncate" title="Exec Code">Exec Code</div>
+                            </th>
+                            <th scope="col" style="width: 14%;">
+                                <div class="slds-truncate" title="Exec Name">Exec Name</div>
+                            </th>
+                            <th scope="col" style="width: 12%; text-align: right;">
+                                <div class="slds-truncate" title="Final Price">Final Price</div>
+                            </th>
+                            <th scope="col" style="width: 10%; text-align: center;">
+                                <div class="slds-truncate" title="Status">Status</div>
+                            </th>
+                            <th scope="col" style="width: 17%;">
+                                <div class="slds-cell-wrap" title="BC Doc No">BC Doc No</div>
+                            </th>
+                            <th scope="col" style="width: 16%;">
+                                <div class="slds-cell-wrap" title="Message">Message/Error</div>
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <template for:each={lineItems} for:item="item">
+                            <tr key={item.lineItemId} class="slds-hint-parent">
+                                
+                                <td data-label="Select" style="vertical-align: middle;">
+                                    <div class="slds-align_absolute-center">
+                                        <lightning-input type="checkbox" variant="label-hidden" data-id={item.lineItemId} checked={item.isSelected} disabled={item.isDisabled} onchange={handleRowSelection}></lightning-input>
+                                    </div>
+                                </td>
+
+                                <td data-label="Barcode">
+                                    <div class="slds-cell-wrap slds-text-title_caps slds-text-color_default">
+                                        <b>{item.barcode}</b>
+                                    </div>
+                                </td>
+
+                                <td data-label="Exec Code">
+                                    <div class="slds-truncate slds-text-color_weak">{item.salesExecutiveCode}</div>
+                                </td>
+
+                                <td data-label="Exec Name">
+                                    <div class="slds-cell-wrap">{item.salesExecutiveName}</div>
+                                </td>
+
+                                <td data-label="Final Price" style="text-align: right;">
+                                    <div class="slds-truncate">
+                                        <lightning-formatted-number value={item.finalPrice} format-style="currency" currency-code="INR" maximum-fraction-digits="2">
+                                        </lightning-formatted-number>
+                                    </div>
+                                </td>
+
+                                <td data-label="Status" style="text-align: center;">
+                                    <div class="slds-truncate">
+                                        <lightning-badge label={item.status} class={item.badgeClass}></lightning-badge>
+                                    </div>
+                                </td>
+
+                                <td data-label="BC Doc No">
+                                    <div class="slds-cell-wrap slds-text-color_success slds-text-title_bold">{item.documentNo}</div>
+                                </td>
+
+                                <td data-label="Message">
+                                    <div class="slds-cell-wrap slds-text-color_error slds-text-body_small">{item.errorMessage}</div>
+                                </td>
+                            </tr>
+                        </template>
+                    </tbody>
+                </table>
+            </div>
+        </template>
+
+        <template if:false={hasResults}>
+            <template if:false={isLoading}>
+                <div class="slds-p-around_xx-large slds-text-align_center">
+                    <lightning-icon icon-name="utility:search" size="large" class="slds-m-bottom_small" variant="weak"></lightning-icon>
+                    <h3 class="slds-text-heading_small slds-text-color_weak">No Line Items Found</h3>
+                </div>
+            </template>
+        </template>
+
+        <div class="slds-m-top_large slds-text-align_center">
+            <lightning-button label="Cancel" variant="neutral" onclick={handleCancel} class="slds-m-right_small"></lightning-button>
+            <lightning-button label="Process Estimates" variant="brand" icon-name="utility:forward" onclick={handleProcess} disabled={disableProcessButton}></lightning-button>
+        </div>
+
+    </div>
+</template>

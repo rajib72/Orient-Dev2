@@ -1,0 +1,50 @@
+<template>
+    <div class="launcherButtonContainer">
+        <lightning-button
+            label={buttonLabel}
+            title={buttonLabel}
+            variant="brand"
+            icon-name="utility:edit"
+            onclick={openModal}>
+        </lightning-button>
+    </div>
+
+    <template if:true={isModalOpen}>
+        <section
+            role="dialog"
+            tabindex="-1"
+            aria-modal="true"
+            aria-label="Manage Activity"
+            class="slds-modal slds-fade-in-open customModal">
+
+            <div class="slds-modal__container customModalContainer">
+
+                <button
+                    class="slds-button
+                           slds-button_icon
+                           slds-modal__close
+                           slds-button_icon-inverse"
+                    title="Close"
+                    onclick={closeModal}>
+
+                    <lightning-icon
+                        icon-name="utility:close"
+                        alternative-text="Close"
+                        variant="inverse"
+                        size="small">
+                    </lightning-icon>
+                </button>
+
+                <div class="customModalBody">
+                    <c-lwc-manage-form-activity
+                        record-id={recordId}
+                        onactivitycancel={handleActivityCancel}
+                        onactivityupdated={handleActivityUpdated}>
+                    </c-lwc-manage-form-activity>
+                </div>
+            </div>
+        </section>
+
+        <div class="slds-backdrop slds-backdrop_open"></div>
+    </template>
+</template>

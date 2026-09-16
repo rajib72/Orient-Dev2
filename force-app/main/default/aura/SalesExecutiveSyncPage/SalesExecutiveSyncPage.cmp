@@ -1,0 +1,49 @@
+<aura:component
+    controller="OrientSalesExecutiveSyncService"
+    implements="flexipage:availableForAllPageTypes,force:appHostable,lightning:isUrlAddressable"
+    access="global">
+
+    <aura:attribute name="isLoading" type="Boolean" default="false"/>
+    <aura:attribute name="message" type="String"/>
+
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+
+    <lightning:navigation aura:id="navService"/>
+
+    <lightning:card title="Sales Executives Sync" iconName="utility:refresh">
+
+        <div class="slds-p-around_medium">
+
+            <aura:if isTrue="{!v.isLoading}">
+                <lightning:spinner
+                    alternativeText="Syncing records"
+                    size="medium"/>
+            </aura:if>
+
+            <aura:if isTrue="{!not(empty(v.message))}">
+                <div class="slds-box slds-theme_default slds-m-bottom_medium">
+                    {!v.message}
+                </div>
+            </aura:if>
+
+            <div class="slds-m-top_medium">
+
+                <lightning:button
+                    label="Run Sync Again"
+                    variant="brand"
+                    onclick="{!c.doSync}"
+                    disabled="{!v.isLoading}"/>
+
+                <lightning:button
+                    label="Cancel"
+                    variant="neutral"
+                    onclick="{!c.handleCancel}"
+                    class="slds-m-left_small"/>
+
+            </div>
+
+        </div>
+
+    </lightning:card>
+
+</aura:component>

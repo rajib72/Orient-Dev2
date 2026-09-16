@@ -1,0 +1,282 @@
+<template>
+    <lightning-quick-action-panel header="Manage Assigned Persons">
+
+        <template if:true={isLoading}>
+            <div class="spinnerOverlay">
+                <lightning-spinner
+                    alternative-text="Loading..."
+                    size="medium">
+                </lightning-spinner>
+            </div>
+        </template>
+
+        <div class="mainWrapper">
+
+            <div class="headerCard">
+                <div class="iconCircle">
+                    <lightning-icon
+                        icon-name="standard:people"
+                        size="small">
+                    </lightning-icon>
+                </div>
+
+                <div>
+                    <h2>Manage Assigned Persons</h2>
+                    <p>Add or remove assigned persons for a Form Activity.</p>
+                </div>
+            </div>
+
+            <div class="formCard">
+                <div class="sectionTitle">
+                    Select Activity
+                </div>
+
+                <div class="slds-grid slds-wrap slds-gutters">
+                    <div class="slds-col slds-size_1-of-1 inputGap">
+                        <lightning-combobox
+                            label="Form Activity"
+                            placeholder="Select Form Activity"
+                            value={selectedActivityId}
+                            options={activityOptions}
+                            onchange={handleActivityChange}
+                            required>
+                        </lightning-combobox>
+                    </div>
+                </div>
+
+                <template if:true={selectedActivityId}>
+                    <div class="activityInfoBox">
+                        <lightning-icon
+                            icon-name="utility:store"
+                            size="x-small">
+                        </lightning-icon>
+                        <span>
+                            Store: <b>{selectedStoreName}</b>
+                        </span>
+                    </div>
+                </template>
+
+                <template if:false={selectedActivityId}>
+                    <div class="noteBox">
+                        <lightning-icon
+                            icon-name="utility:info"
+                            size="x-small">
+                        </lightning-icon>
+                        <span>Select a Form Activity to view and manage assigned persons.</span>
+                    </div>
+                </template>
+            </div>
+
+            <template if:true={selectedActivityId}>
+                <div class="listCard">
+
+                    <div class="listHeader">
+                        <div>
+                            <h3>
+                                Assigned Persons
+                                <span class="countBadge">{assignedCount}</span>
+                            </h3>
+                            <p>Current assigned persons for selected activity.</p>
+                        </div>
+
+                        <div class="headerActions">
+                            <lightning-input
+                                type="search"
+                                variant="label-hidden"
+                                placeholder="Search assigned persons..."
+                                value={searchKey}
+                                onchange={handleSearchChange}>
+                            </lightning-input>
+
+                            <lightning-button
+                                label="Add Person"
+                                icon-name="utility:add"
+                                variant="brand-outline"
+                                onclick={handleOpenAddSection}>
+                            </lightning-button>
+                        </div>
+                    </div>
+
+                    <template if:true={hasAssignedPersons}>
+                        <div class="desktopTable">
+                            <table class="customTable">
+                                <thead>
+                                    <tr>
+                                        <th>SL No.</th>
+                                        <th>Person Name</th>
+                                        <th>Sales Executive</th>
+                                        <th>Store</th>
+                                        <th class="actionCol">Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <template for:each={filteredAssignedPersons} for:item="person">
+                                        <tr key={person.id}>
+                                            <td>{person.slNo}</td>
+                                            <td>{person.personName}</td>
+                                            <td>{person.salesExecutiveName}</td>
+                                            <td>{person.storeName}</td>
+                                            <td class="actionCol">
+                                                <lightning-button-icon
+                                                    icon-name="utility:delete"
+                                                    variant="bare"
+                                                    alternative-text="Delete"
+                                                    title="Delete"
+                                                    data-id={person.id}
+                                                    onclick={handleDeletePerson}>
+                                                </lightning-button-icon>
+                                            </td>
+                                        </tr>
+                                    </template>
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <div class="mobileCards">
+                            <template for:each={filteredAssignedPersons} for:item="person">
+                                <div class="personCard" key={person.id}>
+                                    <div class="personLeft">
+                                        <div class="avatarCircleSmall">
+                                            {person.initial}
+                                        </div>
+                                        <div>
+                                            <div class="personName">{person.personName}</div>
+                                            <div class="personSub">{person.salesExecutiveName}</div>
+                                            <div class="storeText">{person.storeName}</div>
+                                        </div>
+                                    </div>
+
+                                    <lightning-button-icon
+                                        icon-name="utility:delete"
+                                        variant="bare"
+                                        alternative-text="Delete"
+                                        title="Delete"
+                                        data-id={person.id}
+                                        onclick={handleDeletePerson}>
+                                    </lightning-button-icon>
+                                </div>
+                            </template>
+                        </div>
+                    </template>
+
+                    <template if:false={hasAssignedPersons}>
+                        <div class="emptyState">
+                            <div class="emptyIcon">
+                                <lightning-icon
+                                    icon-name="standard:people"
+                                    size="medium">
+                                </lightning-icon>
+                            </div>
+                            <h3>No assigned persons found</h3>
+                            <p>Add sales executives for this activity.</p>
+                        </div>
+                    </template>
+
+                    <template if:true={showAddSection}>
+                        <div class="addSection">
+
+                            <div class="addHeader">
+                                <div>
+                                    <h3>Add Sales Executives</h3>
+                                    <p>Select executives from selected Store.</p>
+                                </div>
+
+                                <div class="selectedBadge">
+                                    {selectedExecutiveCount} Selected
+                                </div>
+                            </div>
+
+                            <template if:true={hasAvailableExecutives}>
+                                <div class="executiveList">
+                                    <template for:each={availableExecutives} for:item="exec">
+                                        <div
+                                            key={exec.id}
+                                            class={exec.cardClass}
+                                            data-id={exec.id}
+                                            onclick={handleExecutiveSelect}>
+
+                                            <div class="avatarCircle">
+                                                {exec.initial}
+                                            </div>
+
+                                            <div class="executiveInfo">
+                                                <div class="executiveName">
+                                                    {exec.name}
+                                                </div>
+
+                                                <template if:true={exec.alreadyAssigned}>
+                                                    <div class="alreadyText">
+                                                        Already Assigned
+                                                    </div>
+                                                </template>
+
+                                                <template if:false={exec.alreadyAssigned}>
+                                                    <div class="executiveSubText">
+                                                        Sales Executive
+                                                    </div>
+                                                </template>
+                                            </div>
+
+                                            <div class="checkArea">
+                                                <template if:true={exec.selected}>
+                                                    <lightning-icon
+                                                        icon-name="utility:check"
+                                                        size="x-small"
+                                                        class="checkIcon">
+                                                    </lightning-icon>
+                                                </template>
+                                            </div>
+
+                                        </div>
+                                    </template>
+                                </div>
+
+                                <div class="addFooter">
+                                    <lightning-button
+                                        label="Cancel Add"
+                                        variant="neutral"
+                                        onclick={handleCloseAddSection}>
+                                    </lightning-button>
+
+                                    <lightning-button
+                                        class="slds-m-left_small"
+                                        label="Add Selected"
+                                        variant="brand"
+                                        onclick={handleAddSelected}
+                                        disabled={isLoading}>
+                                    </lightning-button>
+                                </div>
+                            </template>
+
+                            <template if:false={hasAvailableExecutives}>
+                                <div class="emptyMsg">
+                                    No Sales Executives found for selected Store.
+                                </div>
+                            </template>
+
+                        </div>
+                    </template>
+
+                    <div class="noteBox">
+                        <lightning-icon
+                            icon-name="utility:info"
+                            size="x-small">
+                        </lightning-icon>
+                        <span>You can add new assigned persons or remove existing ones for the selected activity.</span>
+                    </div>
+
+                </div>
+            </template>
+
+            <div class="footerBtn">
+                <lightning-button
+                    label="Close"
+                    variant="neutral"
+                    onclick={handleClose}>
+                </lightning-button>
+            </div>
+
+        </div>
+
+    </lightning-quick-action-panel>
+</template>

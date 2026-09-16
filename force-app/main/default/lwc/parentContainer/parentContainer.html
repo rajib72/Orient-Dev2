@@ -1,0 +1,84 @@
+<template>
+    <lightning-card>
+
+        <!-- HEADER -->
+        <div class="header-container">
+            <h1 class="welcome-text">Welcome to Orient Jewellers</h1>
+            <p class="sub-text">
+                Manage your daily showroom and scheme activities efficiently
+            </p>
+        </div>
+
+        <!-- HERO -->
+        <div class="hero-container">
+
+            <!-- TABLET PORTRAIT OVERLAY -->
+            <div class="hero-overlay">
+                <div class="action-box">
+                    <lightning-button label="Create Showroom Visit" onclick={openCreateActivity}></lightning-button>
+
+                    <!-- <lightning-button label="Scheme Opening" onclick={openSchemeOpening}></lightning-button>
+
+                    <lightning-button label="Scheme Payment" onclick={openSchemePayment}></lightning-button>
+
+                    <lightning-button label="Scheme Redemption" onclick={openSchemeRedemption}></lightning-button> -->
+
+                    <lightning-button label="Showroom Visit Report" onclick={openReport}></lightning-button>
+                </div>
+            </div>
+
+            <!-- DESKTOP / TABLET LANDSCAPE -->
+            <div class="main-container">
+
+                <!-- LEFT -->
+                <div class="buttons-container">
+                    <div class="action-box">
+                        <lightning-button label="Create Showroom Visit" onclick={openCreateActivity}></lightning-button>
+
+                        <!-- <lightning-button label="Scheme Opening" onclick={openSchemeOpening}></lightning-button>
+
+                        <lightning-button label="Scheme Payment" onclick={openSchemePayment}></lightning-button>
+
+                        <lightning-button label="Scheme Redemption" onclick={openSchemeRedemption}></lightning-button> -->
+
+                        <lightning-button label="Showroom Visit Report" onclick={openReport}></lightning-button>
+                    </div>
+                </div>
+
+                <!-- RIGHT -->
+                <div class="image-panel">
+                    <img src="/resource/HomePageLandscapeImg"
+                         alt="Orient Jewellers"
+                         class="homepage-image" />
+                </div>
+
+            </div>
+        </div>
+
+        <!-- MODALS (UNCHANGED) -->
+        <c-modal title={modalTitle} show-modal={isModalOpen} size={modalSize} onclose={closeModal}>
+            <template if:true={showCreateActivity}>
+                <c-create-daily-activity onclose={closeModal}></c-create-daily-activity>
+            </template>
+        </c-modal>
+
+        <c-showreport-modal title={modalTitle} show-modal={isReportModalOpen} size={modalSize} onclose={closeModal}>
+            <template if:true={showReport}>
+                <c-activity-report onclose={closeModal}></c-activity-report>
+            </template>
+
+            <template if:true={showSchemeOpening}>
+                <c-scheme-opening onclose={closeModal}></c-scheme-opening>
+            </template>
+
+            <template if:true={showSchemePayment}>
+                <c-scheme-payment onclose={closeModal}></c-scheme-payment>
+            </template>
+
+            <template if:true={showSchemeRedemption}>
+                <c-scheme-redemption></c-scheme-redemption>
+            </template>
+        </c-showreport-modal>
+
+    </lightning-card>
+</template>

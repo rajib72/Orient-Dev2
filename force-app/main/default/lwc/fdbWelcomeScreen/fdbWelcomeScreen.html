@@ -1,0 +1,110 @@
+<template>
+    <c-fdb-screen layout="fit" head-rule="none" onnavclick={handleNav} onhelpclick={handleHelp}>
+            <div class="ojw__inner">
+
+                <!-- Two groups so landscape can set them side by side. In
+                     portrait both are display:contents, so the children stack
+                     exactly as they did before and nothing moves. -->
+                <div class="ojw__col ojw__col_lead">
+
+                <h1 class="ojw__title">Thank You</h1>
+                <h2 class="ojw__subtitle">For Visiting Orient Jewellers</h2>
+
+                <div class="oj-orn oj-orn_sm">
+                    <span class="oj-orn__line"></span>
+                    <span class="oj-orn__diamond"></span>
+                    <span class="oj-orn__line"></span>
+                </div>
+
+                <p class="ojw__lede">Your feedback helps us serve you better.</p>
+
+                <!-- VIDEO -->
+                <div class="ojw__video">
+                    <template if:true={currentVideoUrl}>
+                        <video autoplay muted onended={handleVideoEnded} class="ojw__video-img" style="width: 100%; border-radius: inherit; height: 100%; object-fit: cover;">
+                            <source src={currentVideoUrl} type="video/mp4" />
+                            Your browser does not support the video tag.
+                        </video>
+                    </template>
+                    <template if:false={currentVideoUrl}>
+                        <div class="ojw__video-img" style="display:flex; align-items:center; justify-content:center; background:#eee; width: 100%; border-radius: inherit; height: 100%;">
+                            <p>Loading video...</p>
+                        </div>
+                    </template>
+                </div>
+
+                </div><!-- /ojw__col_lead -->
+
+                <div class="ojw__col ojw__col_act">
+
+                <!-- BENEFITS -->
+                <h3 class="ojw__section">Your Feedback Helps Us</h3>
+
+                <div class="ojw__benefits">
+                    <div class="ojw__benefit">
+                        <span class="ojw__benefit-icon">
+                            <lightning-icon icon-name="utility:groups" size="small"></lightning-icon>
+                        </span>
+                        <p>Improve Our<br />Service</p>
+                    </div>
+                    <div class="ojw__benefit">
+                        <span class="ojw__benefit-icon">
+                            <lightning-icon icon-name="utility:favorite" size="small"></lightning-icon>
+                        </span>
+                        <p>Train Our Team<br />Better</p>
+                    </div>
+                    <div class="ojw__benefit">
+                        <span class="ojw__benefit-icon">
+                            <lightning-icon icon-name="utility:shield" size="small"></lightning-icon>
+                        </span>
+                        <p>Maintain Highest<br />Quality</p>
+                    </div>
+                    <div class="ojw__benefit">
+                        <span class="ojw__benefit-icon">
+                            <lightning-icon icon-name="utility:lead" size="small"></lightning-icon>
+                        </span>
+                        <p>Serve You<br />Even Better</p>
+                    </div>
+                </div>
+
+                <!-- TIMER -->
+                <div class="ojw__timer">
+                    <span class="ojw__timer-icon">
+                        <lightning-icon icon-name="utility:clock" size="x-small"></lightning-icon>
+                    </span>
+                    <p>Takes Less Than <strong>2 Minutes</strong></p>
+                </div>
+
+                <!-- CTA -->
+                <button class="ojw__cta" type="button" onclick={handleStartFeedback}>
+                    <span>Start Feedback</span>
+                    <svg class="ojw__cta-chev" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                         stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                        <path d="M9 5l7 7-7 7"></path>
+                    </svg>
+                </button>
+
+                </div><!-- /ojw__col_act -->
+
+                <!-- FOOTER -->
+                <div class="oj-footer">
+                    <div class="oj-footer__row">
+                        <span class="oj-footer__lock">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"
+                                 stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                <rect x="4.5" y="10" width="15" height="10.5" rx="2.2"></rect>
+                                <path d="M8.2 10V7.2a3.8 3.8 0 0 1 7.6 0V10"></path>
+                            </svg>
+                        </span>
+                        <p>Your feedback is confidential and<br />used only to improve our services.</p>
+                    </div>
+                    <div class="oj-orn oj-orn_sm oj-orn_footer">
+                        <span class="oj-orn__line"></span>
+                        <span class="oj-orn__diamond"></span>
+                        <span class="oj-orn__line"></span>
+                    </div>
+                </div>
+
+            </div>
+    </c-fdb-screen>
+</template>

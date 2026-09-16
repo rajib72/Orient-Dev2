@@ -1,0 +1,181 @@
+/* -------------------- BACKDROP -------------------- */
+.slds-backdrop_open {
+    opacity: 1 !important;
+    background: rgba(0, 0, 0, 0.65);
+    backdrop-filter: blur(6px);
+}
+
+/* -------------------- MODAL CONTAINER -------------------- */
+.large-modal .slds-modal__container {
+    max-width: 95% !important;
+    width: 95% !important;
+    max-height: 80vh !important;
+    display: flex;
+    flex-direction: column;
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+}
+
+/* -------------------- HEADER -------------------- */
+.slds-modal__header {
+    flex: 0 0 auto;
+    border-bottom: 1px solid #e0e0e0;
+}
+
+/* -------------------- MODAL CONTENT -------------------- */
+.slds-modal__content {
+    flex: 1 1 auto;
+    padding: 1rem;
+    background: #fef8b6;
+    overflow: visible !important;
+}
+
+/* -------------------- FOOTER -------------------- */
+.slds-modal__footer {
+    flex: 0 0 auto;
+    border-top: 1px solid #e0e0e0;
+    padding: 0.75rem 1rem;
+}
+
+/* -------------------- FILTER SECTION -------------------- */
+.filter-section {
+    background: #fef8b6;
+    border-radius: 8px;
+    padding: 1rem;
+    box-sizing: border-box;
+    margin-bottom: 1rem;
+}
+
+.modal-safe-wrapper {
+    width: 100%;
+    max-width: 100%;
+    overflow: hidden;
+    box-sizing: border-box;
+}
+
+/* -------------------- SEARCH BUTTON -------------------- */
+.big-search-btn {
+    --slds-c-button-brand-font-size: 1rem;
+    --slds-c-button-brand-line-height: 2.2rem;
+    --slds-c-button-brand-spacing-inline: 2rem;
+    --slds-c-button-brand-radius-border: 6px;
+}
+
+/* -------------------- TABLE WRAPPER (SCROLLABLE BODY ONLY) -------------------- */
+.table-wrapper {
+    max-height: 280px;
+    background: #ffffff;
+    border-radius: 10px;
+    padding: 0;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+    border: 1px solid #f1e7c6;
+    overflow: hidden; /* important */
+}
+
+/* Force table body to scroll while header stays fixed */
+.table-wrapper table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+/* Sticky header */
+.table-wrapper thead {
+    position: sticky;
+    top: 0;
+    z-index: 10;
+}
+
+/* Header styling */
+.slds-table thead th {
+    background: #80ccf5 !important;
+    color: #ffffff;
+    font-weight: 700;
+    text-transform: uppercase;
+    font-size: 0.82rem;
+    border-bottom: 2px solid #e5d68a;
+    padding: 0.75rem;
+}
+
+.table-wrapper {
+    max-height: 280px;
+    overflow: auto;        /* BOTH scrolls */
+    -webkit-overflow-scrolling: touch;
+}
+
+.table-wrapper table {
+    min-width: 900px;      /* force horizontal scroll */
+    width: 100%;
+}
+.table-wrapper thead th {
+    position: sticky;
+    top: 0;
+    z-index: 2;
+}
+
+
+/* Body cell styles */
+.slds-table tbody td {
+    border-bottom: 1px solid #f0f0f0;
+    padding: 0.65rem !important;
+    font-size: 0.9rem;
+}
+
+/* Hover effect */
+.slds-table tbody tr:hover {
+    background: #fffbea !important;
+    transition: 0.2s ease-in-out;
+}
+
+/* -------------------- NO DATA BOX -------------------- */
+.no-data-box {
+    background: #fff7f7;
+    border: 1px solid #f2c4c4;
+    border-radius: 8px;
+    padding: 1rem;
+    margin-top: 1rem;
+    text-align: center;
+    color: #c23934;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+}
+
+.no-data-icon {
+    --slds-c-icon-color-foreground-default: #c23934;
+}
+@media (max-width: 1024px) {
+
+    .filter-section {
+        padding: 0.75rem;
+    }
+
+    .filter-section .slds-col {
+        width: 100% !important;
+        flex: 0 0 100%;
+    }
+
+    .big-search-btn {
+        margin-top: 0.75rem;
+        display: flex;
+        gap: 0.5rem;
+    }
+}
+@media (max-width: 1024px) {
+
+    .slds-table thead th {
+        font-size: 0.75rem;
+        padding: 0.5rem;
+    }
+
+    .slds-table tbody td {
+        font-size: 0.85rem;
+        padding: 0.5rem;
+        white-space: nowrap;   /* critical */
+    }
+}
+.large-modal .slds-modal__container {
+    overflow: visible !important;
+}

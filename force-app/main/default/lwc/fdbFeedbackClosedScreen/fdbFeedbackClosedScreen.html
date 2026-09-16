@@ -1,0 +1,159 @@
+<template>
+    <c-fdb-screen nav-label="Home" nav-icon="home" onnavclick={handleNav} onhelpclick={handleHelp}>
+            <!-- CONTENT -->
+            <div class="ojp__body ojd__body">
+
+                <!-- ALREADY RECEIVED -->
+                <!-- Two groups so landscape can set them side by side. In
+                     portrait both are display:contents and nothing moves. -->
+                <div class="oj-col oj-col_lead">
+                <div class="ojd__hero ojd__hero_gold">
+                    <span class="ojd__tick ojd__tick_gold">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"
+                             stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                            <path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8l-5-5z"></path>
+                            <path d="M13.6 3.2V8.4h5.2"></path>
+                            <path d="M8.8 14.6l2.2 2.2 4-4.4"></path>
+                        </svg>
+                    </span>
+
+                    <h1 class="ojd__title ojd__title_gold">Feedback Already Submitted</h1>
+
+                    <div class="oj-orn oj-orn_sm">
+                        <span class="oj-orn__line"></span>
+                        <span class="oj-orn__diamond"></span>
+                        <span class="oj-orn__line"></span>
+                    </div>
+
+                    <p class="ojd__text">
+                        We have already received your feedback for this showroom visit.
+                        Only <strong>one feedback</strong> can be submitted per visit.
+                    </p>
+
+                    <template if:true={hasFeedbackSubmittedAt}>
+                        <p class="ojd__stamp">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"
+                                 stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                <circle cx="12" cy="12" r="9"></circle>
+                                <path d="M12 7.2V12l3.2 2"></path>
+                            </svg>
+                            <span>Submitted on {feedbackSubmittedAt}</span>
+                        </p>
+                    </template>
+                </div>
+                </div><!-- /oj-col_lead -->
+
+                <div class="oj-col oj-col_act">
+
+                <!-- THE VISIT IT BELONGS TO -->
+                <div class="ojp__section">
+                    <div class="ojp__section-head">
+                        <span class="ojp__section-icon">
+                            <lightning-icon icon-name="utility:store" size="xx-small" variant="inverse"></lightning-icon>
+                        </span>
+                        <h3>Today's Showroom Visit</h3>
+                    </div>
+
+                    <div class="ojpv__hero">
+                        <span class="ojpv__hero-icon">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"
+                                 stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                <path d="M3.6 9.4L5.2 4.6h13.6l1.6 4.8"></path>
+                                <path d="M3.6 9.4a2.4 2.4 0 0 0 4.8 0 2.4 2.4 0 0 0 4.8 0 2.4 2.4 0 0 0 4.8 0 2.4 2.4 0 0 0 2.4 0"></path>
+                                <path d="M5.2 11.4V20h13.6v-8.6"></path>
+                                <path d="M9.8 20v-5h4.4v5"></path>
+                            </svg>
+                        </span>
+                        <div class="ojpv__hero-text">
+                            <span class="ojpv__hero-label">Showroom</span>
+                            <strong>{visitHero.store}</strong>
+                        </div>
+                        <span class={visitHero.statusClass}>{visitHero.status}</span>
+                    </div>
+
+                    <div class="ojpv__orn-wrap">
+                        <div class="oj-orn oj-orn_sm ojpv__orn">
+                            <span class="oj-orn__line"></span>
+                            <span class="oj-orn__diamond"></span>
+                            <span class="oj-orn__line"></span>
+                        </div>
+                    </div>
+
+                    <div class="ojpv__grid">
+                        <template for:each={visitTiles} for:item="tile">
+                            <div key={tile.key} class="ojpv__tile">
+                                <span class="ojpv__tile-icon">
+                                    <lightning-icon icon-name={tile.icon} size="xx-small"></lightning-icon>
+                                </span>
+                                <span class="ojpv__tile-label">{tile.label}</span>
+                                <strong class="ojpv__tile-value">{tile.value}</strong>
+                            </div>
+                        </template>
+                    </div>
+                </div>
+
+                <p class="ojd__prompt">Is there anything else we can help with?</p>
+
+                <!-- ACTIONS -->
+
+                <button class="ojd__action ojd__action_primary" type="button"
+                        onclick={handleRequestInvoiceAfterFeedback}>
+                    <span class="ojd__action-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"
+                             stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                            <rect x="3" y="5.4" width="18" height="13.2" rx="2.2"></rect>
+                            <path d="M3.6 6.6L12 13l8.4-6.4"></path>
+                        </svg>
+                    </span>
+                    <span class="ojd__action-text">
+                        <strong>Request An Invoice Copy</strong>
+                        <span>We will email your invoice to a verified email address.</span>
+                    </span>
+                    <svg class="ojd__action-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                         stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                        <path d="M9 5l7 7-7 7"></path>
+                    </svg>
+                </button>
+
+                <button class="ojd__action ojd__action_quiet" type="button" onclick={handleSearchAgain}>
+                    <span class="ojd__action-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"
+                             stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                            <circle cx="11" cy="11" r="7"></circle>
+                            <path d="M20 20l-3.6-3.6"></path>
+                        </svg>
+                    </span>
+                    <span class="ojd__action-text">
+                        <strong>Search A Different Number</strong>
+                        <span>Start again with another registered mobile number.</span>
+                    </span>
+                    <svg class="ojd__action-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                         stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                        <path d="M9 5l7 7-7 7"></path>
+                    </svg>
+                </button>
+
+
+                <!-- FOOTER -->
+                </div><!-- /oj-col_act -->
+                <div class="oj-footer">
+                    <div class="oj-footer__row">
+                        <span class="oj-footer__lock">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"
+                                 stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                <rect x="4.5" y="10" width="15" height="10.5" rx="2.2"></rect>
+                                <path d="M8.2 10V7.2a3.8 3.8 0 0 1 7.6 0V10"></path>
+                            </svg>
+                        </span>
+                        <p>Thank you for helping us serve you better.<br />If something needs attention, please contact our Showroom Team.</p>
+                    </div>
+                    <div class="oj-orn oj-orn_sm oj-orn_footer">
+                        <span class="oj-orn__line"></span>
+                        <span class="oj-orn__diamond"></span>
+                        <span class="oj-orn__line"></span>
+                    </div>
+                </div>
+
+            </div>
+    </c-fdb-screen>
+</template>

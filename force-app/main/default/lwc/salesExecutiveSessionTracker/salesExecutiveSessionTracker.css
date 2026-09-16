@@ -1,0 +1,318 @@
+/* =========================
+   HOST CONTAINER
+========================= */
+:host {
+    display: block;
+    width: 100%;
+    overflow: hidden;
+}
+
+/* =========================
+   STATUS BADGES
+========================= */
+.status-active {
+    display: inline-block;
+    background: #e6f4ea;
+    color: #1f7a1f;
+    padding: 4px 8px;
+    border-radius: 12px;
+    font-weight: 600;
+    font-size: 12px;
+    line-height: 1.2;
+}
+
+.status-completed {
+    display: inline-block;
+    background: #fdecea;
+    color: #c23934;
+    padding: 4px 8px;
+    border-radius: 12px;
+    font-weight: 600;
+    font-size: 12px;
+    line-height: 1.2;
+}
+
+/* =========================
+   HEADER
+========================= */
+.summary-header {
+    text-align: center;
+    padding: 1rem;
+    font-size: 1.3rem;
+    font-weight: 600;
+    color: #7a4a00;
+    background: linear-gradient(
+        135deg,
+        #fff8e1 0%,
+        #f5d88c 50%,
+        #fff8e1 100%
+    );
+    border-bottom: 1px solid #e6c76a;
+}
+
+/* =========================
+   TABLE WRAPPER
+   No horizontal scroll
+========================= */
+.table-scroll {
+    width: 100%;
+    overflow-x: hidden;
+}
+
+/* =========================
+   TABLE BASE
+========================= */
+.slds-table {
+    width: 100%;
+    table-layout: fixed;
+    border-radius: 10px;
+    background: #ffffff;
+}
+
+/* =========================
+   TABLE HEADER
+========================= */
+.slds-table thead th {
+    background: linear-gradient(135deg, #edebeb, #d8ebf5);
+    color: #000000;
+    font-weight: 600;
+    font-size: 13px;
+    text-align: center;
+    padding: 8px 5px;
+    border-bottom: 1px solid #d8dde6;
+    white-space: normal;
+    word-break: break-word;
+}
+
+/* =========================
+   TABLE BODY
+========================= */
+.slds-table tbody tr:hover {
+    background-color: #91d4f5;
+}
+
+.slds-table td {
+    padding: 7px 5px;
+    font-size: 12px;
+    color: #3e3e3c;
+    text-align: center;
+    white-space: normal;
+    word-break: break-word;
+    vertical-align: middle;
+}
+
+/* =========================
+   COLUMN WIDTH CONTROL
+   Total width adjusted to fit screen
+========================= */
+
+/* No. */
+.slds-table th:nth-child(1),
+.slds-table td:nth-child(1) {
+    width: 5%;
+}
+
+/* Sales Executive */
+.slds-table th:nth-child(2),
+.slds-table td:nth-child(2) {
+    width: 17%;
+}
+
+/* Session Status */
+.slds-table th:nth-child(3),
+.slds-table td:nth-child(3) {
+    width: 12%;
+}
+
+/* Start Date */
+.slds-table th:nth-child(4),
+.slds-table td:nth-child(4) {
+    width: 10%;
+}
+
+/* Start Time */
+.slds-table th:nth-child(5),
+.slds-table td:nth-child(5) {
+    width: 9%;
+}
+
+/* End Date */
+.slds-table th:nth-child(6),
+.slds-table td:nth-child(6) {
+    width: 10%;
+}
+
+/* End Time */
+.slds-table th:nth-child(7),
+.slds-table td:nth-child(7) {
+    width: 9%;
+}
+
+/* Duration */
+.slds-table th:nth-child(8),
+.slds-table td:nth-child(8) {
+    width: 10%;
+    font-weight: 600;
+}
+
+/* Action */
+.slds-table th:nth-child(9),
+.slds-table td:nth-child(9) {
+    width: 18%;
+}
+
+/* =========================
+   BUTTON DESIGN
+========================= */
+lightning-button {
+    --slds-c-button-radius-border: 14px;
+    --slds-c-button-spacing-inline-start: 0.45rem;
+    --slds-c-button-spacing-inline-end: 0.45rem;
+    font-weight: 600;
+    font-size: 11px;
+}
+
+/* Primary action */
+lightning-button[variant="brand"] {
+    --slds-c-button-brand-color-background: #208a39;
+    --slds-c-button-brand-color-border: #208a39;
+}
+
+/* Secondary action */
+lightning-button[variant="neutral"] {
+    --slds-c-button-neutral-color-border: #c9c9c9;
+    --slds-c-button-neutral-color-text: #2e2e2e;
+}
+
+/* =========================
+   ACTION BUTTON FIX
+   Buttons wrap inside action column
+========================= */
+.slds-table td:last-child {
+    white-space: normal;
+    text-align: center;
+}
+
+.slds-table td:last-child lightning-button {
+    display: inline-block;
+    margin: 2px;
+    white-space: nowrap;
+}
+
+/* Remove extra SLDS left margin issue on small width */
+.slds-table td:last-child .slds-m-left_x-small {
+    margin-left: 2px;
+}
+
+/* =========================
+   TABLET VIEW
+========================= */
+@media (max-width: 1024px) {
+    .summary-header {
+        font-size: 1.1rem;
+        padding: 0.75rem;
+    }
+
+    .slds-table thead th {
+        font-size: 11px;
+        padding: 6px 3px;
+    }
+
+    .slds-table td {
+        font-size: 11px;
+        padding: 6px 3px;
+    }
+
+    .status-active,
+    .status-completed {
+        font-size: 10px;
+        padding: 3px 6px;
+    }
+
+    lightning-button {
+        --slds-c-button-spacing-inline-start: 0.35rem;
+        --slds-c-button-spacing-inline-end: 0.35rem;
+        font-size: 10px;
+    }
+
+    /* Tablet optimized column widths */
+    .slds-table th:nth-child(1),
+    .slds-table td:nth-child(1) {
+        width: 5%;
+    }
+
+    .slds-table th:nth-child(2),
+    .slds-table td:nth-child(2) {
+        width: 16%;
+    }
+
+    .slds-table th:nth-child(3),
+    .slds-table td:nth-child(3) {
+        width: 12%;
+    }
+
+    .slds-table th:nth-child(4),
+    .slds-table td:nth-child(4),
+    .slds-table th:nth-child(6),
+    .slds-table td:nth-child(6) {
+        width: 10%;
+    }
+
+    .slds-table th:nth-child(5),
+    .slds-table td:nth-child(5),
+    .slds-table th:nth-child(7),
+    .slds-table td:nth-child(7) {
+        width: 9%;
+    }
+
+    .slds-table th:nth-child(8),
+    .slds-table td:nth-child(8) {
+        width: 10%;
+    }
+
+    .slds-table th:nth-child(9),
+    .slds-table td:nth-child(9) {
+        width: 19%;
+    }
+}
+
+/* =========================
+   SMALL MOBILE VIEW
+   Still no horizontal scroll
+========================= */
+@media (max-width: 600px) {
+    .summary-header {
+        font-size: 1rem;
+        padding: 0.65rem;
+    }
+
+    .slds-p-around_medium {
+        padding: 0.35rem;
+    }
+
+    .slds-table thead th {
+        font-size: 9px;
+        padding: 5px 2px;
+    }
+
+    .slds-table td {
+        font-size: 9px;
+        padding: 5px 2px;
+    }
+
+    .status-active,
+    .status-completed {
+        font-size: 8px;
+        padding: 2px 4px;
+    }
+
+    lightning-button {
+        --slds-c-button-spacing-inline-start: 0.25rem;
+        --slds-c-button-spacing-inline-end: 0.25rem;
+        font-size: 8px;
+    }
+
+    .slds-table td:last-child lightning-button {
+        margin: 1px;
+    }
+}

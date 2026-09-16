@@ -1,0 +1,83 @@
+.componentHeader {
+    margin-bottom: 1rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid #f1f1f1;
+}
+
+.componentTitle {
+    font-size: 1.25rem;
+    font-weight: 800;
+    color: #1f1f1f;
+    text-align: left;
+}
+
+.componentSubtitle {
+    margin-top: 0.2rem;
+    font-size: 0.82rem;
+    color: #6b6b6b;
+    text-align: left;
+}
+
+/* Added position: relative to keep the spinner trapped inside the component */
+.panel {
+    position: relative; 
+    background: #fff;
+    border: 1px solid #e6e6e6;
+    border-radius: 16px;
+    padding: 1rem;
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.05);
+}
+
+.pinRow,
+.footerRow {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+}
+
+.footerRow {
+    margin-top: 1.5rem;
+    padding-top: 1rem;
+    border-top: 1px solid #f1f1f1;
+    justify-content: flex-end;
+}
+
+.infoBox {
+    background: #eef6ff;
+    border: 1px solid #c9e2ff;
+    color: #184a7a;
+    padding: 0.8rem;
+    border-radius: 12px;
+}
+
+.errorBox {
+    background: #fff0f0;
+    border: 1px solid #f0b4b4;
+    color: #b42318;
+    padding: 0.8rem;
+    border-radius: 12px;
+    font-weight: 600;
+}
+
+/* Updated to position absolute, trapping it inside the .panel */
+.spinnerWrap {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(255, 255, 255, 0.7);
+    z-index: 999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 16px;
+}
+
+@media (min-width: 768px) {
+    .componentTitle {
+        font-size: 1.35rem;
+    }
+}

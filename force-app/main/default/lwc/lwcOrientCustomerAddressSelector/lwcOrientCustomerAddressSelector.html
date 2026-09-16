@@ -1,0 +1,239 @@
+<template>
+    <div class={selectorShellClass}>
+        <template if:true={showSpinner}>
+            <div class="selector-spinner">
+                <lightning-spinner
+                    alternative-text="Loading address..."
+                    size="medium">
+                </lightning-spinner>
+            </div>
+        </template>
+
+        <div class="selector-header">
+            <div class="selector-heading-left">
+                <div class="selector-step-badge">1</div>
+                <div>
+                    <div class="selector-title">Business Central Address Lookup</div>
+                    <div class="selector-subtitle">Search Pin Code, then confirm State, District, City and Village.</div>
+                </div>
+            </div>
+
+            <span class="api-pill">BC Verified</span>
+        </div>
+
+        <div class="pin-row">
+            <div class="pin-input">
+                <lightning-input
+                    type="text"
+                    label="Pin Code"
+                    value={pinCode}
+                    maxlength="10"
+                    placeholder="Enter Pin Code"
+                    onchange={handlePinChange}>
+                </lightning-input>
+            </div>
+
+            <button
+                type="button"
+                class="slds-button slds-button_brand selector-native-button selector-search-button"
+                onclick={handleSearch}
+                disabled={searchButtonDisabled}>
+
+                <lightning-icon
+                    icon-name="utility:search"
+                    size="xx-small"
+                    alternative-text="Search">
+                </lightning-icon>
+                <span>Search</span>
+            </button>
+        </div>
+
+        <template if:true={errorMessage}>
+            <div class="message-box error-box">
+                <lightning-icon
+                    icon-name="utility:error"
+                    size="xx-small"
+                    variant="error">
+                </lightning-icon>
+                <span>{errorMessage}</span>
+            </div>
+        </template>
+
+        <template if:true={infoMessage}>
+            <div class="message-box info-box">
+                <lightning-icon
+                    icon-name="utility:info"
+                    size="xx-small">
+                </lightning-icon>
+                <span>{infoMessage}</span>
+            </div>
+        </template>
+
+        <template if:true={hasPostalData}>
+            <div class="selector-fields-heading"><span>2</span><strong>Confirm location details</strong></div>
+            <div class="address-grid">
+                <lightning-combobox
+                    name="state"
+                    label="State"
+                    value={selectedStateVal}
+                    placeholder="Select State"
+                    options={stateOptions}
+                    onchange={handleStateChange}
+                    required>
+                </lightning-combobox>
+
+                <lightning-combobox
+                    name="district"
+                    label="District"
+                    value={selectedDistrictVal}
+                    placeholder="Select District"
+                    options={districtOptions}
+                    onchange={handleDistrictChange}
+                    disabled={isDistrictDisabled}
+                    required>
+                </lightning-combobox>
+
+                <lightning-combobox
+                    name="city"
+                    label="City"
+                    value={selectedCityVal}
+                    placeholder="Select City"
+                    options={cityOptions}
+                    onchange={handleCityChange}
+                    disabled={isCityDisabled}
+                    required>
+                </lightning-combobox>
+
+                <div class="village-field">
+                    <div class="slds-form-element">
+                        <label class="slds-form-element__label">
+                            <abbr
+                                class="slds-required"
+                                title="required">*</abbr>
+                            Village
+                        </label>
+
+                        <div class="slds-form-element__control">
+                            <div class="slds-combobox_container">
+                                <div
+                                    class={villageComboboxClass}
+                                    aria-expanded={isVillageDropdownOpen}
+                                    aria-haspopup="listbox"
+                                    role="combobox">
+
+                                    <div
+                                        class="slds-combobox__form-element slds-input-has-icon slds-input-has-icon_right"
+                                        role="none">
+
+                                        <lightning-input
+                                            type="text"
+                                            value={villageSearchTerm}
+                                            placeholder="Search / Select Village"
+                                            onchange={handleVillageSearch}
+                                            onclick={openVillageDropdown}
+                                            onblur={closeVillageDropdown}
+                                            disabled={isVillageDisabled}
+                                            variant="label-hidden"
+                                            autocomplete="off">
+                                        </lightning-input>
+
+                                        <lightning-icon
+                                            icon-name="utility:search"
+                                            size="x-small"
+                                            class="slds-input__icon slds-input__icon_right slds-m-top_xxx-small">
+                                        </lightning-icon>
+                                    </div>
+
+                                    <template if:true={isVillageDropdownOpen}>
+                                        <div
+                                            class="slds-dropdown slds-dropdown_length-5 slds-dropdown_fluid village-dropdown"
+                                            role="listbox">
+
+                                            <ul
+                                                class="slds-listbox slds-listbox_vertical"
+                                                role="presentation">
+
+                                                <template
+                                                    for:each={filteredVillageOptions}
+                                                    for:item="option">
+
+                                                    <li
+                                                        key={option.value}
+                                                        role="presentation"
+                                                        class="slds-listbox__item"
+                                                        onmousedown={handleVillageSelect}
+                                                        data-value={option.value}>
+
+                                                        <div
+                                                            class="slds-media slds-listbox__option slds-listbox__option_plain slds-media_small"
+                                                            role="option">
+
+                                                            <span class="slds-media__body">
+                                                                <span
+                                                                    class="slds-truncate"
+                                                                    title={option.label}>
+                                                                    {option.label}
+                                                                </span>
+                                                            </span>
+                                                        </div>
+                                                    </li>
+                                                </template>
+
+                                                <template if:false={hasFilteredVillages}>
+                                                    <li
+                                                        role="presentation"
+                                                        class="slds-listbox__item">
+
+                                                        <div class="slds-p-around_small slds-text-color_weak">
+                                                            No villages found.
+                                                        </div>
+                                                    </li>
+                                                </template>
+                                            </ul>
+                                        </div>
+                                    </template>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <template if:true={hasCompleteSelection}>
+                <div class="selection-preview">
+                    <div class="selection-preview-title">
+                        Selected Address
+                    </div>
+
+                    <div class="selection-preview-value">
+                        {selectedAddressSummary}
+                    </div>
+                </div>
+            </template>
+
+            <div class="selector-actions">
+                <button
+                    type="button"
+                    class="slds-button slds-button_neutral selector-native-button"
+                    onclick={handleCancel}
+                    disabled={isBusy}>
+                    <span>Cancel</span>
+                </button>
+
+                <button
+                    type="button"
+                    class="slds-button slds-button_brand selector-native-button selector-primary-button"
+                    onclick={handleUseAddress}
+                    disabled={useAddressDisabled}>
+
+                    <lightning-icon
+                        icon-name="utility:check"
+                        size="xx-small"
+                        alternative-text="Use Address">
+                    </lightning-icon>
+                    <span>Use This Address</span>
+                </button>
+            </div>
+        </template>
+    </div>
+</template>

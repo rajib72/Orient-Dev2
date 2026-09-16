@@ -1,0 +1,397 @@
+<template>
+
+
+    <div class="slds-p-around_medium">
+
+        <!-- SECTION: File Upload -->
+        <h2 class="section-title">Upload Customer Image</h2>
+
+        <div class="label-with-help">
+            <label class="file-label">Upload Customer Image</label>
+
+            <!-- Small Info Icon like lightning:helptext -->
+            <lightning-icon icon-name="utility:info" size="x-small" alternative-text="Info"
+                title="Image name must contain Cust or Customer" class="info-icon">
+            </lightning-icon>
+        </div>
+
+        <lightning-layout multiple-rows>
+            <lightning-layout-item size="12">
+
+                <!-- File Input -->
+                <lightning-input type="file" name="file" accept=".png,.jpg,.jpeg" onchange={handleFileChange}>
+                </lightning-input>
+
+                <!-- Show file name + remove button -->
+                <template if:true={fileName}>
+                    <div class="file-display">
+                        <span>{fileName}</span>
+                        <lightning-button-icon icon-name="utility:close" alternative-text="Remove" title="Remove file"
+                            onclick={removeFile} class="remove-btn">
+                        </lightning-button-icon>
+                    </div>
+                </template>
+
+            </lightning-layout-item>
+        </lightning-layout>
+
+        <!-- SECTION: Basic Information -->
+        <h2 class="section-title">Basic Information</h2>
+        <lightning-layout multiple-rows>
+
+            <lightning-layout-item size="6" class="slds-p-right_small">
+                <lightning-combobox name="Customer_Type__c" label="Customer Type" value={formData.Customer_Type__c}
+                    options={picklistOptions.Customer_Type__c} onchange={handleChange}>
+                </lightning-combobox>
+            </lightning-layout-item>
+
+            <lightning-layout-item size="6">
+                <lightning-combobox name="Title__c" label="Title" value={formData.Title__c}
+                    options={picklistOptions.Title__c} onchange={handleChange}>
+                </lightning-combobox>
+            </lightning-layout-item>
+
+            <lightning-layout-item size="4">
+                <lightning-input type="text" name="First_Name__c" label="First Name" value={formData.First_Name__c}
+                    onchange={handleChange}>
+                </lightning-input>
+            </lightning-layout-item>
+
+            <lightning-layout-item size="4" class="slds-p-horizontal_xx-small">
+                <lightning-input type="text" name="Middle_Name__c" label="Middle Name" value={formData.Middle_Name__c}
+                    onchange={handleChange}>
+                </lightning-input>
+            </lightning-layout-item>
+
+            <lightning-layout-item size="4">
+                <lightning-input type="text" name="Last_Name__c" label="Last Name" value={formData.Last_Name__c}
+                    onchange={handleChange}>
+                </lightning-input>
+            </lightning-layout-item>
+
+            <lightning-layout-item size="6" class="slds-p-right_small">
+                <lightning-input type="date" name="Date_Of_Birth__c" label="Date of Birth"
+                    value={formData.Date_Of_Birth__c} onchange={handleChange} message-when-bad-input={dobErrorMessage}>
+                </lightning-input>
+            </lightning-layout-item>
+
+            <!-- GENDER -->
+            <lightning-layout-item size="6">
+                <lightning-combobox name="Gender__c" label="Gender" value={formData.Gender__c}
+                    options={picklistOptions.Gender__c} onchange={handleChange}>
+                </lightning-combobox>
+            </lightning-layout-item>
+
+            <!-- SHOW WHEN GENDER = OTHERS -->
+            <template if:true={showGenderOther}>
+                <lightning-layout-item size="12">
+                    <lightning-input type="text" name="Gender_Other__c" label="Specify Gender"
+                        value={formData.Gender_Other__c} onchange={handleChange}>
+                    </lightning-input>
+                </lightning-layout-item>
+            </template>
+
+        </lightning-layout>
+
+        <!-- SECTION: Personal Details -->
+        <h2 class="section-title">Personal Details</h2>
+        <lightning-layout multiple-rows>
+
+            <lightning-layout-item size="6" class="slds-p-right_small">
+                <lightning-combobox name="Marital_Status__c" label="Marital Status" value={formData.Marital_Status__c}
+                    options={picklistOptions.Marital_Status__c} onchange={handleChange}>
+                </lightning-combobox>
+            </lightning-layout-item>
+
+            <lightning-layout-item size="6">
+                <lightning-input type="date" name="Anniversary_Date__c" label="Anniversary Date"
+                    value={formData.Anniversary_Date__c} onchange={handleChange}>
+                </lightning-input>
+            </lightning-layout-item>
+
+            <!-- PREFERRED LANGUAGE -->
+            <lightning-layout-item size="6" class="slds-p-right_small">
+                <lightning-combobox name="Preferred_Language__c" label="Preferred Language"
+                    value={formData.Preferred_Language__c} options={picklistOptions.Preferred_Language__c}
+                    onchange={handleChange}>
+                </lightning-combobox>
+            </lightning-layout-item>
+
+            <!-- SHOW WHEN LANGUAGE = OTHERS -->
+            <template if:true={showPreferredLanguageOther}>
+                <lightning-layout-item size="12">
+                    <lightning-input type="text" name="Preferred_Language_Other__c" label="Specify Other Language"
+                        value={formData.Preferred_Language_Other__c} onchange={handleChange}>
+                    </lightning-input>
+                </lightning-layout-item>
+            </template>
+
+            <lightning-layout-item size="6">
+                <lightning-combobox name="Nationality__c" label="Nationality" value={formData.Nationality__c}
+                    options={picklistOptions.Nationality__c} onchange={handleChange}>
+                </lightning-combobox>
+            </lightning-layout-item>
+
+        </lightning-layout>
+
+        <!-- SECTION: Contact Details -->
+        <h2 class="section-title">Contact Information</h2>
+        <lightning-layout multiple-rows>
+
+            <lightning-layout-item size="6" class="slds-p-right_small">
+                <lightning-input type="tel" name="Phone" label="Phone Number" value={formData.Phone} 
+                    onchange={handleChange} maxlength="10" data-id="phone" required>
+                </lightning-input>
+            </lightning-layout-item>
+
+            <lightning-layout-item size="6">
+                <lightning-input type="phone" name="Whatsapp_Number__c" label="WhatsApp Number"
+                    value={formData.Whatsapp_Number__c} onchange={handleChange} maxlength="10">
+                </lightning-input>
+            </lightning-layout-item>
+
+            <lightning-layout-item size="6" class="slds-p-right_small">
+                <lightning-input type="email" name="Email_Address__c" label="Email Address"
+                    value={formData.Email_Address__c} onchange={handleChange}>
+                </lightning-input>
+            </lightning-layout-item>
+
+            <lightning-layout-item size="6">
+                <lightning-combobox name="Preferred_Contact_Time__c" label="Preferred Contact Time"
+                    value={formData.Preferred_Contact_Time__c} options={picklistOptions.Preferred_Contact_Time__c}
+                    onchange={handleChange}>
+                </lightning-combobox>
+            </lightning-layout-item>
+
+            <lightning-layout-item size="6">
+                <lightning-combobox name="Preferred_Communication_Channel__c" label="Preferred Communication Channel"
+                    value={formData.Preferred_Communication_Channel__c}
+                    options={picklistOptions.Preferred_Communication_Channel__c} onchange={handleChange}>
+                </lightning-combobox>
+            </lightning-layout-item>
+
+        </lightning-layout>
+
+
+        <!-- SECTION: Address -->
+        <h2 class="section-title">Address</h2>
+        <lightning-layout multiple-rows>
+
+            <!-- <lightning-layout-item size="6" class="slds-p-right_small">
+                <lightning-input type="text" name="Residential_City__c" label="Residential City"
+                    value={formData.Residential_City__c} onchange={handleChange}>
+                </lightning-input>
+            </lightning-layout-item> -->
+              <lightning-layout-item size="12">
+                <lightning-textarea name="Permanent_Address__c" label="Address Line 1"
+                    value={formData.Permanent_Address__c} onchange={handleChange}>
+                </lightning-textarea>
+            </lightning-layout-item>
+
+         <lightning-layout-item size="6" class="slds-p-right_small">
+    <lightning-input type="text" name="Locality_Area__c" label="Address Line 2"
+        value={formData.Locality_Area__c} onchange={handleChange}>
+    </lightning-input>
+</lightning-layout-item>
+
+            <lightning-layout-item size="6" class="slds-p-right_small">
+                <lightning-input type="text" name="Pin_Code__c" label="Pin Code" value={formData.Pin_Code__c}
+                    onchange={handleChange} maxlength="6" pattern="[0-9]{6}"
+                    message-when-pattern-mismatch="Pin code must be 6 digits">
+                </lightning-input>
+            </lightning-layout-item>
+
+            <!-- <lightning-layout-item size="6">
+                <lightning-input type="text" name="State_Province__c" label="State / Province"
+                    value={formData.State_Province__c} onchange={handleChange}>
+                </lightning-input>
+            </lightning-layout-item> -->
+
+            <!-- <lightning-layout-item size="6" class="slds-p-right_small">
+                <lightning-input type="text" name="Country__c" label="Country" value={formData.Country__c}
+                    onchange={handleChange}>
+                </lightning-input>
+            </lightning-layout-item> -->
+
+          
+
+        </lightning-layout>
+
+        <!-- SECTION: Customer Preferences -->
+        <h2 class="section-title">Customer Preferences</h2>
+        <lightning-layout multiple-rows>
+
+            <lightning-layout-item size="6" class="slds-p-right_small">
+                <lightning-combobox name="Occupation_Profession__c" label="Occupation / Profession"
+                    value={formData.Occupation_Profession__c} options={picklistOptions.Occupation_Profession__c}
+                    onchange={handleChange}>
+                </lightning-combobox>
+            </lightning-layout-item>
+
+            <lightning-layout-item size="6">
+                <lightning-combobox name="Family_Type__c" label="Family Type" value={formData.Family_Type__c}
+                    options={picklistOptions.Family_Type__c} onchange={handleChange}>
+                </lightning-combobox>
+            </lightning-layout-item>
+
+            <lightning-layout-item size="6" class="slds-p-right_small">
+                <lightning-combobox name="Decision_Maker__c" label="Decision Maker" value={formData.Decision_Maker__c}
+                    options={picklistOptions.Decision_Maker__c} onchange={handleChange}>
+                </lightning-combobox>
+            </lightning-layout-item>
+
+            <!-- PREFERRED STORE 
+            <lightning-layout-item size="6">
+                <lightning-combobox name="Preferred_Store__c" label="Preferred Store"
+                    value={formData.Preferred_Store__c} options={picklistOptions.Preferred_Store__c}
+                    onchange={handleChange}>
+                </lightning-combobox>
+            </lightning-layout-item>-->
+
+            <!-- SHOW WHEN STORE = OTHERS 
+            <template if:true={showPreferredStoreOther}>
+                <lightning-layout-item size="12">
+                    <lightning-input type="text" name="Preferred_Store_Other__c" label="Specify Other Store"
+                        value={formData.Preferred_Store_Other__c} onchange={handleChange}>
+                    </lightning-input>
+                </lightning-layout-item>
+            </template>-->
+
+        </lightning-layout>
+
+        <!-- SECTION: Additional Details -->
+        <h2 class="section-title">Additional Details</h2>
+        <lightning-layout multiple-rows>
+
+            <!--<lightning-layout-item size="12">
+                    <lightning-textarea name="Lead_Source_Detail__c" label="Lead Source Detail"
+                        value={formData.Lead_Source_Detail__c} onchange={handleChange}>
+                    </lightning-textarea>
+                </lightning-layout-item>
+
+                <lightning-layout-item size="6" class="slds-p-right_small">
+                    <lightning-combobox name="Customer_Source_Acquisition__c" label="Customer Source (Acquisition)"
+                        value={formData.Customer_Source_Acquisition__c}
+                        options={picklistOptions.Customer_Source_Acquisition__c} onchange={handleChange}>
+                    </lightning-combobox>
+                </lightning-layout-item>
+
+                <lightning-layout-item size="6">
+                    <lightning-combobox name="Customer_Verification_KYC__c" label="Customer Verification (KYC)"
+                        value={formData.Customer_Verification_KYC__c}
+                        options={picklistOptions.Customer_Verification_KYC__c} onchange={handleChange}>
+                    </lightning-combobox>
+                </lightning-layout-item>
+
+                <lightning-layout-item size="6" class="slds-p-right_small">
+                    <lightning-combobox name="Preferred_Price_Band_Weight__c" label="Preferred Price Band (Weight)"
+                        value={formData.Preferred_Price_Band_Weight__c}
+                        options={picklistOptions.Preferred_Price_Band_Weight__c} onchange={handleChange}>
+                    </lightning-combobox>
+                </lightning-layout-item>
+
+                <lightning-layout-item size="6">
+                    <lightning-combobox name="Buying_Intent__c" label="Buying Intent" value={formData.Buying_Intent__c}
+                        options={picklistOptions.Buying_Intent__c} onchange={handleChange}>
+                    </lightning-combobox>
+                </lightning-layout-item>
+
+                <lightning-layout-item size="6" class="slds-p-right_small">
+                    <lightning-combobox name="Tags_Customer_Labels__c" label="Tags / Customer Labels"
+                        value={formData.Tags_Customer_Labels__c} options={picklistOptions.Tags_Customer_Labels__c}
+                        onchange={handleChange}>
+                    </lightning-combobox>
+                </lightning-layout-item>
+
+                <lightning-layout-item size="6">
+                    <lightning-combobox name="Do_Not_Contact_DNC_Status__c" label="Do Not Contact (DNC) Status"
+                        value={formData.Do_Not_Contact_DNC_Status__c}
+                        options={picklistOptions.Do_Not_Contact_DNC_Status__c} onchange={handleChange}>
+                    </lightning-combobox>
+                </lightning-layout-item>
+
+                <lightning-layout-item size="12">
+                    <lightning-textarea name="Customer_Notes__c" label="Customer Notes"
+                        value={formData.Customer_Notes__c} onchange={handleChange}>
+                    </lightning-textarea>
+                </lightning-layout-item>
+
+                <lightning-layout-item size="6" class="slds-p-right_small">
+                    <lightning-input type="date" name="Date_of_First_Purchase__c" label="Date of First Purchase"
+                        value={formData.Date_of_First_Purchase__c} onchange={handleChange}>
+                    </lightning-input>
+                </lightning-layout-item>
+
+                <lightning-layout-item size="6">
+                    <lightning-input type="date" name="Date_of_Last_Purchase__c" label="Date of Last Purchase"
+                        value={formData.Date_of_Last_Purchase__c} onchange={handleChange}>
+                    </lightning-input>
+                </lightning-layout-item>
+
+                <lightning-layout-item size="6" class="slds-p-right_small">
+                    <lightning-combobox name="Preferred_Gift_Wrapping__c" label="Preferred Gift Wrapping"
+                        value={formData.Preferred_Gift_Wrapping__c} options={picklistOptions.Preferred_Gift_Wrapping__c}
+                        onchange={handleChange}>
+                    </lightning-combobox>
+                </lightning-layout-item>
+
+                <lightning-layout-item size="6">
+                    <lightning-input type="text" name="Referral_Source__c" label="Referral Source"
+                        value={formData.Referral_Source__c} onchange={handleChange}>
+                    </lightning-input>
+                </lightning-layout-item>
+
+                <lightning-layout-item size="6" class="slds-p-right_small">
+                    <lightning-combobox name="Income_Band__c" label="Income Band" value={formData.Income_Band__c}
+                        options={picklistOptions.Income_Band__c} onchange={handleChange}>
+                    </lightning-combobox>
+                </lightning-layout-item>
+
+                <lightning-layout-item size="6">
+                    <lightning-combobox name="Registration_Mode__c" label="Registration Mode"
+                        value={formData.Registration_Mode__c} options={picklistOptions.Registration_Mode__c}
+                        onchange={handleChange}>
+                    </lightning-combobox>
+                </lightning-layout-item> -->
+
+            <lightning-layout-item size="6">
+                <lightning-combobox name="Status__c" label="Status" value={formData.Status__c}
+                    options={picklistOptions.Status__c} disabled>
+                </lightning-combobox>
+            </lightning-layout-item>
+
+            <lightning-layout-item size="12">
+                <lightning-combobox name="Consent_for_Marketing_Communications__c"
+                    label="Consent for Marketing Communications"
+                    value={formData.Consent_for_Marketing_Communications__c}
+                    options={picklistOptions.Consent_for_Marketing_Communications__c} onchange={handleChange}>
+                </lightning-combobox>
+            </lightning-layout-item>
+        </lightning-layout>
+
+
+        <!-- Preferred Sales Executive User Lookup
+        <lightning-layout-item size="6">
+            <lightning-combobox name="Preferred_Sales_Executive__c" label="Preferred Sales Executive"
+                placeholder="Select Sales Executive" options={userOptions} value={formData.Preferred_Sales_Executive__c}
+                onchange={handleChange}>
+            </lightning-combobox>
+        </lightning-layout-item> -->
+
+    </div>
+
+    <!-- --- STICKY BOTTOM BUTTON BAR --- -->
+    <div class="button-bar">
+        <lightning-button variant="neutral" label="Reset" onclick={handleReset} class="slds-m-right_small">
+        </lightning-button>
+
+        <lightning-button variant="brand" label="Save & Next" onclick={handleSaveAndNext} class="slds-m-right_small">
+        </lightning-button>
+
+        <lightning-button variant="success" label="Save" onclick={handleSave}>
+        </lightning-button>
+    </div>
+
+
+
+</template>

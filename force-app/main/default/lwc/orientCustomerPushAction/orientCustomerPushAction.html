@@ -1,0 +1,71 @@
+<template>
+    <lightning-card title="Push Customer to Orient" icon-name="action:upload">
+        <div class="slds-p-around_medium modalBody">
+            <template if:true={isLoading}>
+                <div class="loadingWrap">
+                    <lightning-spinner alternative-text="Sending record..." size="medium"></lightning-spinner>
+                    <div class="slds-m-top_large slds-text-align_center loadingText">
+                        Sending record to Orient API...
+                    </div>
+                </div>
+            </template>
+
+            <template if:false={isLoading}>
+                <template if:true={hasResult}>
+                    <div class={boxClass}>
+                        <div class="headerRow">
+                            <div class="titleWrap">
+                                <lightning-icon
+                                    icon-name={statusIcon}
+                                    size="small"
+                                    alternative-text="Status"
+                                    class="statusIcon">
+                                </lightning-icon>
+                                <div class="titleText">
+                                    <span class="statusTitle">{statusTitle}</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <p class={messageClass}>{result.message}</p>
+
+                        <template if:true={customerNo}>
+                            <div class="customerNoRow">
+                                <span class="label">BC Customer No</span>
+                                <span class="value">{customerNo}</span>
+                            </div>
+                        </template>
+
+                        <p class="recordIdText">
+                            Record Id: {result.recordId}
+                        </p>
+                    </div>
+                </template>
+
+                <template if:true={hasError}>
+                    <div class="errorBox">
+                        <div class="headerRow">
+                            <div class="titleWrap">
+                                <lightning-icon
+                                    icon-name="utility:error"
+                                    size="small"
+                                    alternative-text="Error"
+                                    class="statusIcon">
+                                </lightning-icon>
+                                <div class="titleText">
+                                    <span class="statusTitle">Error</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <p class="errorMessage">{errorMessage}</p>
+                    </div>
+                </template>
+
+                <div class="slds-m-top_medium slds-text-align_right">
+                    <lightning-button label="Close" onclick={handleClose}></lightning-button>
+                </div>
+            </template>
+        </div>
+    </lightning-card>
+</template>

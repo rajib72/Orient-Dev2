@@ -1,0 +1,310 @@
+/* ===============================
+   PREMIUM RED + GOLD QUICK ACTION UI
+================================ */
+
+.premium-wrapper {
+    background: linear-gradient(180deg, #fffaf0 0%, #ffffff 100%);
+    padding: 8px 4px 0;
+}
+
+/* ===============================
+   SPINNER
+================================ */
+
+.spinner-container {
+    min-height: 230px;
+    position: relative;
+    background: linear-gradient(180deg, #ffffff 0%, #fff8e6 100%);
+    border-radius: 16px;
+    border: 1px solid #f2d28b;
+}
+
+/* ===============================
+   HEADER CARD
+================================ */
+
+/* ===============================
+   HEADER CARD - CLEAN PREMIUM
+================================ */
+
+.premium-header {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 20px 22px;
+    margin-bottom: 16px;
+    border-radius: 18px;
+    background: linear-gradient(
+        135deg,
+        #fffdf6 0%,
+        #fff4cf 55%,
+        #ffffff 100%
+    );
+    border: 1px solid #e3c15f;
+    border-left: 6px solid #b11226;
+    box-shadow: 0 10px 26px rgba(90, 55, 0, 0.12);
+}
+
+.header-icon {
+    width: 50px;
+    height: 50px;
+    min-width: 50px;
+    border-radius: 16px;
+    background: linear-gradient(135deg, #b11226, #7f0000);
+    color: #ffffff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+    box-shadow: 0 8px 18px rgba(127, 0, 0, 0.22);
+}
+
+.premium-header h2 {
+    margin: 0;
+    color: #7f0000;
+    font-size: 19px;
+    font-weight: 800;
+    letter-spacing: 0.3px;
+}
+
+.premium-header p {
+    margin: 5px 0 0;
+    color: #6b4e00;
+    font-size: 13.5px;
+    font-weight: 600;
+}
+
+/* ===============================
+   SUMMARY CARD
+================================ */
+
+.summary-card {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 14px;
+    padding: 15px 18px;
+    margin-bottom: 14px;
+    border-radius: 16px;
+    background: linear-gradient(180deg, #ffffff 0%, #fffaf0 100%);
+    border: 1px solid #e7c96b;
+    box-shadow: 0 8px 22px rgba(127, 0, 0, 0.08);
+}
+
+.summary-left {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.summary-label {
+    color: #7f0000;
+    font-size: 13px;
+    font-weight: 700;
+}
+
+.summary-value {
+    background: linear-gradient(135deg, #7f0000, #b11226);
+    color: #ffffff;
+    border: 1px solid #d4af37;
+    padding: 5px 14px;
+    border-radius: 999px;
+    font-size: 13px;
+    font-weight: 800;
+    box-shadow: 0 4px 12px rgba(127, 0, 0, 0.22);
+}
+
+.summary-right {
+    color: #6b4e00;
+    font-size: 12.5px;
+    font-weight: 600;
+}
+
+/* ===============================
+   DATATABLE CARD
+================================ */
+
+.table-card {
+    max-height: 430px;
+    overflow: auto;
+    border-radius: 18px;
+    background: #ffffff;
+    border: 1px solid #d4af37;
+    box-shadow: 0 12px 30px rgba(127, 0, 0, 0.12);
+}
+
+/* Datatable premium styling */
+.table-card lightning-datatable {
+    --slds-c-table-header-color-background: #fff4c2;
+    --slds-c-table-header-text-color: #7f0000;
+    --slds-c-table-cell-color-border: #f0dfaa;
+}
+
+/* ===============================
+   EMPTY STATE
+================================ */
+
+.empty-box {
+    text-align: center;
+    padding: 44px 24px;
+    background: linear-gradient(180deg, #ffffff 0%, #fff8e6 100%);
+    border: 1px dashed #d4af37;
+    border-radius: 20px;
+    box-shadow: 0 10px 24px rgba(127, 0, 0, 0.08);
+}
+
+.empty-icon {
+    width: 58px;
+    height: 58px;
+    margin: 0 auto 16px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #7f0000, #b11226);
+    color: #ffffff;
+    border: 2px solid #d4af37;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 28px;
+    font-weight: 900;
+    box-shadow: 0 8px 18px rgba(127, 0, 0, 0.22);
+}
+
+.empty-box h3 {
+    margin: 0;
+    color: #7f0000;
+    font-size: 18px;
+    font-weight: 800;
+}
+
+.empty-box p {
+    margin: 9px auto 0;
+    max-width: 540px;
+    color: #6b4e00;
+    font-size: 13.5px;
+    line-height: 1.55;
+    font-weight: 500;
+}
+
+/* ===============================
+   FOOTER
+================================ */
+
+.premium-footer {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    padding-top: 8px;
+}
+
+/* Save button premium effect */
+.save-button {
+    --slds-c-button-brand-color-background: #b11226;
+    --slds-c-button-brand-color-background-hover: #7f0000;
+    --slds-c-button-brand-color-border: #d4af37;
+    --slds-c-button-brand-color-border-hover: #d4af37;
+    --slds-c-button-brand-text-color: #ffffff;
+}
+
+/* ===============================
+   SCROLLBAR
+================================ */
+
+.table-card::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+
+.table-card::-webkit-scrollbar-track {
+    background: #fff4c2;
+    border-radius: 10px;
+}
+
+.table-card::-webkit-scrollbar-thumb {
+    background: linear-gradient(180deg, #b11226, #d4af37);
+    border-radius: 10px;
+}
+
+.table-card::-webkit-scrollbar-thumb:hover {
+    background: linear-gradient(180deg, #7f0000, #c79a22);
+}
+
+/* ===============================
+   RESPONSIVE
+================================ */
+
+@media only screen and (max-width: 768px) {
+    .premium-header {
+        padding: 15px;
+        gap: 12px;
+    }
+
+    .header-icon {
+        width: 44px;
+        height: 44px;
+        min-width: 44px;
+        font-size: 21px;
+        border-radius: 14px;
+    }
+
+    .premium-header h2 {
+        font-size: 16px;
+    }
+
+    .premium-header p {
+        font-size: 12.5px;
+    }
+
+    .summary-card {
+        flex-direction: column;
+        align-items: flex-start;
+        padding: 13px 15px;
+    }
+
+    .summary-right {
+        font-size: 12px;
+    }
+
+    .table-card {
+        max-height: 360px;
+    }
+}
+
+.custom-table-wrapper {
+    width: 100%;
+    overflow-x: hidden;
+    border: 1px solid #d8dde6;
+    border-radius: 8px;
+}
+
+.custom-table {
+    width: 100%;
+    table-layout: fixed;
+    background: white;
+}
+
+.custom-table th {
+    background: #f3f3f3;
+    font-weight: 600;
+    white-space: normal;
+    word-break: break-word;
+    padding: 6px;
+    font-size: 12px;
+}
+
+.custom-table td {
+    white-space: normal;
+    word-break: break-word;
+    vertical-align: middle;
+    padding: 6px;
+    font-size: 12px;
+}
+.header-content {
+    flex: 1;
+}
+
+.header-refresh {
+    margin-left: auto;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}

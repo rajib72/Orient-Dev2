@@ -1,0 +1,60 @@
+<template>
+    <lightning-quick-action-panel header="Remove Customer Estimation Line Item">
+        
+        <div class="styled-card header-card slds-m-bottom_medium slds-media slds-media_center slds-p-around_medium">
+            <div class="slds-media__figure">
+                <div class="icon-container">
+                    <lightning-icon icon-name="utility:cart" size="medium" variant="inverse"></lightning-icon>
+                </div>
+            </div>
+            <div class="slds-media__body slds-m-left_small">
+                <h1 class="header-title slds-m-bottom_xx-small">Remove Customer Estimation Line Items</h1>
+            </div>
+                <div class="header-refresh">
+        <lightning-button-icon
+            icon-name="utility:refresh"
+            variant="border-filled"
+            alternative-text="Refresh"
+            title="Refresh"
+            onclick={handleRefresh}>
+        </lightning-button-icon>
+    </div>
+        </div>
+
+        <div class="styled-card slds-m-bottom_medium slds-p-around_small slds-grid slds-grid_align-spread slds-media_center">
+            <div class="slds-col slds-no-flex slds-grid slds-media_center">
+                <span class="sub-header-title">Available Estimation Line Items</span>
+                <span class="count-badge slds-m-left_medium">{recordCount}</span>
+            </div>
+            <div class="slds-col slds-no-flex">
+                <span class="instruction-text">Please select one or more Line items before remove.</span>
+            </div>
+        </div>
+
+        <div class="styled-card table-wrapper slds-m-bottom_medium">
+            <div style="max-height: 300px; overflow-y: auto;">
+                <lightning-datatable
+                    key-field="Id"
+                    data={data}
+                    columns={columns}
+                    onrowselection={handleRowSelection}
+                    show-row-number-column>
+                </lightning-datatable>
+            </div>
+        </div>
+
+        <template if:true={isProcessing}>
+            <lightning-spinner alternative-text="Processing..." size="medium"></lightning-spinner>
+        </template>
+
+        <div slot="footer" class="slds-text-align_right">
+            <lightning-button 
+                variant="destructive" 
+                label="Remove" 
+                onclick={handleRemove} 
+                disabled={isRemoveDisabled}>
+            </lightning-button>
+        </div>
+        
+    </lightning-quick-action-panel>
+</template>

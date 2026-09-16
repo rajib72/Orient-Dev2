@@ -1,0 +1,258 @@
+<template>
+    <lightning-card>
+        <div class="main-wrapper">
+            <template if:true={isLoading}>
+                <div class="spinner-backdrop">
+                    <div class="loading-box">
+                        <lightning-spinner alternative-text="Loading data..." size="medium">
+                        </lightning-spinner>
+                        <div class="loading-text">Please wait, product data is loading...</div>
+                    </div>
+                </div>
+            </template>
+
+            <template if:true={hasData}>
+                <div class="container">
+
+                    <div class="image-section">
+                        <div class="carousel-wrapper">
+
+                            <div class="custom-carousel-container">
+                                <div class="carousel-content" ontouchstart={handleTouchStart}
+                                    ontouchend={handleTouchEnd}>
+
+                                    <template if:true={showIndicators}>
+                                        <div class="nav-btn prev-btn" onclick={handlePrev}>
+                                            <lightning-icon icon-name="utility:chevronleft" size="x-small">
+                                            </lightning-icon>
+                                        </div>
+                                    </template>
+
+                                    <template if:true={currentMedia}>
+
+                                        <template if:true={currentMedia.isImage}>
+                                            <img src={currentMedia.url} class="product-media image-media"
+                                                 onclick={openZoom} data-src={currentMedia.url} alt="Product Media" />
+                                        </template>
+
+                                        <template if:true={currentMedia.isVideo}>
+                                            <div class="video-container">
+                                                <video src={currentMedia.url} class="product-media video-media" autoplay
+                                                    loop muted playsinline onclick={togglePlayPause}
+                                                    onplay={handleVideoPlay} onpause={handleVideoPause}></video>
+
+                                                <template if:false={isVideoPlaying}>
+                                                    <div class="play-overlay" onclick={togglePlayPauseOverlay}>
+                                                        <div class="play-circle">
+                                                            <lightning-icon icon-name="utility:play" size="medium"
+                                                                variant="inverse"></lightning-icon>
+                                                        </div>
+                                                    </div>
+                                                </template>
+                                            </div>
+                                        </template>
+
+                                    </template>
+
+                                    <template if:true={showIndicators}>
+                                        <div class="nav-btn next-btn" onclick={handleNext}>
+                                            <lightning-icon icon-name="utility:chevronright" size="x-small">
+                                            </lightning-icon>
+                                        </div>
+                                    </template>
+                                </div>
+
+                                <template if:true={showIndicators}>
+                                    <div class="carousel-indicators">
+                                        <template for:each={indicators} for:item="ind">
+                                            <span key={ind.id} class={ind.class} data-index={ind.index} onclick={handleIndicatorClick}></span>
+                                        </template>
+                                    </div>
+                                </template>
+                            </div>
+
+                            <template if:true={isZoomOpen}>
+                                <section class="zoom-backdrop" onclick={closeZoom}>
+                                    <div class="zoom-image-container">
+                                        <img src={zoomImage} class={zoomImageClass} onclick={handleImageZoomClick} alt="Zoomed Product" />
+                                    </div>
+                                </section>
+                            </template>
+                        </div>
+                    </div>
+
+                    <div class="details-section">
+
+                        <h1 class="product-name"><b>{productName}</b></h1>
+
+                        <p class="price">
+                            <span class="price-label">
+                                Product Price
+                                <span class="gst-text">(Including GST)</span>
+                            </span>
+                            <span class="price-value">₹{productPriceInclusiveGST}</span>
+                        </p>
+                        <p class="price">
+                            <span class="price-label">
+                                Product Price
+                                <span class="gst-text">(Excluding GST)</span>
+                            </span>
+                            <span class="price-value">₹{price}</span>
+                        </p>
+                        <p class="price">
+                            <span class="price-label"> Tax Amount </span>
+                            <span class="price-value">₹{taxAmount}</span>
+                        </p>
+
+                        <p class="barcode">
+                            <b>Product Code </b><span>{barcode}</span>
+                        </p>
+
+                        <p class="design-code">
+                            <b>Design Code </b>
+                            <span>{designCode}</span>
+                        </p>
+
+                        <div class="metal-section">
+
+                            <lightning-accordion allow-multiple-sections-open active-section-name="metal"
+                                class="product-accordion">
+
+                                <lightning-accordion-section name="metal" label="🔱 Metal Details">
+                                    <div class="metal-grid">
+                                        <div class="metal-item">
+                                            <div class="metal-value">{grossWeight}</div>
+                                            <div class="metal-label">Gross Weight (Gram)</div>
+                                        </div>
+                                        <div class="metal-item">
+                                            <div class="metal-value">{netWeight}</div>
+                                            <div class="metal-label">Net Weight (Gram)</div>
+                                        </div>
+                                        <div class="metal-item">
+                                            <div class="metal-value">{goldPurity}</div>
+                                            <div class="metal-label">Metal Purity (Karat)</div>
+                                        </div>
+                                        <div class="metal-item">
+                                            <div class="metal-value">{goldColor}</div>
+                                            <div class="metal-label">Metal Color</div>
+                                        </div>
+                                        <div class="metal-item">
+                                            <div class="metal-value">{size}</div>
+                                            <div class="metal-label">Size</div>
+                                        </div>
+                                        <div class="metal-item">
+                                            <div class="metal-value">{diamondWeight}</div>
+                                            <div class="metal-label">Diamond Wt</div>
+                                        </div>
+                                        <div class="metal-item">
+                                            <div class="metal-value">{stoneWeight}</div>
+                                            <div class="metal-label">Stone Wt.</div>
+                                        </div>
+                                    </div>
+                                </lightning-accordion-section>
+
+                                <lightning-accordion-section name="moreInfo" label="🧾Price Breakup">
+                                    <template if:true={hasDetailLines}>
+                                        <div class="table-title">Tag Price Detail Line</div>
+                                        <div class="table-wrapper">
+                                            <table class="info-table">
+                                                <thead>
+                                                    <tr>
+                                                        <th>BOM Item</th>
+                                                        <th>Purity</th>
+                                                        <th>Quantity</th>
+                                                        <th>UOM</th>
+                                                        <th>Rate</th>
+                                                        <th>Amount</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    <template for:each={detailLines} for:item="row">
+                                                        <tr key={row.key}>
+                                                            <td>{row.bomItem}</td>
+                                                            <td>{row.purity}</td>
+                                                            <td style="text-align: center;">{row.quantity}</td>
+                                                            <td>{row.uom}</td>
+                                                            <td>{row.rate}</td>
+                                                            <td>{row.amount}</td>
+                                                        </tr>
+                                                    </template>
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </template>
+
+                                    <template if:true={hasScmLines}>
+                                        <div class="table-title scm-space">Tag Price SMC</div>
+                                        <div class="table-wrapper">
+                                            <table class="info-table">
+                                                <thead>
+                                                    <tr>
+                                                        <th>BOM Item</th>
+                                                        <th>Quantity</th>
+                                                        <th>Rate</th>
+                                                        <th>Amount</th>
+                                                        <th>Making Type</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    <template for:each={scmLines} for:item="row">
+                                                        <tr key={row.key}>
+                                                            <td>{row.bomItem}</td>
+                                                            <td style="text-align: center;">{row.quantity}</td>
+                                                            <td>{row.rate}</td>
+                                                            <td>{row.amount}</td>
+                                                            <td>{row.makingType}</td>
+                                                        </tr>
+                                                    </template>
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </template>
+
+                                    <template if:false={hasDetailLines}>
+                                        <template if:false={hasScmLines}>
+                                            <div class="accordion-text">No More Info available.</div>
+                                        </template>
+                                    </template>
+                                </lightning-accordion-section>
+
+                                <lightning-accordion-section name="goldInfo" label="🏅 Certification Information">
+                                    <div class="metal-item">
+                                        <div class="metal-value">{certificationBy}</div>
+                                        <div class="metal-label">Certification By</div>
+                                    </div>
+                                </lightning-accordion-section>
+
+                                <lightning-accordion-section name="questions" label="Customer's Activity">
+                                    <template if:true={hasQuestions}>
+                                        <div class="questions-wrapper">
+                                            <template for:each={questions} for:item="q">
+                                                <div key={q.Id} class="question-row">
+                                                    <lightning-input type="checkbox" label={q.Question__c}
+                                                        checked={q.Question_Checked__c} data-id={q.Id}
+                                                        onchange={handleQuestionChange}>
+                                                    </lightning-input>
+                                                </div>
+                                            </template>
+                                        </div>
+                                    </template>
+                                    <template if:false={hasQuestions}>
+                                        <div class="accordion-text">No questions available.</div>
+                                    </template>
+                                </lightning-accordion-section>
+
+                            </lightning-accordion>
+                        </div>
+                    </div>
+                </div>
+            </template>
+        </div>
+
+        <template if:true={showNoData}>
+            <div class="no-data">
+                No product found for this barcode.
+            </div>
+        </template>
+    </lightning-card>
+</template>

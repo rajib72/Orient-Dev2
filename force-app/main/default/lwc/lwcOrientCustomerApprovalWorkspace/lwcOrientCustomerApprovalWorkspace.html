@@ -1,0 +1,1629 @@
+<template>
+    <div class="workspace-shell">
+        <template if:true={showWorkspaceSpinner}>
+            <div class="workspace-spinner">
+                <lightning-spinner
+                    alternative-text="Loading Customer Approval Workspace..."
+                    size="medium">
+                </lightning-spinner>
+            </div>
+        </template>
+
+        <header class="workspace-header">
+            <div>
+                <div class="workspace-eyebrow">ORIENT CUSTOMER PROFILE</div>
+                <h1>Customer Approval Workspace</h1>
+                <p>{workspaceDescription}</p>
+            </div>
+
+            <lightning-button
+                class="refresh-button"
+                label="Refresh"
+                icon-name="utility:refresh"
+                onclick={handleRefresh}
+                disabled={isLoading}>
+            </lightning-button>
+        </header>
+
+        <template if:true={isAdmin}>
+            <div class="admin-banner">
+                <div class="admin-icon-wrap">
+                    <lightning-icon
+                        icon-name="utility:shield"
+                        size="small"
+                        alternative-text="System Administrator">
+                    </lightning-icon>
+                </div>
+                <div class="admin-banner-copy">
+                    <div class="admin-banner-title">
+                        System Administrator Approval Mode
+                    </div>
+                    <div class="admin-banner-text">
+                        Full Customer Profile approval visibility is enabled. You can review, approve or reject any Pending request.
+                    </div>
+                </div>
+                <div class="admin-mini-metrics">
+                    <div>
+                        <span class="admin-metric-number">
+                            {approvedCount}
+                        </span>
+                        <span class="admin-metric-label">
+                            Approved
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </template>
+
+        <div class="summary-grid">
+            <button
+                type="button"
+                class="summary-card summary-card-pending"
+                data-tab="pending"
+                onclick={handleTabChange}>
+                <span class="summary-label">
+                    My Pending Approvals
+                </span>
+                <span class="summary-number">
+                    {pendingCount}
+                </span>
+                <span class="summary-caption">
+                    Waiting for my action
+                </span>
+            </button>
+
+            <button
+                type="button"
+                class="summary-card summary-card-actioned"
+                data-tab="actioned"
+                onclick={handleTabChange}>
+                <span class="summary-label">
+                    My Actioned Approvals
+                </span>
+                <span class="summary-number">
+                    {actionedCount}
+                </span>
+                <span class="summary-caption">
+                    Actions completed by me
+                </span>
+            </button>
+
+            <template if:true={isAdmin}>
+                <button
+                    type="button"
+                    class="summary-card summary-card-admin"
+                    data-tab="allPending"
+                    onclick={handleTabChange}>
+                    <span class="summary-label">
+                        All Pending Approvals
+                    </span>
+                    <span class="summary-number">
+                        {allPendingCount}
+                    </span>
+                    <span class="summary-caption">
+                        Pending across all approvers
+                    </span>
+                </button>
+
+                <button
+                    type="button"
+                    class="summary-card summary-card-all"
+                    data-tab="allRequests"
+                    onclick={handleTabChange}>
+                    <span class="summary-label">
+                        All Customer Requests
+                    </span>
+                    <span class="summary-number">
+                        {allRequestCount}
+                    </span>
+                    <span class="summary-caption">
+                        Complete approval overview
+                    </span>
+                </button>
+            </template>
+        </div>
+
+        <div class="workspace-toolbar">
+            <div class="workspace-tabs">
+                <button
+                    type="button"
+                    class={pendingTabClass}
+                    data-tab="pending"
+                    onclick={handleTabChange}>
+                    My Pending
+                    <span class="tab-count">
+                        {pendingCount}
+                    </span>
+                </button>
+
+                <template if:true={isAdmin}>
+                    <button
+                        type="button"
+                        class={allPendingTabClass}
+                        data-tab="allPending"
+                        onclick={handleTabChange}>
+                        All Pending
+                        <span class="tab-count">
+                            {allPendingCount}
+                        </span>
+                    </button>
+                </template>
+
+                <button
+                    type="button"
+                    class={actionedTabClass}
+                    data-tab="actioned"
+                    onclick={handleTabChange}>
+                    My Actioned
+                    <span class="tab-count">
+                        {actionedCount}
+                    </span>
+                </button>
+
+                <template if:true={isAdmin}>
+                    <button
+                        type="button"
+                        class={allRequestsTabClass}
+                        data-tab="allRequests"
+                        onclick={handleTabChange}>
+                        All Requests
+                        <span class="tab-count">
+                            {allRequestCount}
+                        </span>
+                    </button>
+                </template>
+            </div>
+
+            <div class="search-area">
+                <lightning-input
+                    data-id="workspaceSearch"
+                    type="search"
+                    variant="label-hidden"
+                    label="Search approvals"
+                    placeholder="Search customer, request, store, approver, status..."
+                    onchange={handleSearch}>
+                </lightning-input>
+
+                <template if:true={searchKey}>
+                    <lightning-button-icon
+                        icon-name="utility:clear"
+                        alternative-text="Clear search"
+                        title="Clear search"
+                        onclick={handleClearSearch}>
+                    </lightning-button-icon>
+                </template>
+            </div>
+        </div>
+
+        <template if:true={hasLoadError}>
+            <div class="state-card state-error">
+                <lightning-icon
+                    icon-name="utility:error"
+                    size="small"
+                    variant="error"
+                    alternative-text="Error">
+                </lightning-icon>
+
+                <div>
+                    <div class="state-title">
+                        Unable to load approvals
+                    </div>
+                    <div class="state-message">
+                        {loadError}
+                    </div>
+                </div>
+            </div>
+        </template>
+
+        <template if:true={isPendingTab}>
+            <template if:true={hasPendingRows}>
+                <div class="approval-table-wrap">
+                    <table class="approval-table">
+                        <thead>
+                            <tr>
+                                <th>Request</th>
+                                <th>Customer</th>
+                                <th>Store</th>
+                                <th>Submitted By</th>
+                                <th>Submitted</th>
+                                <th>Current Level</th>
+                                <th>Changes</th>
+                                <th>Status</th>
+                                <th class="action-column">
+                                    Action
+                                </th>
+                            </tr>
+                        </thead>
+
+                        <tbody>
+                            <template
+                                for:each={filteredPendingApprovals}
+                                for:item="row">
+
+                                <tr key={row.approvalTransactionId}>
+                                    <td>
+                                        <div class="primary-cell">
+                                            {row.requestName}
+                                        </div>
+                                    </td>
+
+                                    <td>
+                                        <div class="primary-cell">
+                                            {row.customerName}
+                                        </div>
+                                    </td>
+
+                                    <td>
+                                        {row.storeName}
+                                    </td>
+
+                                    <td>
+                                        {row.submittedByName}
+                                    </td>
+
+                                    <td>
+                                        <lightning-formatted-date-time
+                                            value={row.submittedDateTime}
+                                            day="2-digit"
+                                            month="short"
+                                            year="numeric"
+                                            hour="2-digit"
+                                            minute="2-digit">
+                                        </lightning-formatted-date-time>
+                                    </td>
+
+                                    <td>
+                                        <div class="level-cell">
+                                            {row.currentLevelName}
+                                        </div>
+                                    </td>
+
+                                    <td>
+                                        <span class="change-count-pill">
+                                            {row.changeCount}
+                                        </span>
+                                    </td>
+
+                                    <td>
+                                        <span class={row.statusClass}>
+                                            {row.approvalStatusDisplay}
+                                        </span>
+                                    </td>
+
+                                    <td class="action-column">
+                                        <lightning-button
+                                            class="preview-button"
+                                            label="Preview"
+                                            icon-name="utility:preview"
+                                            data-transaction-id={row.approvalTransactionId}
+                                            onclick={handlePreview}>
+                                        </lightning-button>
+                                    </td>
+                                </tr>
+                            </template>
+                        </tbody>
+                    </table>
+                </div>
+            </template>
+
+            <template if:false={hasPendingRows}>
+                <div class="state-card state-empty">
+                    <lightning-icon
+                        icon-name="utility:check"
+                        size="small"
+                        alternative-text="No pending approvals">
+                    </lightning-icon>
+
+                    <div>
+                        <div class="state-title">
+                            No pending Customer Profile approvals
+                        </div>
+                        <div class="state-message">
+                            There is currently no Customer Profile request waiting for your approval.
+                        </div>
+                    </div>
+                </div>
+            </template>
+        </template>
+
+        <template if:true={isAllPendingTab}>
+            <template if:true={hasAllPendingRows}>
+                <div class="approval-table-wrap">
+                    <table class="approval-table">
+                        <thead>
+                            <tr>
+                                <th>Request</th>
+                                <th>Customer</th>
+                                <th>Store</th>
+                                <th>Submitted By</th>
+                                <th>Submitted</th>
+                                <th>Current Level</th>
+                                <th>Pending With</th>
+                                <th>Changes</th>
+                                <th>Status</th>
+                                <th class="action-column">
+                                    Admin Action
+                                </th>
+                            </tr>
+                        </thead>
+
+                        <tbody>
+                            <template
+                                for:each={filteredAllPendingApprovals}
+                                for:item="row">
+
+                                <tr key={row.approvalTransactionId}>
+                                    <td>
+                                        <div class="primary-cell">
+                                            {row.requestName}
+                                        </div>
+                                    </td>
+
+                                    <td>
+                                        <div class="primary-cell">
+                                            {row.customerName}
+                                        </div>
+                                    </td>
+
+                                    <td>
+                                        {row.storeName}
+                                    </td>
+
+                                    <td>
+                                        {row.submittedByName}
+                                    </td>
+
+                                    <td>
+                                        <lightning-formatted-date-time
+                                            value={row.submittedDateTime}
+                                            day="2-digit"
+                                            month="short"
+                                            year="numeric"
+                                            hour="2-digit"
+                                            minute="2-digit">
+                                        </lightning-formatted-date-time>
+                                    </td>
+
+                                    <td>
+                                        <div class="level-cell">
+                                            {row.currentLevelName}
+                                        </div>
+                                    </td>
+
+                                    <td>
+                                        <div class="pending-with-cell">
+                                            {row.pendingWithName}
+                                        </div>
+                                    </td>
+
+                                    <td>
+                                        <span class="change-count-pill">
+                                            {row.changeCount}
+                                        </span>
+                                    </td>
+
+                                    <td>
+                                        <span class={row.statusClass}>
+                                            {row.approvalStatusDisplay}
+                                        </span>
+                                    </td>
+
+                                    <td class="action-column">
+                                        <lightning-button
+                                            class="preview-button"
+                                            label="Review"
+                                            icon-name="utility:preview"
+                                            data-transaction-id={row.approvalTransactionId}
+                                            onclick={handlePreview}>
+                                        </lightning-button>
+                                    </td>
+                                </tr>
+                            </template>
+                        </tbody>
+                    </table>
+                </div>
+            </template>
+
+            <template if:false={hasAllPendingRows}>
+                <div class="state-card state-empty">
+                    <lightning-icon
+                        icon-name="utility:check"
+                        size="small"
+                        alternative-text="No pending approvals">
+                    </lightning-icon>
+
+                    <div>
+                        <div class="state-title">
+                            No pending Customer Profile approvals
+                        </div>
+                        <div class="state-message">
+                            There is currently no pending Customer Profile request across the approval workspace.
+                        </div>
+                    </div>
+                </div>
+            </template>
+        </template>
+
+        <template if:true={isActionedTab}>
+            <template if:true={hasActionedRows}>
+                <div class="approval-table-wrap">
+                    <table class="approval-table">
+                        <thead>
+                            <tr>
+                                <th>Request</th>
+                                <th>Customer</th>
+                                <th>Store</th>
+                                <th>My Action</th>
+                                <th>Action Date</th>
+                                <th>Current Level</th>
+                                <th>Pending With</th>
+                                <th>Current Status</th>
+                                <th>Changes</th>
+                                <th class="action-column">
+                                    View
+                                </th>
+                            </tr>
+                        </thead>
+
+                        <tbody>
+                            <template
+                                for:each={filteredActionedApprovals}
+                                for:item="row">
+
+                                <tr key={row.actionHistoryId}>
+                                    <td>
+                                        <div class="primary-cell">
+                                            {row.requestName}
+                                        </div>
+                                    </td>
+
+                                    <td>
+                                        {row.customerName}
+                                    </td>
+
+                                    <td>
+                                        {row.storeName}
+                                    </td>
+
+                                    <td>
+                                        <span class={row.actionClass}>
+                                            {row.actionLabel}
+                                        </span>
+                                    </td>
+
+                                    <td>
+                                        <lightning-formatted-date-time
+                                            value={row.myActionDateTime}
+                                            day="2-digit"
+                                            month="short"
+                                            year="numeric"
+                                            hour="2-digit"
+                                            minute="2-digit">
+                                        </lightning-formatted-date-time>
+                                    </td>
+
+                                    <td>
+                                        {row.currentLevelName}
+                                    </td>
+
+                                    <td>
+                                        {row.pendingWithName}
+                                    </td>
+
+                                    <td>
+                                        <span class={row.statusClass}>
+                                            {row.approvalStatusDisplay}
+                                        </span>
+                                    </td>
+
+                                    <td>
+                                        <span class="change-count-pill">
+                                            {row.changeCount}
+                                        </span>
+                                    </td>
+
+                                    <td class="action-column">
+                                        <lightning-button
+                                            class="preview-button"
+                                            label="View"
+                                            icon-name="utility:preview"
+                                            data-transaction-id={row.approvalTransactionId}
+                                            onclick={handlePreview}>
+                                        </lightning-button>
+                                    </td>
+                                </tr>
+                            </template>
+                        </tbody>
+                    </table>
+                </div>
+            </template>
+
+            <template if:false={hasActionedRows}>
+                <div class="state-card state-empty">
+                    <lightning-icon
+                        icon-name="utility:info"
+                        size="small"
+                        alternative-text="No action history">
+                    </lightning-icon>
+
+                    <div>
+                        <div class="state-title">
+                            No Customer Profile approval actions yet
+                        </div>
+                        <div class="state-message">
+                            Your completed Customer Profile approval actions will appear here.
+                        </div>
+                    </div>
+                </div>
+            </template>
+        </template>
+
+        <template if:true={isAllRequestsTab}>
+            <template if:true={hasAllRequestRows}>
+                <div class="approval-table-wrap">
+                    <table class="approval-table">
+                        <thead>
+                            <tr>
+                                <th>Request</th>
+                                <th>Customer</th>
+                                <th>Store</th>
+                                <th>Submitted By</th>
+                                <th>Current Level</th>
+                                <th>Pending With</th>
+                                <th>Last Action</th>
+                                <th>Status</th>
+                                <th>Changes</th>
+                                <th class="action-column">
+                                    View
+                                </th>
+                            </tr>
+                        </thead>
+
+                        <tbody>
+                            <template
+                                for:each={filteredAllRequests}
+                                for:item="row">
+
+                                <tr key={row.approvalTransactionId}>
+                                    <td>
+                                        <div class="primary-cell">
+                                            {row.requestName}
+                                        </div>
+                                    </td>
+
+                                    <td>
+                                        <div class="primary-cell">
+                                            {row.customerName}
+                                        </div>
+                                    </td>
+
+                                    <td>
+                                        {row.storeName}
+                                    </td>
+
+                                    <td>
+                                        {row.submittedByName}
+                                    </td>
+
+                                    <td>
+                                        {row.currentLevelName}
+                                    </td>
+
+                                    <td>
+                                        {row.pendingWithName}
+                                    </td>
+
+                                    <td>
+                                        <span class={row.actionClass}>
+                                            {row.actionLabel}
+                                        </span>
+                                    </td>
+
+                                    <td>
+                                        <span class={row.statusClass}>
+                                            {row.approvalStatusDisplay}
+                                        </span>
+                                    </td>
+
+                                    <td>
+                                        <span class="change-count-pill">
+                                            {row.changeCount}
+                                        </span>
+                                    </td>
+
+                                    <td class="action-column">
+                                        <lightning-button
+                                            class="preview-button"
+                                            label="View"
+                                            icon-name="utility:preview"
+                                            data-transaction-id={row.approvalTransactionId}
+                                            onclick={handlePreview}>
+                                        </lightning-button>
+                                    </td>
+                                </tr>
+                            </template>
+                        </tbody>
+                    </table>
+                </div>
+            </template>
+
+            <template if:false={hasAllRequestRows}>
+                <div class="state-card state-empty">
+                    <lightning-icon
+                        icon-name="utility:info"
+                        size="small"
+                        alternative-text="No requests">
+                    </lightning-icon>
+
+                    <div>
+                        <div class="state-title">
+                            No Customer Profile approval requests
+                        </div>
+                        <div class="state-message">
+                            No Customer Profile approval transaction is currently available.
+                        </div>
+                    </div>
+                </div>
+            </template>
+        </template>
+    </div>
+
+    <template if:true={showPreview}>
+        <section
+            role="dialog"
+            tabindex="-1"
+            aria-modal="true"
+            aria-labelledby="customer-approval-preview-heading"
+            class="slds-modal slds-fade-in-open workspace-modal">
+
+            <div class="slds-modal__container modal-container">
+                <header class="slds-modal__header modal-header">
+                    <div class="modal-header-actions">
+                        <lightning-button-icon
+                            class="modal-action-icon"
+                            icon-name="utility:refresh"
+                            variant="border-filled"
+                            alternative-text="Refresh Data"
+                            title="Refresh Data"
+                            onclick={handleRefreshPreview}
+                            disabled={isActionLoading}>
+                        </lightning-button-icon>
+
+                        <lightning-button-icon
+                            class="modal-action-icon modal-close-fixed"
+                            icon-name="utility:close"
+                            variant="border-filled"
+                            alternative-text="Close"
+                            title="Close"
+                            onclick={handleClosePreview}
+                            disabled={isActionLoading}>
+                        </lightning-button-icon>
+                    </div>
+
+                    <div class="workspace-eyebrow">
+                        CUSTOMER PROFILE APPROVAL
+                    </div>
+
+                    <h2 id="customer-approval-preview-heading">
+                        {preview.customerName}
+                    </h2>
+
+                    <div class="modal-request-line">
+                        <span>
+                            {preview.requestName}
+                        </span>
+
+                        <span class="meta-dot">
+                            •
+                        </span>
+
+                        <span class={previewStatusClass}>
+                            {preview.approvalStatusDisplay}
+                        </span>
+                    </div>
+
+                    <template if:true={preview.isAdminOverride}>
+                        <div class="admin-override-badge">
+                            <lightning-icon
+                                icon-name="utility:shield"
+                                size="xx-small"
+                                alternative-text="Admin Override">
+                            </lightning-icon>
+                            Admin Override
+                        </div>
+                    </template>
+                </header>
+
+                <div class="slds-modal__content modal-content">
+                    <template if:true={isPreviewLoading}>
+                        <div class="preview-spinner">
+                            <lightning-spinner
+                                alternative-text="Loading approval preview..."
+                                size="medium">
+                            </lightning-spinner>
+                        </div>
+                    </template>
+
+                    <template if:true={preview.isAdminOverride}>
+                        <div class="admin-override-note">
+                            <lightning-icon
+                                icon-name="utility:warning"
+                                size="small"
+                                alternative-text="Admin Override">
+                            </lightning-icon>
+
+                            <div>
+                                <div class="admin-override-title">
+                                    System Administrator action
+                                </div>
+                                <div class="admin-override-text">
+                                    {adminOverrideText}
+                                </div>
+                            </div>
+                        </div>
+                    </template>
+
+                    <div class="preview-summary-grid">
+                        <div class="preview-summary-item">
+                            <span class="preview-label">
+                                Customer
+                            </span>
+                            <span class="preview-value">
+                                {preview.customerName}
+                            </span>
+                        </div>
+
+                        <div class="preview-summary-item">
+                            <span class="preview-label">
+                                Request
+                            </span>
+                            <span class="preview-value">
+                                {preview.requestName}
+                            </span>
+                        </div>
+
+                        <div class="preview-summary-item">
+                            <span class="preview-label">
+                                Store
+                            </span>
+                            <span class="preview-value">
+                                {preview.storeName}
+                            </span>
+                        </div>
+
+                        <div class="preview-summary-item">
+                            <span class="preview-label">
+                                Location Code
+                            </span>
+                            <span class="preview-value">
+                                {preview.locationCode}
+                            </span>
+                        </div>
+
+                        <div class="preview-summary-item">
+                            <span class="preview-label">
+                                Submitted By
+                            </span>
+                            <span class="preview-value">
+                                {preview.submittedByName}
+                            </span>
+                        </div>
+
+                        <div class="preview-summary-item">
+                            <span class="preview-label">
+                                Current Level
+                            </span>
+                            <span class="preview-value">
+                                {preview.currentLevelName}
+                            </span>
+                        </div>
+
+                        <div class="preview-summary-item">
+                            <span class="preview-label">
+                                Pending With
+                            </span>
+                            <span class="preview-value">
+                                {preview.pendingWithName}
+                            </span>
+                        </div>
+                    </div>
+
+                    <template if:true={preview.showBCDetails}>
+                        <div class="bc-integration-card">
+                            <div class="bc-integration-header">
+                                <div>
+                                    <div class="bc-integration-title">
+                                        BC Integration
+                                    </div>
+
+                                    <div class="bc-integration-subtitle">
+                                        Current BC information for this Customer Profile request.
+                                    </div>
+                                </div>
+
+                                <template if:true={preview.hasBCApplicableChanges}>
+                                    <span class="bc-required-pill">
+                                        BC Push Required
+                                    </span>
+                                </template>
+                            </div>
+
+                            <div class="bc-integration-grid">
+                                <div>
+                                    <span class="preview-label">
+                                        BC Customer No
+                                    </span>
+                                    <span class="preview-value">
+                                        {preview.bcCustomerNoDisplay}
+                                    </span>
+                                </div>
+
+                                <div>
+                                    <span class="preview-label">
+                                        BC Push Status
+                                    </span>
+                                    <span class="preview-value">
+                                        {preview.bcPushStatusDisplay}
+                                    </span>
+                                </div>
+
+                                <div>
+                                    <span class="preview-label">
+                                        Push Attempts
+                                    </span>
+                                    <span class="preview-value">
+                                        {preview.bcPushAttemptDisplay}
+                                    </span>
+                                </div>
+                            </div>
+
+                            <template if:true={preview.bcPushMessage}>
+                                <div class="bc-integration-message">
+                                    {preview.bcPushMessageDisplay}
+                                </div>
+                            </template>
+                        </div>
+                    </template>
+
+                    <div class="reason-block">
+                        <div class="preview-label">
+                            Change Reason
+                        </div>
+                        <div class="reason-text">
+                            {preview.changeReason}
+                        </div>
+                    </div>
+
+                    <div class="preview-documents-bar">
+                        <div>
+                            <div class="preview-documents-title">
+                                Supporting Documents
+                            </div>
+
+                            <div class="preview-documents-help">
+                                Preview all Salesforce Files attached to this Customer Change Request.
+                            </div>
+                        </div>
+
+                        <lightning-button
+                            class="preview-documents-button"
+                            label="Preview Supporting Documents"
+                            icon-name="utility:preview"
+                            onclick={handlePreviewSupportingDocuments}
+                            disabled={isLoadingDocuments}>
+                        </lightning-button>
+                    </div>
+
+                    <template if:true={showPhoneDuplicateLookup}>
+                        <section class="phone-lookup-card">
+                            <div class="phone-lookup-header">
+                                <div class="phone-lookup-title-wrap">
+                                    <div class="phone-lookup-icon">
+                                        <lightning-icon
+                                            icon-name="utility:search"
+                                            size="small"
+                                            alternative-text="Phone and WhatsApp Duplicate Lookup">
+                                        </lightning-icon>
+                                    </div>
+
+                                    <div>
+                                        <div class="phone-lookup-title">
+                                            Phone / WhatsApp Duplicate Verification
+                                        </div>
+
+                                        <div class="phone-lookup-subtitle">
+                                            This request contains a Phone and/or WhatsApp number change. Verify every requested contact number against other customers before taking any approval decision.
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <lightning-button
+                                    class="phone-lookup-button"
+                                    variant="brand-outline"
+                                    label={phoneLookupButtonLabel}
+                                    icon-name="utility:search"
+                                    onclick={handleLookupCustomersWithSameContactNumbers}
+                                    disabled={phoneLookupButtonDisabled}>
+                                </lightning-button>
+                            </div>
+
+                            <div class="requested-contact-grid">
+                                <template if:true={preview.hasPendingPhoneChange}>
+                                    <div class="phone-proposed-row">
+                                        <span class="preview-label">
+                                            Requested Phone
+                                        </span>
+                                        <span class="phone-proposed-value">
+                                            {preview.pendingProposedPhone}
+                                        </span>
+                                    </div>
+                                </template>
+
+                                <template if:true={preview.hasPendingWhatsappChange}>
+                                    <div class="phone-proposed-row">
+                                        <span class="preview-label">
+                                            Requested WhatsApp
+                                        </span>
+                                        <span class="phone-proposed-value">
+                                            {preview.pendingProposedWhatsapp}
+                                        </span>
+                                    </div>
+                                </template>
+                            </div>
+
+                            <template if:false={phoneLookupPerformed}>
+                                <div class="phone-lookup-required-note">
+                                    <lightning-icon
+                                        icon-name="utility:info"
+                                        size="xx-small"
+                                        alternative-text="Lookup Required">
+                                    </lightning-icon>
+
+                                    Lookup is required before field-level approval decisions can be submitted.
+                                </div>
+                            </template>
+
+                            <template if:true={showPhoneLookupSuccess}>
+                                <div class="phone-lookup-result phone-lookup-success">
+                                    <lightning-icon
+                                        icon-name="utility:success"
+                                        size="small"
+                                        variant="success"
+                                        alternative-text="No Duplicate Found">
+                                    </lightning-icon>
+
+                                    <div>
+                                        <div class="phone-result-title">
+                                            No Duplicate Customer Found
+                                        </div>
+                                        <div class="phone-result-message">
+                                            {phoneLookupMessage}
+                                            You may continue with the normal field-level Approve / Reject decisions.
+                                        </div>
+                                    </div>
+                                </div>
+                            </template>
+
+                            <template if:true={showPhoneLookupDuplicate}>
+                                <div class="phone-lookup-result phone-lookup-duplicate">
+                                    <lightning-icon
+                                        icon-name="utility:error"
+                                        size="small"
+                                        variant="error"
+                                        alternative-text="Duplicate Phone Found">
+                                    </lightning-icon>
+
+                                    <div>
+                                        <div class="phone-result-title">
+                                            Duplicate Phone / WhatsApp Found — Entire Request Must Be Rejected
+                                        </div>
+
+                                        <div class="phone-result-message">
+                                            {phoneLookupMessage}
+                                            Approval of any field in this Customer Change Request is blocked.
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="duplicate-customer-list">
+                                    <template
+                                        for:each={phoneLookupMatches}
+                                        for:item="customer">
+
+                                        <div
+                                            key={customer.rowKey}
+                                            class="duplicate-customer-row">
+
+                                            <div>
+                                                <div class="duplicate-customer-name">
+                                                    {customer.customerName}
+                                                </div>
+
+                                                <div class="duplicate-customer-meta">
+                                                    BC Customer No:
+                                                    {customer.bcCustomerNoDisplay}
+                                                </div>
+
+                                                <div class="duplicate-customer-meta">
+                                                    Requested:
+                                                    {customer.requestedFieldLabel}
+                                                    — {customer.requestedNumber}
+                                                </div>
+                                            </div>
+
+                                            <span class="duplicate-match-pill">
+                                                Match: {customer.matchSource}
+                                            </span>
+                                        </div>
+                                    </template>
+                                </div>
+
+                                <div class="duplicate-request-reject-panel">
+                                    <div>
+                                        <div class="preview-label">
+                                            Request Rejection Reason
+                                            <span class="required-star">
+                                                *
+                                            </span>
+                                        </div>
+
+                                        <lightning-textarea
+                                            label="Request Rejection Reason"
+                                            variant="label-hidden"
+                                            value={duplicatePhoneRejectionReason}
+                                            placeholder="Enter the reason for rejecting the entire request because of the duplicate Phone / WhatsApp number..."
+                                            onchange={handleDuplicatePhoneRejectionReason}>
+                                        </lightning-textarea>
+                                    </div>
+
+                                    <template if:true={duplicatePhoneRejectionError}>
+                                        <div class="field-decision-error">
+                                            {duplicatePhoneRejectionError}
+                                        </div>
+                                    </template>
+
+                                    <div class="duplicate-request-reject-action">
+                                        <lightning-button
+                                            variant="destructive"
+                                            label="Reject Entire Request"
+                                            icon-name="utility:close"
+                                            onclick={handleRejectEntireRequestForDuplicateContactNumber}
+                                            disabled={duplicatePhoneRejectDisabled}>
+                                        </lightning-button>
+                                    </div>
+                                </div>
+                            </template>
+                        </section>
+                    </template>
+
+                    <section class="section-card">
+                        <div class="section-card-header">
+                            <div>
+                                <template if:true={preview.isKycRequest}>
+                                    <div class="section-title">
+                                        Atomic KYC Approval Review
+                                    </div>
+
+                                    <div class="section-subtitle">
+                                        Review every KYC value below. This request must be approved as one complete set or returned as one complete set. Individual field decisions are disabled.
+                                    </div>
+                                </template>
+
+                                <template if:false={preview.isKycRequest}>
+                                    <div class="section-title">
+                                        Field-Level Approval Decisions
+                                    </div>
+
+                                    <div class="section-subtitle">
+                                        Standard fields remain independent. BC-controlled address fields use one combined decision shown after the BC-controlled fields.
+                                    </div>
+                                </template>
+                            </div>
+
+                            <span class="change-count-pill">
+                                {preview.changeCount}
+                            </span>
+                        </div>
+
+                        <div class="changes-list">
+                            <template
+                                for:each={preview.changes}
+                                for:item="change">
+
+                                <template if:true={change.workspaceVisible}>
+                                    <article
+                                        key={change.changeItemId}
+                                        class="change-preview-card">
+
+                                        <div class="change-preview-heading">
+                                            <div>
+                                                <div class="change-section-name">
+                                                    {change.sectionName}
+                                                </div>
+
+                                                <div class="change-field-name">
+                                                    {change.fieldLabel}
+                                                </div>
+                                            </div>
+
+                                            <div class="item-heading-statuses">
+                                                <span class={change.itemStatusClass}>
+                                                    {change.itemApprovalStatusDisplay}
+                                                </span>
+
+                                                <template if:true={change.bcPushApplicable}>
+                                                    <span class="bc-pill">
+                                                        BC Push
+                                                    </span>
+                                                </template>
+
+                                                <template if:true={change.bcControlledAddress}>
+                                                    <span class="bc-address-pill">
+                                                        BC Controlled
+                                                    </span>
+                                                </template>
+                                            </div>
+                                        </div>
+
+                                        <div class="change-comparison">
+                                            <div class="comparison-box comparison-old">
+                                                <span class="comparison-label">
+                                                    Existing Value
+                                                </span>
+
+                                                <span class="comparison-value">
+                                                    {change.oldDisplayValue}
+                                                </span>
+                                            </div>
+
+                                            <div class="comparison-arrow">
+                                                <lightning-icon
+                                                    icon-name="utility:forward"
+                                                    size="xx-small"
+                                                    alternative-text="To">
+                                                </lightning-icon>
+                                            </div>
+
+                                            <div class="comparison-box comparison-new">
+                                                <span class="comparison-label">
+                                                    Requested New Value
+                                                </span>
+
+                                                <span class="comparison-value requested-value">
+                                                    {change.newDisplayValue}
+                                                </span>
+                                            </div>
+                                        </div>
+
+                                        <template if:true={change.showIndividualDecisionPanel}>
+                                            <div class="field-decision-panel">
+                                                <div>
+                                                    <div class="preview-label">
+                                                        Your Decision
+                                                    </div>
+
+                                                    <lightning-combobox
+                                                        data-item-id={change.changeItemId}
+                                                        label="Decision"
+                                                        variant="label-hidden"
+                                                        value={change.decision}
+                                                        options={change.decisionOptions}
+                                                        placeholder="Select Approve or Reject"
+                                                        onchange={handleItemDecision}
+                                                        disabled={phoneDecisionControlsDisabled}>
+                                                    </lightning-combobox>
+                                                </div>
+
+                                                <template if:true={change.isRejectedDecision}>
+                                                    <div>
+                                                        <div class="preview-label">
+                                                            Rejection Reason
+                                                            <span class="required-star">
+                                                                *
+                                                            </span>
+                                                        </div>
+
+                                                        <lightning-textarea
+                                                            data-item-id={change.changeItemId}
+                                                            label="Rejection Reason"
+                                                            variant="label-hidden"
+                                                            value={change.rejectionReasonInput}
+                                                            placeholder="Explain why this particular field is being rejected..."
+                                                            onchange={handleItemRejectionReason}
+                                                            disabled={phoneDecisionControlsDisabled}>
+                                                        </lightning-textarea>
+                                                    </div>
+                                                </template>
+                                            </div>
+                                        </template>
+
+                                        <template if:true={change.isRejected}>
+                                            <div class="field-rejected-details">
+                                                <div>
+                                                    <span class="preview-label">
+                                                        Rejected From
+                                                    </span>
+                                                    <span class="preview-value">
+                                                        {change.rejectedFromLevelName}
+                                                    </span>
+                                                </div>
+
+                                                <div>
+                                                    <span class="preview-label">
+                                                        Rejected By
+                                                    </span>
+                                                    <span class="preview-value">
+                                                        {change.rejectedByName}
+                                                    </span>
+                                                </div>
+
+                                                <div class="field-rejected-reason">
+                                                    <span class="preview-label">
+                                                        Reason
+                                                    </span>
+                                                    <span class="preview-value">
+                                                        {change.rejectionReason}
+                                                    </span>
+                                                </div>
+                                            </div>
+                                        </template>
+
+                                        <template if:true={change.isFinalApproved}>
+                                            <div class="field-final-approved-details">
+                                                <lightning-icon
+                                                    icon-name="utility:success"
+                                                    size="xx-small"
+                                                    variant="success"
+                                                    alternative-text="Final Approved">
+                                                </lightning-icon>
+
+                                                <span>
+                                                    Final Approved by
+                                                    {change.finalApprovedByName}
+                                                </span>
+                                            </div>
+                                        </template>
+                                    </article>
+
+                                    <template if:true={change.showBCAddressDecisionAfter}>
+                                        <section
+                                            key={change.bcAddressDecisionKey}
+                                            class="bc-address-group-card">
+
+                                            <div class="bc-address-group-header">
+                                                <div>
+                                                    <div class="bc-address-group-title">
+                                                        Business Central Controlled Address
+                                                    </div>
+
+                                                    <div class="bc-address-group-subtitle">
+                                                        All Pending BC-controlled location values move together.
+                                                        Approve the complete address or reject the complete address.
+                                                    </div>
+                                                </div>
+
+                                                <span class="bc-address-group-count">
+                                                    {preview.pendingBCControlledAddressCount}
+                                                    visible fields
+                                                </span>
+                                            </div>
+
+                                            <div class="bc-address-group-decision-grid">
+                                                <div>
+                                                    <div class="preview-label">
+                                                        Address Decision
+                                                        <span class="required-star">
+                                                            *
+                                                        </span>
+                                                    </div>
+
+                                                    <lightning-combobox
+                                                        label="BC Address Decision"
+                                                        variant="label-hidden"
+                                                        value={bcAddressDecision}
+                                                        options={bcAddressDecisionOptions}
+                                                        placeholder="Approve All or Reject All"
+                                                        onchange={handleBCAddressDecision}
+                                                        disabled={bcAddressDecisionControlsDisabled}>
+                                                    </lightning-combobox>
+                                                </div>
+
+                                                <template if:true={isBCAddressRejectedDecision}>
+                                                    <div>
+                                                        <div class="preview-label">
+                                                            Address Rejection Reason
+                                                            <span class="required-star">
+                                                                *
+                                                            </span>
+                                                        </div>
+
+                                                        <lightning-textarea
+                                                            label="BC Address Rejection Reason"
+                                                            variant="label-hidden"
+                                                            value={bcAddressRejectionReason}
+                                                            placeholder="Explain why the complete BC-controlled address is being rejected..."
+                                                            onchange={handleBCAddressRejectionReason}
+                                                            disabled={bcAddressDecisionControlsDisabled}>
+                                                        </lightning-textarea>
+                                                    </div>
+                                                </template>
+                                            </div>
+                                        </section>
+                                    </template>
+                                </template>
+                            </template>
+                        </div>
+
+                        <template if:true={showKycAtomicDecision}>
+                            <section class="bc-address-group-card">
+                                <div class="bc-address-group-header">
+                                    <div>
+                                        <div class="bc-address-group-title">
+                                            Complete KYC Decision
+                                        </div>
+
+                                        <div class="bc-address-group-subtitle">
+                                            {preview.kycDisplayName} is an atomic approval request. Your decision will apply to every Pending KYC field shown above.
+                                        </div>
+                                    </div>
+
+                                    <span class="bc-address-group-count">
+                                        {preview.changeCount} fields together
+                                    </span>
+                                </div>
+
+                                <div class="bc-address-group-decision-grid">
+                                    <div>
+                                        <div class="preview-label">
+                                            KYC Decision
+                                            <span class="required-star">
+                                                *
+                                            </span>
+                                        </div>
+
+                                        <lightning-combobox
+                                            label="KYC Decision"
+                                            variant="label-hidden"
+                                            value={kycDecision}
+                                            options={kycDecisionOptions}
+                                            placeholder="Approve All or Return All"
+                                            onchange={handleKycDecision}
+                                            disabled={kycDecisionControlsDisabled}>
+                                        </lightning-combobox>
+                                    </div>
+
+                                    <template if:true={isKycRejectedDecision}>
+                                        <div>
+                                            <div class="preview-label">
+                                                Return Reason
+                                                <span class="required-star">
+                                                    *
+                                                </span>
+                                            </div>
+
+                                            <lightning-textarea
+                                                label="KYC Return Reason"
+                                                variant="label-hidden"
+                                                value={kycRejectionReason}
+                                                placeholder="Explain why the complete KYC request is being returned..."
+                                                onchange={handleKycRejectionReason}
+                                                disabled={kycDecisionControlsDisabled}>
+                                            </lightning-textarea>
+                                        </div>
+                                    </template>
+                                </div>
+                            </section>
+                        </template>
+                    </section>
+
+                    <section class="section-card">
+                        <div class="section-card-header">
+                            <div>
+                                <div class="section-title">
+                                    Approval History
+                                </div>
+
+                                <div class="section-subtitle">
+                                    Complete action trail for the current Customer change request.
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="history-list">
+                            <template
+                                for:each={preview.history}
+                                for:item="history">
+
+                                <div
+                                    key={history.historyId}
+                                    class="history-row">
+
+                                    <div class="history-marker"></div>
+
+                                    <div>
+                                        <div class="history-topline">
+                                            <span class={history.actionClass}>
+                                                {history.action}
+                                            </span>
+
+                                            <span class="history-level">
+                                                {history.approvalLevelName}
+                                            </span>
+                                        </div>
+
+                                        <template if:true={history.customerChangeItemLabel}>
+                                            <div class="history-field-label">
+                                                Field:
+                                                {history.customerChangeItemLabel}
+                                            </div>
+                                        </template>
+
+                                        <div class="history-meta">
+                                            {history.actionByName}
+
+                                            <span class="meta-dot">
+                                                •
+                                            </span>
+
+                                            <lightning-formatted-date-time
+                                                value={history.actionDateTime}
+                                                day="2-digit"
+                                                month="short"
+                                                year="numeric"
+                                                hour="2-digit"
+                                                minute="2-digit">
+                                            </lightning-formatted-date-time>
+                                        </div>
+
+                                        <div class="history-assigned">
+                                            Assigned To:
+                                            {history.assignedToName}
+                                        </div>
+
+                                        <template if:true={history.comments}>
+                                            <div class="history-comments">
+                                                {history.comments}
+                                            </div>
+                                        </template>
+                                    </div>
+                                </div>
+                            </template>
+                        </div>
+                    </section>
+
+                    <div class={routingClass}>
+                        <lightning-icon
+                            icon-name="utility:routing_offline"
+                            size="small"
+                            alternative-text="Approval Routing">
+                        </lightning-icon>
+
+                        <div>
+                            <div class="routing-title">
+                                Approval Routing
+                            </div>
+
+                            <div class="routing-message">
+                                {preview.routingMessage}
+                            </div>
+
+                            <template if:true={preview.routingReady}>
+                                <div class="next-routing-grid">
+                                    <div>
+                                        <span class="preview-label">
+                                            Next Level
+                                        </span>
+                                        <span class="preview-value">
+                                            {preview.nextLevelName}
+                                        </span>
+                                    </div>
+
+                                    <div>
+                                        <span class="preview-label">
+                                            Next Approver
+                                        </span>
+                                        <span class="preview-value">
+                                            {preview.nextApproverName}
+                                        </span>
+                                    </div>
+                                </div>
+                            </template>
+                        </div>
+                    </div>
+
+                    <template if:true={preview.isFinalLevel}>
+                        <div class="final-approval-note">
+                            <lightning-icon
+                                icon-name="utility:warning"
+                                size="small"
+                                alternative-text="Final Approval">
+                            </lightning-icon>
+
+                            <div>
+                                <template if:true={preview.isKycRequest}>
+                                    <div class="final-approval-title">
+                                        Final Atomic KYC Approval
+                                    </div>
+
+                                    <div class="final-approval-text">
+                                        This is the final approval level for {preview.kycDisplayName}. All Pending KYC values must be approved together or returned together.
+                                        On final approval, the complete approved KYC set will be applied to the Customer, and the mapped verification flags are handled internally.
+                                        Verification checkbox fields are not presented as approver decisions.
+                                    </div>
+                                </template>
+
+                                <template if:false={preview.isKycRequest}>
+                                    <div class="final-approval-title">
+                                        Final Field Approval
+                                    </div>
+
+                                    <div class="final-approval-text">
+                                        This is the final approval level. Only fields marked Approve will be applied to the Customer.
+                                        BC-supported approved fields will be pushed to BC first. Any field marked Reject is excluded
+                                        permanently from this request, with the rejection level, approver and reason retained for audit.
+                                    </div>
+                                </template>
+                            </div>
+                        </div>
+                    </template>
+
+                    <template if:true={preview.canApprove}>
+                        <div class="approval-comment-card">
+                            <div class="preview-label">
+                                Approval Comments
+                            </div>
+
+                            <lightning-textarea
+                                class="approval-comments"
+                                label="Approval Comments"
+                                variant="label-hidden"
+                                value={approvalComments}
+                                placeholder="Optional comments for this approval action..."
+                                onchange={handleApprovalComments}>
+                            </lightning-textarea>
+                        </div>
+                    </template>
+                </div>
+
+                <footer class="slds-modal__footer modal-footer">
+                    <div class="field-decision-footer-note">
+                        <template if:true={preview.isFinalLevel}>
+                            <template if:true={preview.isKycRequest}>
+                                The complete KYC set will be committed only after successful final processing, including BC push when required.
+                            </template>
+
+                            <template if:false={preview.isKycRequest}>
+                                Final Approved fields will be committed only after a successful BC response when BC push is required.
+                            </template>
+                        </template>
+                    </div>
+
+                    <lightning-button
+                        label="Close"
+                        onclick={handleClosePreview}
+                        disabled={isActionLoading}>
+                    </lightning-button>
+
+                    <lightning-button
+                        class="approve-button"
+                        variant="brand"
+                        label={fieldDecisionSubmitLabel}
+                        icon-name="utility:save"
+                        onclick={handleSubmitFieldDecisions}
+                        disabled={fieldDecisionSubmitDisabled}>
+                    </lightning-button>
+                </footer>
+            </div>
+        </section>
+
+        <div class="slds-backdrop slds-backdrop_open"></div>
+    </template>
+
+    <template if:true={showSupportingDocumentPreview}>
+        <c-lwc-orient-supporting-document-preview
+            documents={supportingDocumentPreviewFiles}
+            selected-document-id={supportingDocumentPreviewSelectedId}
+            onclosepreview={handleCloseSupportingDocumentPreview}>
+        </c-lwc-orient-supporting-document-preview>
+    </template>
+</template>

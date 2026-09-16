@@ -1,0 +1,382 @@
+<template>
+    <c-fdb-screen nav-label="Back" onnavclick={handleNav} onhelpclick={handleHelp}>
+            <!-- CONTENT -->
+            <div class="ojp__body oji__body">
+
+                <!-- TITLE -->
+                <!-- Two groups so landscape can set them side by side. In
+                     portrait both are display:contents and nothing moves. -->
+                <div class="oj-col oj-col_lead">
+                <div class="oji__head">
+                    <h1 class="oji__title">Request Previous Invoice</h1>
+                    <div class="oj-orn oj-orn_sm">
+                        <span class="oj-orn__line"></span>
+                        <span class="oj-orn__diamond"></span>
+                        <span class="oj-orn__line"></span>
+                    </div>
+                    <p class="oji__lede">
+                        We can email a copy of your invoice. This step is optional &mdash; you may skip it.
+                    </p>
+                </div>
+
+                <!-- EMAIL VERIFICATION -->
+                <div class="ojp__section">
+                    <div class="ojp__section-head">
+                        <span class="ojp__section-icon">
+                            <lightning-icon icon-name="utility:email" size="xx-small" variant="inverse"></lightning-icon>
+                        </span>
+                        <h3>Send To Verified Email</h3>
+                    </div>
+
+                    <div class="oji__pane">
+                        <p class="oji__hint">
+                            Each address is proved by a code sent to it. The invoice only
+                            goes to an address that has been verified here.
+                        </p>
+
+                        <!-- One card per address: the one on file, and an
+                             optional different one. Both verify the same way. -->
+                        <div class="oji__mails">
+                            <template for:each={emailFields} for:item="fld">
+                                <div key={fld.key} class={fld.cardClass}>
+
+                                    <div class="oji__mail-head">
+                                        <span class="oji__mail-title">{fld.title}</span>
+                                        <template if:true={fld.isOptional}>
+                                            <span class="oji__mail-tag">Optional</span>
+                                        </template>
+                                        <span class={fld.statusClass}>{fld.statusLabel}</span>
+                                    </div>
+
+                                    <p class="oji__mail-hint">{fld.hint}</p>
+
+                                    <div class="oji__inputrow">
+                                        <template if:true={fld.isFixed}>
+                                            <span class="oji__mail-addr">{fld.email}</span>
+                                        </template>
+
+                                        <template if:false={fld.isFixed}>
+                                            <lightning-input
+                                                class="oji__input"
+                                                type="email"
+                                                label={fld.title}
+                                                variant="label-hidden"
+                                                placeholder="name@example.com"
+                                                value={fld.email}
+                                                data-key={fld.key}
+                                                onchange={handleInvoiceEmailChange}
+                                                disabled={fld.isVerified}>
+                                            </lightning-input>
+                                        </template>
+
+                                        <template if:true={fld.showSend}>
+                                            <button class="oji__btn" type="button"
+                                                    data-key={fld.key}
+                                                    disabled={fld.isBusy}
+                                                    onclick={handleInvoiceSendVerifyOtp}>
+                                                {fld.buttonLabel}
+                                            </button>
+                                        </template>
+
+                                        <template if:true={fld.isVerified}>
+                                            <span class="oji__verified">
+                                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6"
+                                                     stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                                    <path d="M6 12.5l4 4 8-8.5"></path>
+                                                </svg>
+                                                <span>Verified</span>
+                                            </span>
+                                        </template>
+                                    </div>
+
+                                    <template if:true={fld.showOtpInput}>
+                                        <div class="oji__field">
+                                            <span class="oji__label">Enter The Code Sent To This Address</span>
+                                            <div class="oji__inputrow">
+                                                <lightning-input
+                                                    class="oji__input"
+                                                    type="text"
+                                                    label="Email OTP"
+                                                    variant="label-hidden"
+                                                    placeholder="6-digit code"
+                                                    value={fld.otp}
+                                                    data-key={fld.key}
+                                                    onchange={handleInvoiceOtpChange}>
+                                                </lightning-input>
+                                                <button class="oji__btn oji__btn_solid" type="button"
+                                                        data-key={fld.key}
+                                                        disabled={fld.isBusy}
+                                                        onclick={handleInvoiceSendVerifyOtp}>
+                                                    {fld.buttonLabel}
+                                                </button>
+                                            </div>
+                                            <button class="oji__resend" type="button"
+                                                    data-key={fld.key}
+                                                    disabled={fld.isBusy}
+                                                    onclick={handleResendCode}>
+                                                Didn't get it? Send another code
+                                            </button>
+                                        </div>
+                                    </template>
+
+                                    <template if:true={fld.error}>
+                                        <div class="oji__error">
+                                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                                                 stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                                <circle cx="12" cy="12" r="9"></circle>
+                                                <path d="M12 7.6v5.2"></path>
+                                                <path d="M12 16.4h.01"></path>
+                                            </svg>
+                                            <span>{fld.error}</span>
+                                        </div>
+                                    </template>
+                                </div>
+                            </template>
+                        </div>
+
+                        <!-- Where it is actually going, spelled out before they commit -->
+                        <template if:true={showDestination}>
+                            <div class="oji__dest">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"
+                                     stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                    <rect x="3" y="5.4" width="18" height="13.2" rx="2.2"></rect>
+                                    <path d="M3.6 6.6L12 13l8.4-6.4"></path>
+                                </svg>
+                                <span>Your invoice will be emailed to <strong>{destinationEmail}</strong></span>
+                            </div>
+                        </template>
+
+                        <template if:true={hasUnverifiedProposed}>
+                            <div class="oji__dest oji__dest_wait">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"
+                                     stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                    <circle cx="12" cy="12" r="9"></circle>
+                                    <path d="M12 7.6v5.2"></path>
+                                    <path d="M12 16.4h.01"></path>
+                                </svg>
+                                <span>Verify the different address to use it, or clear that field to have the invoice sent to your registered address.</span>
+                            </div>
+                        </template>
+                    </div>
+                </div>
+
+                <!-- INVOICE SELECTION -->
+                </div><!-- /oj-col_lead -->
+
+                <div class="oj-col oj-col_act">
+                <div class="ojp__section">
+                    <div class="ojp__section-head">
+                        <span class="ojp__section-icon">
+                            <lightning-icon icon-name="utility:file" size="xx-small" variant="inverse"></lightning-icon>
+                        </span>
+                        <h3>Which Invoice?</h3>
+                    </div>
+
+                    <div class="oji__choices">
+                        <button class={latestInvoiceClass} type="button" onclick={selectLatestInvoice}>
+                            <span class="oji__choice-tick">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"
+                                     stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                    <path d="M6 12.5l4 4 8-8.5"></path>
+                                </svg>
+                            </span>
+                            <strong>Latest Invoice</strong>
+                            <span>Your most recent purchase</span>
+                        </button>
+
+                        <button class={specificInvoiceClass} type="button" onclick={selectSpecificInvoice}>
+                            <span class="oji__choice-tick">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"
+                                     stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                    <path d="M6 12.5l4 4 8-8.5"></path>
+                                </svg>
+                            </span>
+                            <strong>Specific Invoice</strong>
+                            <span>A particular bill</span>
+                        </button>
+
+                        <button class={last12InvoiceClass} type="button" onclick={selectLast12Invoice}>
+                            <span class="oji__choice-tick">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"
+                                     stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                    <path d="M6 12.5l4 4 8-8.5"></path>
+                                </svg>
+                            </span>
+                            <strong>Last 12 Months</strong>
+                            <span>Everything from the past year</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- WHAT THAT CHOICE FINDS -->
+                <div class="ojp__section">
+                    <div class="ojp__section-head">
+                        <span class="ojp__section-icon">
+                            <lightning-icon icon-name="utility:page" size="xx-small" variant="inverse"></lightning-icon>
+                        </span>
+                        <h3>{invoiceListHeading}</h3>
+                    </div>
+
+                    <!-- DATE RANGE - the specific list is read over it -->
+                    <template if:true={showDateRange}>
+                        <div class="oji__range">
+                            <div class="oji__range-field">
+                                <span class="oji__label">From</span>
+                                <lightning-input
+                                    class="oji__input"
+                                    type="date"
+                                    label="From date"
+                                    variant="label-hidden"
+                                    date-style="short"
+                                    value={fromDate}
+                                    onchange={handleFromDateChange}>
+                                </lightning-input>
+                            </div>
+                            <div class="oji__range-field">
+                                <span class="oji__label">To</span>
+                                <lightning-input
+                                    class="oji__input"
+                                    type="date"
+                                    label="To date"
+                                    variant="label-hidden"
+                                    date-style="short"
+                                    value={toDate}
+                                    onchange={handleToDateChange}>
+                                </lightning-input>
+                            </div>
+                        </div>
+
+                        <template if:true={dateRangeError}>
+                            <div class="oji__error oji__error_range">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                                     stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                    <circle cx="12" cy="12" r="9"></circle>
+                                    <path d="M12 7.6v5.2"></path>
+                                    <path d="M12 16.4h.01"></path>
+                                </svg>
+                                <span>{dateRangeError}</span>
+                            </div>
+                        </template>
+                    </template>
+
+                    <!-- HOW MANY ARE TICKED, AND THE ALL / NONE SHORTCUT -->
+                    <template if:true={showPickBar}>
+                        <div class="oji__pickbar">
+                            <span class="oji__pickbar-count">{pickedSummary}</span>
+                            <button class="oji__pickbar-all" type="button"
+                                    onclick={handleSelectAllInvoices}>
+                                {selectAllLabel}
+                            </button>
+                        </div>
+                    </template>
+
+                    <template if:true={isLoadingInvoices}>
+                        <div class="oji__bills-note">
+                            <lightning-spinner alternative-text="Loading invoices" size="small"
+                                               variant="brand"></lightning-spinner>
+                            <span>Fetching your invoices...</span>
+                        </div>
+                    </template>
+
+                    <template if:true={invoiceLoadError}>
+                        <div class="oji__error">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                                 stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                <circle cx="12" cy="12" r="9"></circle>
+                                <path d="M12 7.6v5.2"></path>
+                                <path d="M12 16.4h.01"></path>
+                            </svg>
+                            <span>{invoiceLoadError}</span>
+                        </div>
+                    </template>
+
+                    <template if:true={showNoInvoices}>
+                        <div class="oji__bills-note">
+                            <span>We could not find any invoices for this selection.</span>
+                        </div>
+                    </template>
+
+                    <template if:true={hasInvoices}>
+                        <ul class="oji__bills">
+                            <template for:each={invoiceRows} for:item="inv">
+                                <li key={inv.documentNo}>
+                                    <!-- A label so the whole row is the hit area for its tick -->
+                                    <label class={inv.rowClass}>
+                                        <template if:true={isMultiPick}>
+                                            <input type="checkbox" class="oji__bill-radio"
+                                                   value={inv.documentNo}
+                                                   data-doc={inv.documentNo}
+                                                   checked={inv.isPicked}
+                                                   onchange={handlePickInvoice} />
+                                        </template>
+                                        <template if:false={isMultiPick}>
+                                            <template if:true={isPickable}>
+                                                <input type="radio" class="oji__bill-radio"
+                                                       name="fdbInvoicePick"
+                                                       value={inv.documentNo}
+                                                       data-doc={inv.documentNo}
+                                                       checked={inv.isPicked}
+                                                       onchange={handlePickInvoice} />
+                                            </template>
+                                        </template>
+                                        <span class="oji__bill-no">{inv.documentNo}</span>
+                                        <span class="oji__bill-date">{inv.whereLine}</span>
+                                        <span class="oji__bill-cust">{inv.whoLine}</span>
+                                        <span class="oji__bill-value">&#8377;&nbsp;{inv.amountDisplay}</span>
+                                    </label>
+                                </li>
+                            </template>
+                        </ul>
+                    </template>
+                </div>
+
+                <!-- NOTE -->
+                <!-- CTA -->
+                <button class="ojp__cta" type="button"
+                        disabled={isRaiseInvoiceDisabled} onclick={handleRaiseInvoice}>
+                    <svg class="ojp__cta-lead" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                         stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                        <rect x="3" y="5.4" width="18" height="13.2" rx="2.2"></rect>
+                        <path d="M3.6 6.6L12 13l8.4-6.4"></path>
+                    </svg>
+                    <span>{raiseInvoiceLabel}</span>
+                    <svg class="ojp__cta-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                         stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                        <path d="M4 12h15"></path>
+                        <path d="M13.5 6.5L20 12l-6.5 5.5"></path>
+                    </svg>
+                </button>
+
+                <button class="ojp__cta ojp__cta_ghost" type="button" onclick={handleSkipInvoice}>
+                    <span>Skip For Now</span>
+                    <svg class="ojp__cta-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                         stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                        <path d="M4 12h15"></path>
+                        <path d="M13.5 6.5L20 12l-6.5 5.5"></path>
+                    </svg>
+                </button>
+
+
+                <!-- FOOTER -->
+                </div><!-- /oj-col_act -->
+                <div class="oj-footer">
+                    <div class="oj-footer__row">
+                        <span class="oj-footer__lock">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"
+                                 stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                <rect x="4.5" y="10" width="15" height="10.5" rx="2.2"></rect>
+                                <path d="M8.2 10V7.2a3.8 3.8 0 0 1 7.6 0V10"></path>
+                            </svg>
+                        </span>
+                        <p>Invoices are sent only to the verified email address above.<br />We never share your details with anyone.</p>
+                    </div>
+                    <div class="oj-orn oj-orn_sm oj-orn_footer">
+                        <span class="oj-orn__line"></span>
+                        <span class="oj-orn__diamond"></span>
+                        <span class="oj-orn__line"></span>
+                    </div>
+                </div>
+
+            </div>
+    </c-fdb-screen>
+</template>

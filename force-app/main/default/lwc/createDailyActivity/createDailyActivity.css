@@ -1,0 +1,319 @@
+/* MAIN COMPONENT */
+:host {
+    display: block;
+}
+
+/*SCROLL AREA */
+.form-scroll {
+    max-height: 60vh;
+    overflow-y: auto;
+    padding-bottom: 1rem;
+}
+
+/* FORM GRID */
+.form-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem 1.5rem;
+}
+
+.form-grid.padded {
+    padding: 0 1rem 1rem 1rem;
+}
+
+/* SECTION TITLE */
+.section-title {
+    margin: 1rem 1rem 0.75rem 1rem;
+    padding: 0.7rem 1rem;
+    font-size: 14px;
+    font-weight: 700;
+    color: #5a1a1a;
+    background: linear-gradient(90deg, #fff4df, #f7d9a5);
+    border-left: 5px solid #b8860b;
+    border-radius: 8px;
+    letter-spacing: 0.3px;
+    box-shadow: 0 2px 6px rgba(184, 134, 11, 0.18);
+}
+
+/* Textarea full width */
+.form-grid lightning-textarea {
+    grid-column: 1 / -1;
+}
+
+/* MULTISELECT PILL DESIGN */
+.multiselect-container {
+    display: flex;
+    flex-direction: column;
+}
+
+.pill-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+    margin-top: 6px;
+    min-height: 2px; /* Keeps layout stable even when empty */
+}
+
+.pill-container lightning-pill {
+    --slds-c-pill-color-background: #fffdf8;
+    --slds-c-pill-color-border: #e5c26b;
+}
+
+/* CUSTOMER / PURPOSE DROPDOWN */
+.customer-result,
+.purpose-dropdown {
+    grid-column: 1 / -1;
+    background: #fffdf8;
+    border: 1px solid #e5c26b;
+    border-radius: 10px;
+    padding: 8px;
+    max-height: 280px;
+    overflow-y: auto;
+    box-shadow: 0 4px 12px rgba(90, 26, 26, 0.16);
+}
+
+.result-header {
+    font-weight: 700;
+    color: #8b0000;
+    margin-bottom: 0.75rem;
+}
+
+.customer-card,
+.purpose-row {
+    padding: 10px 12px;
+    border: 1px solid #f1dfb6;
+    border-left: 4px solid #8b0000;
+    border-radius: 8px;
+    background: #ffffff;
+    cursor: pointer;
+    margin-bottom: 8px;
+    transition: all 0.2s ease;
+}
+
+.customer-card {
+    display: flex;
+    align-items: center;
+    gap: 0.85rem;
+}
+
+.customer-card:hover,
+.purpose-row:hover {
+    background: linear-gradient(90deg, #fff4df, #fffaf2);
+    border-color: #b8860b;
+    transform: translateY(-1px);
+    box-shadow: 0 3px 8px rgba(184, 134, 11, 0.22);
+}
+
+.customer-avatar {
+    width: 42px;
+    height: 42px;
+    min-width: 42px;
+    border-radius: 50%;
+    background: #fff4df;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+}
+
+.customer-info {
+    flex: 1;
+}
+
+.customer-name {
+    font-size: 14px;
+    font-weight: 700;
+    color: #080707;
+}
+
+.customer-phone {
+    font-size: 12px;
+    color: #706e6b;
+    margin-top: 2px;
+}
+
+.select-text {
+    font-size: 12px;
+    font-weight: 700;
+    color: #8b0000;
+}
+
+/* PURPOSE TEXT DESIGN*/
+.purpose-level1 {
+    display: inline-block;
+    font-size: 11px;
+    font-weight: 700;
+    color: #ffffff;
+    background: #8b0000;
+    padding: 3px 8px;
+    border-radius: 12px;
+    margin-bottom: 6px;
+}
+
+.purpose-level2 {
+    font-size: 13px;
+    font-weight: 700;
+    color: #7a0c0c;
+    margin-top: 4px;
+}
+
+.purpose-level3 {
+    font-size: 14px;
+    font-weight: 600;
+    color: #1b1b1b;
+    margin-top: 5px;
+    white-space: normal;
+    word-break: break-word;
+    line-height: 1.45;
+}
+
+/* FILE UPLOAD SECTION*/
+.design-upload-box {
+    grid-column: 1 / -1;
+    width: 100%;
+    box-sizing: border-box;
+    margin: 0;
+    padding: 1rem;
+    border: 1px dashed #b8860b;
+    border-radius: 10px;
+    background: #fffaf2;
+}
+
+/* File upload heading */
+.upload-header {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    font-size: 14px;
+    font-weight: 700;
+    color: #8b0000;
+    margin-bottom: 0.75rem;
+}
+
+/* Native lightning file input wrapper */
+.design-file-input {
+    display: block;
+    width: 100%;
+}
+
+/* Selected file row */
+.file-name {
+    margin-top: 0.6rem;
+    padding: 0.55rem 0.75rem;
+    background: #fff4df;
+    border: 1px solid #f1dfb6;
+    border-left: 4px solid #8b0000;
+    border-radius: 8px;
+    font-size: 12px;
+    font-weight: 600;
+    color: #5a1a1a;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 0.75rem;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+/* File name text */
+.file-name span {
+    word-break: break-word;
+    overflow-wrap: anywhere;
+}
+
+/* Remove file button */
+.remove-file-btn {
+    border: none;
+    background: #b31313;
+    color: #ffffff;
+    font-size: 11px;
+    font-weight: 700;
+    padding: 4px 10px;
+    border-radius: 12px;
+    cursor: pointer;
+    white-space: nowrap;
+}
+
+.remove-file-btn:hover {
+    background: #8b0000;
+}
+
+/* FOOTER BUTTONS */
+.footer-buttons {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 1rem;
+    margin-top: 1.5rem;
+    padding-bottom: 1rem;
+}
+
+.footer-buttons lightning-button {
+    --slds-c-button-brand-color-background: #e21b1b;
+    --slds-c-button-brand-color-border: #e21b1b;
+    --slds-c-button-brand-color-background-hover: #b31313;
+    --slds-c-button-brand-color-border-hover: #b31313;
+}
+
+/* SPACER */
+.spacer {
+    height: 1rem;
+}
+
+/*MOBILE RESPONSIVE */
+@media screen and (max-width: 768px) {
+    .form-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .customer-card {
+        align-items: flex-start;
+    }
+
+    .footer-buttons {
+        flex-wrap: wrap;
+        gap: 0.75rem;
+    }
+
+    .file-name {
+        align-items: flex-start;
+    }
+}
+.upload-help-text {
+    font-size: 12px;
+    color: #706e6b;
+    margin-bottom: 0.75rem;
+    font-weight: 600;
+}
+
+.upload-spinner-box {
+    position: relative;
+    min-height: 40px;
+    margin-bottom: 0.75rem;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.uploading-text {
+    font-size: 12px;
+    font-weight: 700;
+    color: #8b0000;
+    margin-left: 2.25rem;
+}
+
+.saving-overlay {
+    position: relative;
+    min-height: 70px;
+    margin-top: 1rem;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.saving-text {
+    margin-top: 3rem;
+    font-size: 13px;
+    font-weight: 700;
+    color: #8b0000;
+}

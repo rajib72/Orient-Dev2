@@ -1,0 +1,58 @@
+/* Base card styling for the gold border and pale background */
+.styled-card {
+    background-color: #FFFCF6; /* Pale yellow/white */
+    border: 1px solid #D5B996; /* Gold/brown border */
+    border-radius: 12px;
+}
+
+/* Specific styling for the top header card */
+.header-card {
+    background: linear-gradient(to right, #FFFFFF, #FFFCF6);
+    border-left: 6px solid #950000; /* Thick dark red left border */
+}
+
+/* The dark red rounded icon box */
+.icon-container {
+    background-color: #950000;
+    border-radius: 12px;
+    padding: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 6px rgba(149, 0, 0, 0.2);
+}
+
+/* Typography styles matching the mockup */
+.header-title {
+    color: #950000;
+    font-size: 18px;
+    font-weight: 700;
+}
+
+.sub-header-title {
+    color: #950000;
+    font-weight: 700;
+    font-size: 14px;
+}
+
+/* The dark red circle badge for the count */
+.count-badge {
+    background-color: #950000;
+    color: white;
+    border-radius: 50%;
+    padding: 2px 10px;
+    font-weight: 700;
+    font-size: 14px;
+}
+
+.instruction-text {
+    color: #555555;
+    font-size: 13px;
+    font-weight: 600;
+}
+
+/* Wraps the datatable to ensure it doesn't break out of the rounded borders */
+.table-wrapper {
+    overflow: hidden; 
+    padding: 2px;
+}

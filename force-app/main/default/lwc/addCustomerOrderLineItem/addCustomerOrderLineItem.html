@@ -1,0 +1,117 @@
+<template>
+    <lightning-quick-action-panel header="Add Customer Estimation Line Item">
+
+        <div class="premium-wrapper">
+
+            <template if:true={isLoading}>
+                <div class="spinner-container">
+                    <lightning-spinner alternative-text="Loading..." size="medium"></lightning-spinner>
+                </div>
+            </template>
+
+            <template if:false={isLoading}>
+
+               <div class="premium-header">
+    <div class="header-icon">🛒</div>
+
+    <div class="header-content">
+        <h2>Add Customer Estimation Line Items</h2>
+        <p>Select unique wishlist items and create estimation line items instantly.</p>
+    </div>
+
+    <div class="header-refresh">
+        <lightning-button-icon
+            icon-name="utility:refresh"
+            variant="border-filled"
+            alternative-text="Refresh"
+            title="Refresh"
+            onclick={handleRefresh}>
+        </lightning-button-icon>
+    </div>
+</div>
+
+                <template if:true={hasData}>
+                    <div class="summary-card">
+                        <div class="summary-left">
+                            <span class="summary-label">Available Wishlist Items</span>
+                            <span class="summary-value">{availableItemCount}</span>
+                        </div>
+
+                        <div class="summary-right">
+                            Please select one or more wishlist items before saving.
+                        </div>
+                    </div>
+
+                    <!-- <div class="table-card">
+                        <lightning-datatable key-field="wishlistId" data={wishlistItems} columns={columns}
+                            selected-rows={selectedRowIds} onrowselection={handleRowSelection}>
+                        </lightning-datatable>
+                    </div> -->
+                    <div class="table-card">
+                        <div class="custom-table-wrapper">
+                            <table class="slds-table slds-table_cell-buffer slds-table_bordered custom-table">
+                                <thead>
+                                    <tr>
+                                        <th style="width: 50px;">
+                                            Select
+                                        </th>
+                                        <th>Wishlist Item</th>
+                                        <th>Barcode</th>
+                                        <th>Gross Wt.</th>
+                                        <th>Net Wt.</th>
+                                        <th>Diamond Wt.</th>
+                                        <th>Sales Executive</th>
+                                        <th>Product Price(Incl.GST)</th>
+                                    </tr>
+                                </thead>
+
+                                <tbody>
+                                    <template for:each={wishlistItems} for:item="item">
+                                        <tr key={item.wishlistId}>
+                                            <td>
+                                                <lightning-input type="checkbox" variant="label-hidden"
+                                                    data-id={item.wishlistId} onchange={handleCheckboxChange}>
+                                                </lightning-input>
+                                            </td>
+
+                                            <td>{item.wishlistName}</td>
+                                            <td>{item.barcodeValue}</td>
+                                            <td>{item.grWt}</td>
+                                            <td>{item.netWt}</td>
+                                            <td>{item.diaWt}</td>
+                                            <td>{item.salesExe}</td>
+                                            <td>{item.priceGST}</td>
+                                        </tr>
+                                    </template>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </template>
+
+                <template if:false={hasData}>
+                    <div class="empty-box">
+                        <div class="empty-icon">✓</div>
+                        <h3>No Wishlist Items Available</h3>
+                        <p>
+                            No wishlist items are available for this Customer Order.
+                            All wishlist item barcodes may already be present in Customer Order Line Items.
+                        </p>
+                    </div>
+                </template>
+
+            </template>
+
+        </div>
+
+        <div slot="footer" class="premium-footer">
+            <lightning-button label="Cancel" variant="neutral" onclick={handleCancel}>
+            </lightning-button>
+
+            <lightning-button class="save-button slds-m-left_small" label="Save" variant="brand" disabled={disableSave}
+                onclick={handleSave}>
+            </lightning-button>
+        </div>
+
+    </lightning-quick-action-panel>
+</template>

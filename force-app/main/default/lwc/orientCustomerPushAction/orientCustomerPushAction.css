@@ -1,0 +1,114 @@
+.modalBody {
+    min-height: 180px;
+}
+
+.loadingWrap {
+    padding: 28px 0;
+}
+
+.loadingText {
+    font-size: 0.95rem;
+    color: #5c5c5c;
+}
+
+.successBox,
+.warningBox,
+.errorBox {
+    border-radius: 16px;
+    padding: 18px 18px 14px 18px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+    background: #ffffff;
+}
+
+.successBox {
+    border: 1px solid #c9e7d3;
+    background: #f6fff8;
+}
+
+.warningBox {
+    border: 1px solid #f1c56c;
+    background: #fff9eb;
+}
+
+.errorBox {
+    border: 1px solid #e39a9a;
+    background: #fff6f6;
+}
+
+.headerRow {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 10px;
+}
+
+.titleWrap {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.statusIcon {
+    flex-shrink: 0;
+}
+
+.statusTitle {
+    font-size: 1rem;
+    font-weight: 700;
+    color: #222;
+}
+
+.successMessage,
+.neutralMessage {
+    margin-top: 6px;
+    font-size: 0.96rem;
+    color: #2b2b2b;
+    line-height: 1.45;
+}
+
+.alreadySentMessage {
+    margin-top: 6px;
+    font-size: 1rem;
+    font-weight: 700;
+    color: #c62828;
+    line-height: 1.45;
+}
+
+.errorMessage {
+    margin-top: 6px;
+    font-size: 0.96rem;
+    color: #c62828;
+    line-height: 1.45;
+    font-weight: 600;
+}
+
+.customerNoRow {
+    margin-top: 14px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 12px;
+    background: rgba(255,255,255,0.75);
+    border-radius: 12px;
+    border: 1px solid rgba(0,0,0,0.06);
+}
+
+.customerNoRow .label {
+    font-size: 0.8rem;
+    font-weight: 700;
+    color: #666;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+}
+
+.customerNoRow .value {
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: #111;
+}
+
+.recordIdText {
+    margin-top: 12px;
+    font-size: 0.82rem;
+    color: #777;
+}

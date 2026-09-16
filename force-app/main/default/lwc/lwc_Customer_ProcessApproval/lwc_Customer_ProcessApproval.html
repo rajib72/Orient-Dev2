@@ -1,0 +1,54 @@
+<template>
+    <lightning-card title="Review Field Change Requests" icon-name="standard:approval">
+        <div if:true={isLoading} class="slds-is-relative slds-p-around_large">
+            <lightning-spinner alternative-text="Processing"></lightning-spinner>
+        </div>
+
+        <div if:false={isLoading} class="slds-p-horizontal_medium">
+            <template if:true={hasFields}>
+                <table class="slds-table slds-table_cell-buffer slds-table_bordered slds-table_fixed-layout slds-m-bottom_medium">
+                    <thead>
+                        <tr class="slds-line-height_reset">
+                            <th scope="col" style="width: 10%;"><div class="slds-truncate" title="Approve">Approve</div></th>
+                            <th scope="col" style="width: 30%;"><div class="slds-truncate" title="Field Name">Field Name</div></th>
+                            <th scope="col" style="width: 30%;"><div class="slds-truncate" title="Current Value">Current Value</div></th>
+                            <th scope="col" style="width: 30%;"><div class="slds-truncate" title="Requested Value">Requested Value</div></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <template for:each={pendingFields} for:item="field" for:index="index">
+                            <tr key={field.accountFieldApiName} class={field.rowClass}>
+                                <td class="vertical-center">
+                                    <lightning-input type="checkbox" checked={field.isApproved} data-index={index} onchange={handleCheckboxChange}></lightning-input>
+                                </td>
+                                <td class="vertical-center">
+                                    <div class="slds-truncate field-label" title={field.fieldLabel}>{field.fieldLabel}</div>
+                                </td>
+                                <td class="vertical-center">
+                                    <div class="slds-truncate old-value-badge" title={field.oldValue}>{field.oldValue}</div>
+                                </td>
+                                <td class="vertical-center">
+                                    <div class="slds-truncate new-value-badge" title={field.newValue}>{field.newValue}</div>
+                                </td>
+                            </tr>
+                        </template>
+                    </tbody>
+                </table>
+                
+                <div class="slds-text-align_right slds-p-top_small slds-border_top">
+                    <lightning-button variant="destructive" label="Reject Request" onclick={handleReject} class="slds-m-right_small"></lightning-button>
+                    <lightning-button variant="success" label="Approve Selected" onclick={handleApprove} disabled={isApproveDisabled}></lightning-button>
+                </div>
+            </template>
+
+            <template if:false={hasFields}>
+                <div class="slds-illustration slds-illustration_small slds-p-around_large slds-text-align_center">
+                    <div class="slds-text-longform">
+                        <h3 class="slds-text-heading_medium">All Caught Up!</h3>
+                        <p class="slds-text-body_regular slds-m-top_small">There are no pending changes requiring approval on this record.</p>
+                    </div>
+                </div>
+            </template>
+        </div>
+    </lightning-card>
+</template>

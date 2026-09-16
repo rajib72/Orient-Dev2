@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<LightningComponentBundle xmlns="http://soap.sforce.com/2006/04/metadata">
+    <apiVersion>66.0</apiVersion>
+    <isExposed>true</isExposed>
+    <masterLabel>Orient Customer Approval Workspace</masterLabel>
+    <description>Customer Profile approval workspace with assigned approver and System Administrator review, approve and reject access.</description>
+    <targets>
+        <target>lightning__AppPage</target>
+        <target>lightning__UrlAddressable</target>
+    </targets>
+</LightningComponentBundle>

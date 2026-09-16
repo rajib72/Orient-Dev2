@@ -1,0 +1,89 @@
+<template>
+    <c-fdb-screen onnavclick={handleNav} onhelpclick={handleHelp}>
+            <div class="ojn__inner">
+
+                <!-- Two groups so landscape can set them side by side. In
+                     portrait both are display:contents and nothing moves. -->
+                <div class="oj-col oj-col_lead">
+
+                <svg class="ojn__mark" viewBox="0 0 170 110" fill="none" aria-hidden="true">
+                    <g stroke="#c9a24d" stroke-width="2.6" stroke-linecap="round">
+                        <path d="M44 32 L24 22"></path>
+                        <path d="M40 55 L16 55"></path>
+                        <path d="M44 78 L24 88"></path>
+                        <path d="M126 32 L146 22"></path>
+                        <path d="M130 55 L154 55"></path>
+                        <path d="M126 78 L146 88"></path>
+                    </g>
+                    <circle cx="85" cy="55" r="35" stroke="#c8102e" stroke-width="5"></circle>
+                    <path d="M72 42 L98 68 M98 42 L72 68" stroke="#c8102e" stroke-width="6"
+                          stroke-linecap="round"></path>
+                </svg>
+
+                <h1 class="ojn__title">Customer Not Found</h1>
+
+                <div class="oj-orn oj-orn_sm">
+                    <span class="oj-orn__line"></span>
+                    <span class="oj-orn__diamond"></span>
+                    <span class="oj-orn__line"></span>
+                </div>
+
+                <p class="ojn__text">
+                    We could not find any customer record<br />associated with this mobile number.
+                </p>
+
+                <span class="ojn__rule"></span>
+
+                <p class="ojn__text">
+                    Feedback can be submitted only by<br />
+                    registered customers of <strong>Orient Jewellers</strong>.
+                </p>
+
+                </div><!-- /oj-col_lead -->
+
+                <div class="oj-col oj-col_act">
+
+                <span class="ojn__rule"></span>
+
+                <p class="ojn__text">
+                    If you have recently visited our showroom,<br />
+                    please contact our <strong>Showroom Team</strong><br />
+                    for assistance or directly Contact Our<br />
+                    Customer Care No.
+                </p>
+
+                <span class="ojn__headset">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"
+                         stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                        <path d="M4.5 14.2v-2.1a7.5 7.5 0 0 1 15 0v2.1"></path>
+                        <rect x="2.6" y="13.6" width="4.2" height="6.6" rx="1.7"></rect>
+                        <rect x="17.2" y="13.6" width="4.2" height="6.6" rx="1.7"></rect>
+                    </svg>
+                </span>
+
+                <div class="ojn__contact">
+                    <template for:each={supportNumbers} for:item="num">
+                        <a key={num} class="ojn__contact-row" href={num.href}>
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"
+                                 stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                <path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1.9.3 1.8.6 2.7a2 2 0 0 1-.5 2.1L8.1 9.6a16 16 0 0 0 6 6l1.1-1.1a2 2 0 0 1 2.1-.5c.9.3 1.8.5 2.7.6a2 2 0 0 1 1.7 2z"></path>
+                            </svg>
+                            <span>{num.display}</span>
+                        </a>
+                    </template>
+                </div>
+
+                <button class="ojn__cta" type="button" onclick={handleSearchAgain}>
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"
+                         stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                        <path d="M20.5 12a8.5 8.5 0 1 1-2.6-6.1"></path>
+                        <path d="M19.4 3.2v5.2h-5.2"></path>
+                    </svg>
+                    <span>Search Again</span>
+                </button>
+
+                </div><!-- /oj-col_act -->
+
+            </div>
+    </c-fdb-screen>
+</template>

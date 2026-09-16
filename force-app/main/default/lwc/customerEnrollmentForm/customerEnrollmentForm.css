@@ -1,0 +1,86 @@
+/* ======================================================
+   Make the form scrollable with sticky buttons
+   ====================================================== */
+.form-scroll {
+    max-height: 75vh;
+    overflow-y: auto;
+    padding-bottom: 80px; /* space for sticky buttons */
+}
+
+/* ======================================================
+   Sticky bottom button bar
+   ====================================================== */
+.button-bar {
+    position: sticky;
+    bottom: 0;
+    background: white;
+    padding: 10px 15px;
+    border-top: 1px solid #d8dde6;
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    z-index: 10;
+}
+
+/* ======================================================
+   Spacing between form fields
+   ====================================================== */
+/*lightning-layout-item {
+    margin-bottom: 1rem;
+}*/
+
+/* Full width input components */
+lightning-layout-item > lightning-input,
+lightning-layout-item > lightning-combobox,
+lightning-layout-item > lightning-textarea {
+    width: 100%;
+}
+
+/* Section titles */
+.section-title {
+    margin-top: 2rem;
+    margin-bottom: 1rem;
+    font-weight: 600;
+    font-size: 1.1rem;
+}
+
+
+/*File Display Box*/
+  
+.file-display {
+    margin-top: 10px;
+    background: #f4f6f9;
+    padding: 5px 10px;
+    border-radius: 5px;
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.remove-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+}
+
+/* LABEL WITH HELP ICON (New) */
+.label-with-help {
+    display: flex;
+    align-items: center;
+    margin-bottom: 5px;
+}
+
+.file-label {
+    font-weight: 600;
+    margin-right: 6px;
+}
+
+/* Updated and final version of info icon */
+.info-icon {
+    cursor: pointer;
+    color: #706e6b;     /* SLDS standard grey */
+    margin-left: 5px;
+    margin-top: 2px;    /* aligns vertically with text */
+    width: 16px;
+    height: 16px;
+}

@@ -1,0 +1,182 @@
+<template>
+    <c-fdb-screen layout="fit" nav-label="Back" head-rule="none" onnavclick={handleNav} onhelpclick={handleHelp}>
+            <!-- ============ BODY ============ -->
+            <div class="oj-body">
+                <div class="oj-body__inner">
+
+                    <!-- Two groups so landscape can set them side by side. In
+                         portrait both are display:contents, so the children
+                         stack exactly as they did before. -->
+                    <div class="ojs__col ojs__col_lead">
+
+                    <!-- Lotus ornament -->
+                    <div class="oj-orn">
+                        <span class="oj-orn__line"></span>
+                        <svg class="oj-orn__lotus" viewBox="0 0 44 22" aria-hidden="true">
+                            <path d="M22 1c4 6 4 13 0 19-4-6-4-13 0-19z"></path>
+                            <path d="M22 20c-6-2-11-7-13-13 6 1 11 6 13 13z" opacity=".85"></path>
+                            <path d="M22 20c6-2 11-7 13-13-6 1-11 6-13 13z" opacity=".85"></path>
+                        </svg>
+                        <span class="oj-orn__line"></span>
+                    </div>
+
+                    <h1 class="oj-welcome">Welcome!</h1>
+                    <p class="oj-welcome__sub">Your feedback helps us serve you better.</p>
+
+                    <!-- Diamond ornament -->
+                    <div class="oj-orn oj-orn_sm">
+                        <span class="oj-orn__line"></span>
+                        <span class="oj-orn__diamond"></span>
+                        <span class="oj-orn__line"></span>
+                    </div>
+
+                    <p class="oj-instruction">
+                        Please enter your registered mobile number<br />to get started.
+                    </p>
+
+                    </div><!-- /ojs__col_lead -->
+
+                    <div class="ojs__col ojs__col_act">
+
+                    <!-- ============ MOBILE FIELD ============ -->
+                    <div class="oj-field">
+                        <label class="oj-field__label" for="oj-mobile">
+                            Mobile Number <span class="oj-field__req">*</span>
+                        </label>
+
+                        <div class="oj-inputrow">
+                            <div class="oj-cc">+91</div>
+
+                            <div class="oj-phone">
+                                <svg class="oj-phone__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                     stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                    <path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1.9.3 1.8.6 2.7a2 2 0 0 1-.5 2.1L8.1 9.6a16 16 0 0 0 6 6l1.1-1.1a2 2 0 0 1 2.1-.5c.9.3 1.8.5 2.7.6a2 2 0 0 1 1.7 2z"></path>
+                                </svg>
+                                <input
+                                    id="oj-mobile"
+                                    class="oj-phone__input"
+                                    type="tel"
+                                    inputmode="numeric"
+                                    autocomplete="tel-national"
+                                    maxlength="10"
+                                    placeholder="Enter 10-digit mobile number"
+                                    value={searchKey}
+                                    oninput={restrictToNumbers}
+                                    onkeydown={allowOnlyNumbers}
+                                    onpaste={handlePaste} />
+                            </div>
+                        </div>
+
+                        <template if:true={searchError}>
+                            <p class="oj-error">{searchError}</p>
+                        </template>
+                    </div>
+
+                    <!-- ============ SEARCH BUTTON ============ -->
+                    <button class="oj-cta" type="button" onclick={handleSearchProfile} disabled={isSearching}>
+                        <template if:false={isSearching}>
+                            <svg class="oj-cta__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                 stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                <circle cx="11" cy="11" r="7"></circle>
+                                <path d="M20 20l-3.6-3.6"></path>
+                            </svg>
+                            <span>Search Profile</span>
+                        </template>
+                        <template if:true={isSearching}>
+                            <span>Searching…</span>
+                        </template>
+                    </button>
+
+                    <!-- ============ RESULTS ============ -->
+                    <template if:true={showSearchTable}>
+                        <div class="oj-result">
+                            <div class="oj-result__head">
+                                <h3>Today's Showroom Visits</h3>
+                                <span>{visitList.length} Result(s)</span>
+                            </div>
+                            <div class="table-scroll">
+                                <lightning-datatable
+                                    key-field="Id"
+                                    data={visitList}
+                                    columns={columns}
+                                    hide-checkbox-column="true"
+                                    onrowaction={handleRowAction}>
+                                </lightning-datatable>
+                            </div>
+                        </div>
+                    </template>
+
+                    <!-- ============ TRUST STRIP ============ -->
+                    <div class="oj-trust">
+                        <div class="oj-trust__item">
+                            <div class="oj-trust__icon">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"
+                                     stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                    <path d="M12 3l7 2.8v5.4c0 4.4-3 8.2-7 9.8-4-1.6-7-5.4-7-9.8V5.8L12 3z"></path>
+                                    <path d="M9.2 12.1l2 2 3.6-3.8"></path>
+                                </svg>
+                            </div>
+                            <div class="oj-trust__text">
+                                <strong>Your Feedback Matters</strong>
+                                <span>Help us improve every day</span>
+                            </div>
+                        </div>
+
+                        <div class="oj-trust__item">
+                            <div class="oj-trust__icon">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"
+                                     stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                    <rect x="4.5" y="10" width="15" height="10.5" rx="2.2"></rect>
+                                    <path d="M8.2 10V7.2a3.8 3.8 0 0 1 7.6 0V10"></path>
+                                </svg>
+                            </div>
+                            <div class="oj-trust__text">
+                                <strong>100% Secure</strong>
+                                <span>Your information is safe with us</span>
+                            </div>
+                        </div>
+
+                        <div class="oj-trust__item">
+                            <div class="oj-trust__icon">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"
+                                     stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                    <path d="M12 20.5s-6.2-4.1-6.2-8.3a3.4 3.4 0 0 1 6.2-1.9 3.4 3.4 0 0 1 6.2 1.9c0 4.2-6.2 8.3-6.2 8.3z"></path>
+                                </svg>
+                            </div>
+                            <div class="oj-trust__text">
+                                <strong>Better Experience</strong>
+                                <span>Your feedback helps us serve you better</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    </div><!-- /ojs__col_act -->
+
+                    <!-- ============ FOOTER ============
+                         Inside the body box, as the welcome screen has it.
+                         Left outside as a sibling of it, the footer answered
+                         to the shell instead, and the shell's foot is not the
+                         foot of the page - the frame stops 16px above the base
+                         band, and the ornament kept landing in the gap. -->
+                    <div class="oj-footer ojs__footer">
+                        <div class="oj-footer__row">
+                            <span class="oj-footer__lock">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"
+                                     stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                    <rect x="4.5" y="10" width="15" height="10.5" rx="2.2"></rect>
+                                    <path d="M8.2 10V7.2a3.8 3.8 0 0 1 7.6 0V10"></path>
+                                </svg>
+                            </span>
+                            <p>Your information is safe and secure with us.<br />We never share your details with anyone.</p>
+                        </div>
+                        <div class="oj-orn oj-orn_sm oj-orn_footer">
+                            <span class="oj-orn__line"></span>
+                            <span class="oj-orn__diamond"></span>
+                            <span class="oj-orn__line"></span>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+    </c-fdb-screen>
+</template>

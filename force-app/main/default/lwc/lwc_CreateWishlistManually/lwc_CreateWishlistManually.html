@@ -1,0 +1,34 @@
+<template>
+    <lightning-card title="Manual Barcode Entry" icon-name="custom:custom93">
+        <div class="slds-p-around_medium">
+            <lightning-input 
+                type="text" 
+                label="Barcode Value" 
+                value={barcodeValue} 
+                onchange={handleInputChange} 
+                required 
+                class="slds-m-bottom_medium"
+                placeholder="Enter barcode manually...">
+            </lightning-input>
+
+            <div class="slds-text-align_right">
+                <lightning-button 
+                    label="Cancel" 
+                    variant="neutral" 
+                    onclick={handleCancel}
+                    class="slds-m-right_x-small">
+                </lightning-button>
+                <lightning-button 
+                    label="Add Barcode" 
+                    variant="brand" 
+                    onclick={handleCreate} 
+                    disabled={isButtonDisabled}>
+                </lightning-button>
+            </div>
+        </div>
+
+        <template if:true={isLoading}>
+            <lightning-spinner alternative-text="Loading" size="small"></lightning-spinner>
+        </template>
+    </lightning-card>
+</template>

@@ -1,0 +1,567 @@
+.main-container {
+    padding: 20px;
+    background: #f4f6f9;
+}
+
+.header-section {
+    background: #ffffff;
+    border-radius: 10px;
+    padding: 20px 24px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 14px;
+}
+
+.header-left {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+}
+
+.header-section h1 {
+    font-size: 26px;
+    font-weight: 700;
+    color: #0b4aad;
+    margin: 0;
+}
+
+.header-icon {
+    --slds-c-icon-color-foreground-default: #0b4aad;
+}
+
+.refresh-icon-btn {
+    margin-left: 12px;
+    --slds-c-button-radius-border: 9999px;
+    --slds-c-button-color-background: #ffffff;
+    --slds-c-button-color-background-hover: #fff5f5;
+    --slds-c-button-color-background-active: #ffe3e3;
+    --slds-c-button-color-border: #e5e7eb;
+    --slds-c-button-color-border-hover: #f5b5b5;
+    --slds-c-icon-color-foreground-default: #c1121f;
+    --slds-c-icon-color-foreground-hover: #a30f1a;
+    --slds-c-button-shadow: 0 2px 8px rgba(15, 23, 42, 0.12);
+}
+
+.search-section {
+    background: #ffffff;
+    border-radius: 10px;
+    padding: 18px 24px 24px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+    display: flex;
+    align-items: flex-end;
+    gap: 20px;
+}
+
+.input-wrapper {
+    flex: 1;
+}
+
+.input-wrapper label {
+    display: block;
+    font-size: 14px;
+    font-weight: 600;
+    color: #222;
+    margin-bottom: 8px;
+}
+
+.required {
+    color: red;
+    margin-right: 4px;
+}
+
+.verify-btn,
+.update-btn {
+    border: none;
+    outline: none;
+    border-radius: 22px;
+    background: #e91b12;
+    color: #ffffff;
+    padding: 10px 24px;
+    font-weight: 700;
+    font-size: 14px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    min-height: 42px;
+    transition: all 0.2s ease-in-out;
+}
+
+.verify-btn:hover,
+.update-btn:hover {
+    background: #c9140d;
+    transform: translateY(-1px);
+}
+
+.verify-btn:disabled,
+.update-btn:disabled {
+    opacity: 0.65;
+    cursor: not-allowed;
+    transform: none;
+}
+
+.success-box {
+    margin-top: 22px;
+    border: 1px solid #9ce2b3;
+    background: #eaf8ef;
+    border-radius: 10px;
+    padding: 20px 24px;
+    display: flex;
+    align-items: center;
+    gap: 18px;
+}
+
+.success-box h2 {
+    margin: 0 0 6px 0;
+    font-size: 20px;
+    color: #0d6b30;
+    font-weight: 700;
+}
+
+.success-box p {
+    margin: 0;
+    color: #0d6b30;
+    font-size: 14px;
+}
+
+.success-icon {
+    background: #168c3a;
+    border-radius: 50%;
+    padding: 8px;
+}
+
+.error-box {
+    margin-top: 22px;
+    border: 1px solid #f5b5b5;
+    background: #fff0f0;
+    border-radius: 10px;
+    padding: 20px 24px;
+    display: flex;
+    align-items: center;
+    gap: 18px;
+}
+
+.error-box h2 {
+    margin: 0 0 6px 0;
+    font-size: 20px;
+    color: #b00000;
+    font-weight: 700;
+}
+
+.error-box p {
+    margin: 0;
+    color: #b00000;
+    font-size: 14px;
+}
+
+.error-icon {
+    background: #c62828;
+    border-radius: 50%;
+    padding: 8px;
+}
+
+.details-card {
+    margin-top: 24px;
+    background: #ffffff;
+    border-radius: 10px;
+    padding: 24px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+
+    /*
+     * The PAN component can be placed inside a narrow Salesforce
+     * record-page column even when the browser viewport is wide.
+     * Container-based responsiveness therefore works better than
+     * viewport-only media queries for this card.
+     */
+    container-type: inline-size;
+    container-name: pan-details-card;
+}
+
+.details-header {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    margin-bottom: 24px;
+}
+
+.details-header h2 {
+    margin: 0;
+    font-size: 24px;
+    font-weight: 700;
+    color: #0b4aad;
+}
+
+.details-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    width: 100%;
+    min-width: 0;
+}
+
+.detail-row {
+    display: grid;
+    grid-template-columns: minmax(110px, 32%) minmax(0, 1fr);
+    align-items: center;
+    gap: 16px;
+    border-bottom: 1px solid #e2e6ea;
+    padding: 15px 0;
+    min-height: 56px;
+    min-width: 0;
+}
+
+.label {
+    color: #637796;
+    font-size: 14px;
+    font-weight: 700;
+    line-height: 1.35;
+    min-width: 0;
+}
+
+.value {
+    color: #071225;
+    font-size: 14px;
+    font-weight: 700;
+    line-height: 1.45;
+    min-width: 0;
+    max-width: 100%;
+    word-break: normal;
+    overflow-wrap: break-word;
+    white-space: normal;
+}
+
+.status-pill {
+    background: #ccf5d8;
+    color: #08732b;
+    padding: 5px 14px;
+    border-radius: 8px;
+    font-weight: 700;
+    display: inline-block;
+    text-transform: capitalize;
+}
+
+.button-area {
+    margin-top: 24px;
+    display: flex;
+    justify-content: flex-end;
+}
+
+.spinner-area {
+    position: relative;
+    min-height: 80px;
+}
+
+/* =========================================
+   MODAL STYLING
+========================================= */
+
+.custom-modal-width {
+    max-width: 540px !important;
+    width: 100% !important;
+}
+
+.custom-header-left {
+    text-align: left;
+    border-radius: 8px 8px 0 0;
+    padding: 16px 24px;
+    background: #ffffff;
+    border-bottom: 1px solid #e2e8f0;
+}
+
+.header-content {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.header-title {
+    font-weight: 700;
+    color: #1e293b;
+    font-size: 20px;
+    margin: 0;
+}
+
+.header-title-centered {
+    font-weight: 700;
+    color: #1e293b;
+    font-size: 24px;
+}
+
+.modal-text {
+    color: #334155;
+    font-size: 15px;
+    line-height: 1.5;
+}
+
+.custom-rounded-top {
+    border-radius: 8px 8px 0 0;
+    background: #ffffff;
+}
+
+.custom-rounded-bottom {
+    border-radius: 0 0 8px 8px;
+}
+
+.custom-footer-right {
+    padding: 16px 24px;
+    background: #ffffff;
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+    border-top: none;
+}
+
+.custom-btn {
+    padding: 0 20px;
+    border-radius: 6px;
+    font-weight: 600;
+    height: 40px;
+    line-height: 40px;
+}
+
+.custom-table {
+    border: 1px solid #e2e8f0;
+    border-radius: 6px;
+    overflow: hidden;
+}
+
+.custom-table th {
+    background-color: #f8fafc;
+    color: #0f172a;
+    font-weight: 700;
+}
+
+.custom-table td {
+    color: #334155;
+}
+
+.custom-hr {
+    border: 0;
+    border-top: 1px solid #e2e8f0;
+    margin: 0;
+}
+
+.warning-icon-large-wrapper {
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+    width: 64px;
+    height: 64px;
+    border-radius: 50%;
+    background-color: #ffedd5;
+}
+
+.warning-icon-custom {
+    --slds-c-icon-color-foreground-default: #f97316;
+}
+
+.warning-icon-header {
+    --slds-c-icon-color-foreground-default: #d97706;
+}
+
+.info-alert-box {
+    background-color: #fffbeb;
+    border: 1px solid #fde68a;
+    border-radius: 8px;
+    padding: 16px;
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    color: #1e293b;
+    font-size: 14px;
+    line-height: 1.5;
+}
+
+.info-icon-custom {
+    --slds-c-icon-color-foreground-default: #d97706;
+    margin-top: 2px;
+}
+
+.custom-corner-close {
+    position: absolute !important;
+    right: 16px !important;
+    top: 16px !important;
+    --slds-c-icon-color-foreground-default: #64748b;
+}
+
+/* =========================================
+   SUCCESS MODAL STYLING
+========================================= */
+
+.custom-success-box {
+    background-color: #f3faf4 !important;
+    border: 1px solid #bce1c6 !important;
+    border-radius: 8px !important;
+    padding: 24px !important;
+    position: relative;
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1) !important;
+}
+
+.success-close-color {
+    --slds-c-icon-color-foreground-default: #1b7a43;
+}
+
+.success-body {
+    display: flex;
+    align-items: flex-start;
+    gap: 18px;
+    margin-bottom: 24px;
+    margin-top: 10px;
+}
+
+.success-icon-container {
+    background-color: #22a04c;
+    width: 52px !important;
+    min-width: 52px !important;
+    height: 52px !important;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-shrink: 0;
+}
+
+.success-text-content {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.success-heading {
+    font-size: 22px;
+    font-weight: 700;
+    color: #0f592d;
+    margin: 0;
+    line-height: 1.2;
+}
+
+.success-desc {
+    font-size: 15px;
+    color: #1e293b;
+    margin: 0;
+    line-height: 1.5;
+}
+
+.success-footer-divider {
+    border-top: 1px solid #c9e8d3;
+    margin-bottom: 20px;
+}
+
+.success-action {
+    display: flex;
+    justify-content: flex-end;
+}
+
+.btn-success-close {
+    background-color: #22a04c;
+    color: #ffffff;
+    border: none;
+    padding: 0 28px;
+    border-radius: 6px;
+    font-weight: 600;
+    height: 40px;
+    font-size: 15px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+    outline: none;
+}
+
+.btn-success-close:hover {
+    background-color: #1b823e;
+}
+
+/*
+ * Show two columns only when the PAN details card itself is wide enough.
+ * When this component is placed in a narrow Salesforce region, the
+ * fallback remains a clean single-column list regardless of viewport size.
+ */
+@container pan-details-card (min-width: 680px) {
+    .details-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        column-gap: 28px;
+    }
+}
+
+@container pan-details-card (max-width: 360px) {
+    .detail-row {
+        grid-template-columns: minmax(0, 1fr);
+        gap: 5px;
+        align-items: start;
+    }
+}
+
+/* =========================================
+   MEDIA QUERIES
+========================================= */
+
+@media only screen and (max-width: 768px) {
+    .header-section {
+        align-items: flex-start;
+    }
+
+    .search-section {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .verify-btn,
+    .update-btn {
+        justify-content: center;
+        width: 100%;
+    }
+
+    .detail-row {
+        grid-template-columns: minmax(105px, 34%) minmax(0, 1fr);
+        gap: 12px;
+    }
+
+    .button-area {
+        justify-content: stretch;
+    }
+}
+
+
+
+
+@media only screen and (max-width: 420px) {
+    .main-container {
+        padding: 10px;
+    }
+
+    .details-card {
+        padding: 16px;
+    }
+
+    .detail-row {
+        grid-template-columns: 1fr;
+        gap: 5px;
+        align-items: start;
+    }
+}
+
+
+/* =========================================
+   STANDARD APPROVAL SUBMITTED MESSAGE
+========================================= */
+
+.success-icon-header {
+    --slds-c-icon-color-foreground-default: #16a34a;
+}
+
+.success-alert-box {
+    background-color: #f0fdf4;
+    border: 1px solid #bbf7d0;
+    border-radius: 8px;
+    padding: 16px;
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    color: #166534;
+    font-size: 14px;
+    line-height: 1.5;
+}
+
+.success-alert-box p {
+    margin: 0;
+}

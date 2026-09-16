@@ -1,0 +1,437 @@
+<template>
+    <lightning-card>
+
+        <!-- Manual Refresh Button -->
+        <lightning-button slot="actions" label="Refresh" title="Refresh Customer Data" icon-name="utility:refresh"
+            variant="neutral" onclick={handleManualRefresh} disabled={isRefreshing}>
+        </lightning-button>
+
+        <!-- Refresh Spinner -->
+        <template if:true={isRefreshing}>
+            <div class="slds-is-relative slds-p-vertical_large">
+                <lightning-spinner alternative-text="Refreshing customer data" size="small">
+                </lightning-spinner>
+            </div>
+        </template>
+
+        <template if:true={isDataLoaded}>
+
+            <!-- VIEW MODE -->
+            <template if:false={isEditMode}>
+                <lightning-record-view-form record-id={recordId} object-api-name="Account" onload={handleFormLoad}>
+
+                    <template for:each={formSections} for:item="section">
+                        <div key={section.id} class={section.sectionClass}>
+
+                            <h3 class="slds-section__title">
+                                <button
+                                    type="button"
+                                    aria-controls={section.id}
+                                    aria-expanded={section.isOpen}
+                                    class="slds-button slds-section__title-action"
+                                    data-id={section.id}
+                                    onclick={toggleSection}>
+
+                                    <lightning-icon
+                                        icon-name={section.iconName}
+                                        size="x-small"
+                                        class="slds-section__title-action-icon slds-button__icon_left">
+                                    </lightning-icon>
+
+                                    <span
+                                        class="slds-truncate"
+                                        title={section.label}>
+                                        {section.label}
+                                    </span>
+                                </button>
+                            </h3>
+
+                            <div aria-hidden={section.isHidden}
+                                class="slds-section__content slds-p-horizontal_medium slds-p-bottom_medium"
+                                id={section.id}>
+
+                                <div class="slds-grid slds-wrap slds-gutters">
+
+                                    <!-- LEFT COLUMN -->
+                                    <div class="slds-col slds-size_1-of-1 slds-medium-size_1-of-2">
+                                        <template for:each={section.left} for:item="field">
+
+                                            <div key={field.accountApi} class={field.viewClass}>
+
+                                                <div class="customer-field-body">
+                                                    <lightning-output-field field-name={field.accountApi}
+                                                        variant="label-stacked">
+                                                    </lightning-output-field>
+                                                </div>
+
+                                                <div class="customer-field-action">
+
+                                                    <!-- Verified Tick -->
+                                                    <template if:true={field.isVerified}>
+                                                        <lightning-icon icon-name="utility:success" variant="success"
+                                                            size="xx-small" alternative-text="Verified"
+                                                            title="Verified">
+                                                        </lightning-icon>
+                                                    </template>
+
+                                                    <template if:false={field.isVerified}>
+
+                                                        <!-- Edit Button -->
+                                                        <template if:false={field.isReadonly}>
+                                                            <lightning-button-icon icon-name="utility:edit"
+                                                                variant="bare" size="small" alternative-text="Edit"
+                                                                title="Edit" onclick={enableEditMode}>
+                                                            </lightning-button-icon>
+                                                        </template>
+
+                                                        <!-- Read-only Lock -->
+                                                        <template if:true={field.isReadonly}>
+                                                            <lightning-icon icon-name="utility:lock" size="xx-small"
+                                                                alternative-text="Read Only" title="Read Only">
+                                                            </lightning-icon>
+                                                        </template>
+
+                                                    </template>
+                                                </div>
+
+                                            </div>
+                                        </template>
+                                    </div>
+
+                                    <!-- RIGHT COLUMN -->
+                                    <div class="slds-col slds-size_1-of-1 slds-medium-size_1-of-2">
+                                        <template for:each={section.right} for:item="field">
+
+                                            <div key={field.accountApi} class={field.viewClass}>
+
+                                                <div class="customer-field-body">
+                                                    <lightning-output-field field-name={field.accountApi}
+                                                        variant="label-stacked">
+                                                    </lightning-output-field>
+                                                </div>
+
+                                                <div class="customer-field-action">
+
+                                                    <!-- Verified Tick -->
+                                                    <template if:true={field.isVerified}>
+                                                        <lightning-icon icon-name="utility:success" variant="success"
+                                                            size="xx-small" alternative-text="Verified"
+                                                            title="Verified">
+                                                        </lightning-icon>
+                                                    </template>
+
+                                                    <template if:false={field.isVerified}>
+
+                                                        <!-- Edit Button -->
+                                                        <template if:false={field.isReadonly}>
+                                                            <lightning-button-icon icon-name="utility:edit"
+                                                                variant="bare" size="small" alternative-text="Edit"
+                                                                title="Edit" onclick={enableEditMode}>
+                                                            </lightning-button-icon>
+                                                        </template>
+
+                                                        <!-- Read-only Lock -->
+                                                        <template if:true={field.isReadonly}>
+                                                            <lightning-icon icon-name="utility:lock" size="xx-small"
+                                                                alternative-text="Read Only" title="Read Only">
+                                                            </lightning-icon>
+                                                        </template>
+
+                                                    </template>
+                                                </div>
+
+                                            </div>
+                                        </template>
+                                    </div>
+
+                                </div>
+                            </div>
+                        </div>
+                    </template>
+
+                </lightning-record-view-form>
+            </template>
+
+            <!-- EDIT MODE -->
+            <template if:true={isEditMode}>
+                <lightning-record-edit-form record-id={recordId} object-api-name="Account" onsuccess={handleSuccess}
+                    onsubmit={handleSubmit} onerror={handleError} onload={handleFormLoad}>
+
+                    <lightning-messages></lightning-messages>
+
+                    <div class="slds-p-bottom_xx-large">
+
+                        <template for:each={formSections} for:item="section">
+                            <div key={section.id} class={section.sectionClass}>
+
+                                <h3 class="slds-section__title">
+                                    <button
+                                        type="button"
+                                        aria-controls={section.id}
+                                        aria-expanded={section.isOpen}
+                                        class="slds-button slds-section__title-action"
+                                        data-id={section.id}
+                                        onclick={toggleSection}>
+
+                                        <lightning-icon
+                                            icon-name={section.iconName}
+                                            size="x-small"
+                                            class="slds-section__title-action-icon slds-button__icon_left">
+                                        </lightning-icon>
+
+                                        <span
+                                            class="slds-truncate"
+                                            title={section.label}>
+                                            {section.label}
+                                        </span>
+                                    </button>
+                                </h3>
+
+                                <div aria-hidden={section.isHidden}
+                                    class="slds-section__content slds-p-horizontal_medium slds-p-bottom_medium">
+
+                                    <div class="slds-grid slds-wrap slds-gutters">
+
+                                        <!-- LEFT COLUMN -->
+                                        <div class="slds-col slds-size_1-of-1 slds-medium-size_1-of-2">
+                                            <template for:each={section.left} for:item="field">
+
+                                                <div key={field.accountApi} class={field.editWrapperClass}>
+
+                                                    <div class="customer-field-body">
+                                                        <template if:true={field.isManualDate}>
+                                                            <lightning-input type="tel" label={field.manualDateLabel}
+                                                                value={field.manualDateValue}
+                                                                disabled={field.isReadonly}
+                                                                data-field-name={field.accountApi}
+                                                                placeholder="DD/MM/YYYY" maxlength="10"
+                                                                autocomplete="off" onchange={handleManualDateInput}>
+                                                            </lightning-input>
+                                                        </template>
+
+                                                        <template if:false={field.isManualDate}>
+                                                            <lightning-input-field field-name={field.accountApi}
+                                                                disabled={field.isReadonly} variant="label-stacked"
+                                                                class={field.editClass} onchange={handleFieldChange}>
+                                                            </lightning-input-field>
+                                                        </template>
+                                                    </div>
+
+                                                    <template if:true={field.isVerified}>
+                                                        <div class="customer-field-action">
+                                                            <lightning-icon icon-name="utility:success"
+                                                                variant="success" size="xx-small"
+                                                                alternative-text="Verified" title="Verified">
+                                                            </lightning-icon>
+                                                        </div>
+                                                    </template>
+
+                                                </div>
+                                            </template>
+                                        </div>
+
+                                        <!-- RIGHT COLUMN -->
+                                        <div class="slds-col slds-size_1-of-1 slds-medium-size_1-of-2">
+                                            <template for:each={section.right} for:item="field">
+
+                                                <div key={field.accountApi} class={field.editWrapperClass}>
+
+                                                    <div class="customer-field-body">
+                                                        <template if:true={field.isManualDate}>
+                                                            <lightning-input type="tel" label={field.manualDateLabel}
+                                                                value={field.manualDateValue}
+                                                                disabled={field.isReadonly}
+                                                                data-field-name={field.accountApi}
+                                                                placeholder="DD/MM/YYYY" maxlength="10"
+                                                                autocomplete="off" onchange={handleManualDateInput}>
+                                                            </lightning-input>
+                                                        </template>
+
+                                                        <template if:false={field.isManualDate}>
+                                                            <lightning-input-field field-name={field.accountApi}
+                                                                disabled={field.isReadonly} variant="label-stacked"
+                                                                class={field.editClass} onchange={handleFieldChange}>
+                                                            </lightning-input-field>
+                                                        </template>
+                                                    </div>
+
+                                                    <template if:true={field.isVerified}>
+                                                        <div class="customer-field-action">
+                                                            <lightning-icon icon-name="utility:success"
+                                                                variant="success" size="xx-small"
+                                                                alternative-text="Verified" title="Verified">
+                                                            </lightning-icon>
+                                                        </div>
+                                                    </template>
+
+                                                </div>
+                                            </template>
+                                        </div>
+
+                                    </div>
+                                </div>
+                            </div>
+                        </template>
+
+                    </div>
+
+                    <!-- DOCKED FOOTER -->
+                    <div class="slds-docked-form-footer">
+
+                        <lightning-button label="Cancel" onclick={handleCancel} class="slds-m-right_small">
+                        </lightning-button>
+
+                        <lightning-button variant="brand" type="submit" label="Save">
+                        </lightning-button>
+
+                    </div>
+
+                </lightning-record-edit-form>
+            </template>
+
+        </template>
+    </lightning-card>
+
+    <!-- DUPLICATE CUSTOMER MODAL -->
+    <template if:true={showDuplicateModal}>
+
+        <section role="dialog" tabindex="-1" aria-modal="true" class="slds-modal slds-fade-in-open slds-modal_small">
+
+            <div class="slds-modal__container">
+
+                <!-- STEP 1 -->
+                <template if:true={isStep1}>
+
+                    <header class="slds-modal__header">
+
+                        <button
+                            type="button"
+                            class="slds-button slds-button_icon slds-modal__close slds-button_icon-inverse"
+                            title="Close"
+                            onclick={handleCancelMerge}>
+
+                            <lightning-icon
+                                icon-name="utility:close"
+                                alternative-text="Close"
+                                size="small">
+                            </lightning-icon>
+
+                            <span class="slds-assistive-text">
+                                Close
+                            </span>
+                        </button>
+
+                        <h2
+                            class="slds-text-heading_medium slds-grid slds-grid_vertical-align-center slds-wrap slds-grid_align-center">
+
+                            <lightning-icon icon-name="utility:warning" variant="warning" size="small"
+                                class="slds-m-right_x-small">
+                            </lightning-icon>
+
+                            <strong>
+                                Warning: Duplicate Mobile Number Identified
+                            </strong>
+                        </h2>
+                    </header>
+
+                    <div class="slds-modal__content slds-p-around_medium">
+
+                        <p class="slds-m-bottom_medium slds-text-body_regular">
+                            A customer record already exists with the entered phone number.
+                        </p>
+
+                        <h3 class="slds-text-heading_small slds-m-bottom_x-small">
+                            <strong>Existing Customer:</strong>
+                        </h3>
+
+                        <div class="slds-box slds-m-bottom_medium slds-theme_default">
+
+                            <div class="slds-grid slds-m-bottom_xx-small">
+                                <div class="slds-col slds-size_1-of-4">
+                                    <strong>Name</strong>
+                                </div>
+
+                                <div class="slds-col slds-size_3-of-4">
+                                    : {duplicateName}
+                                </div>
+                            </div>
+
+                            <div class="slds-grid">
+                                <div class="slds-col slds-size_1-of-4">
+                                    <strong>Mobile</strong>
+                                </div>
+
+                                <div class="slds-col slds-size_3-of-4">
+                                    : {duplicatePhone}
+                                </div>
+                            </div>
+
+                        </div>
+
+                        <p class="slds-m-bottom_small slds-text-body_regular">
+                            Please verify ownership of the mobile number before proceeding.
+                        </p>
+
+                        <p class="slds-text-color_error slds-m-bottom_medium slds-text-body_regular">
+                            Continue may override existing customer information.
+                        </p>
+
+                        <p class="slds-text-heading_small">
+                            <strong>Do you want to continue?</strong>
+                        </p>
+
+                    </div>
+
+                    <footer class="slds-modal__footer">
+
+                        <lightning-button label="Cancel" onclick={handleCancelMerge} class="slds-m-right_small">
+                        </lightning-button>
+
+                        <lightning-button variant="brand" label="Continue" onclick={handleStep1Continue}>
+                        </lightning-button>
+
+                    </footer>
+
+                </template>
+
+                <!-- STEP 2 -->
+                <template if:false={isStep1}>
+
+                    <div
+                        class="slds-modal__content slds-p-around_large slds-text-align_center duplicate-confirmation-box">
+
+                        <lightning-icon icon-name="utility:warning" variant="warning" size="large"
+                            class="slds-m-bottom_medium">
+                        </lightning-icon>
+
+                        <h2 class="slds-text-heading_large slds-m-bottom_medium">
+                            <strong>Are you sure?</strong>
+                        </h2>
+
+                        <p class="slds-text-body_regular slds-m-bottom_large">
+                            Existing customer information may be overridden
+                            <br />
+                            if you continue.
+                        </p>
+
+                        <div class="slds-border_top slds-m-top_large slds-p-top_medium">
+
+                            <lightning-button label="Back" onclick={handleStep2Back} class="slds-m-right_small">
+                            </lightning-button>
+
+                            <lightning-button variant="brand" label="Yes, Continue" onclick={handleContinueMerge}>
+                            </lightning-button>
+
+                        </div>
+                    </div>
+
+                </template>
+
+            </div>
+        </section>
+
+        <div class="slds-backdrop slds-backdrop_open" role="presentation">
+        </div>
+
+    </template>
+</template>

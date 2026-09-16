@@ -1,0 +1,738 @@
+<template>
+    <lightning-card>
+        <div class="main-container">
+
+            <div class="form-card">
+                <div class="header-row">
+                    <div class="section-title">
+                        <lightning-icon
+                            icon-name="utility:record_lookup"
+                            size="small">
+                        </lightning-icon>
+
+                        <h2>GSTIN Verification</h2>
+                    </div>
+
+                    <lightning-button-icon
+                        icon-name="utility:refresh"
+                        alternative-text="Refresh"
+                        title="Refresh"
+                        onclick={handleRefresh}
+                        disabled={disableRefreshButton}
+                        variant="border-filled"
+                        size="small"
+                        class="refresh-icon-btn">
+                    </lightning-button-icon>
+                </div>
+
+                <div class="input-row">
+                    <lightning-input
+                        label="GSTIN / ID Number"
+                        value={gstinNumber}
+                        onchange={handleGSTChange}
+                        placeholder="Enter GSTIN Number"
+                        maxlength="15"
+                        required>
+                    </lightning-input>
+
+                    <lightning-button
+                        label="Verify GSTIN"
+                        variant="brand"
+                        icon-name="utility:search"
+                        onclick={handleVerify}
+                        disabled={disableVerifyButton}>
+                    </lightning-button>
+                </div>
+
+                <template if:true={isLoading}>
+                    <div class="spinner-box">
+                        <lightning-spinner
+                            alternative-text="Verifying GSTIN..."
+                            size="medium">
+                        </lightning-spinner>
+                    </div>
+                </template>
+
+                <template if:true={isRefreshing}>
+                    <div class="spinner-box">
+                        <lightning-spinner
+                            alternative-text="Refreshing..."
+                            size="medium">
+                        </lightning-spinner>
+                    </div>
+                </template>
+            </div>
+
+            <template if:true={errorMessage}>
+                <div class="error-box">
+                    <lightning-icon
+                        icon-name="utility:error"
+                        size="small">
+                    </lightning-icon>
+
+                    <span>{errorMessage}</span>
+                </div>
+            </template>
+
+            <template if:true={showResult}>
+                <div class={bannerClass}>
+                    <lightning-icon
+                        icon-name={bannerIcon}
+                        size="small">
+                    </lightning-icon>
+
+                    <div>
+                        <h2>{result.title}</h2>
+                        <p>{result.message}</p>
+                    </div>
+                </div>
+
+                <div class="two-column-grid">
+                    <div class="result-card">
+                        <div class="section-title">
+                            <lightning-icon
+                                icon-name="utility:user"
+                                size="small">
+                            </lightning-icon>
+
+                            <h2>Customer Account Details</h2>
+                        </div>
+
+                        <div class="details-list">
+                            <div class="detail-row">
+                                <span class="label">Customer Name</span>
+                                <span class="value">{accName}</span>
+                            </div>
+
+                            <div class="detail-row">
+                                <span class="label">PAN</span>
+                                <span class="value">{accPan}</span>
+                            </div>
+
+                            <div class="detail-row">
+                                <span class="label">Current GSTIN</span>
+                                <span class="value">{accGst}</span>
+                            </div>
+
+                            <div class="detail-row">
+                                <span class="label">Entered GSTIN</span>
+                                <span class="value">{gstinNumber}</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="result-card">
+                        <div class="section-title">
+                            <lightning-icon
+                                icon-name="utility:shield"
+                                size="small">
+                            </lightning-icon>
+
+                            <h2>Verified GSTIN Details</h2>
+                        </div>
+
+                        <div class="details-list">
+                            <div class="detail-row">
+                                <span class="label">Legal Name</span>
+                                <span class="value">
+                                    {gstinData.legal_name}
+                                </span>
+                            </div>
+
+                            <div class="detail-row">
+                                <span class="label">Business Name</span>
+                                <span class="value">
+                                    {gstinData.business_name}
+                                </span>
+                            </div>
+
+                            <div class="detail-row">
+                                <span class="label">PAN</span>
+                                <span class="value">
+                                    {gstinData.pan_number}
+                                </span>
+                            </div>
+
+                            <div class="detail-row">
+                                <span class="label">
+                                    Date of Registration
+                                </span>
+
+                                <span class="value">
+                                    {formattedRegistrationDate}
+                                </span>
+                            </div>
+
+                            <div class="detail-row">
+                                <span class="label">GSTIN Status</span>
+                                <span class={statusClass}>
+                                    {gstinData.gstin_status}
+                                </span>
+                            </div>
+
+                            <div class="detail-row">
+                                <span class="label">
+                                    Constitution of Business
+                                </span>
+
+                                <span class="value">
+                                    {gstinData.constitution_of_business}
+                                </span>
+                            </div>
+
+                            <div class="detail-row">
+                                <span class="label">Taxpayer Type</span>
+                                <span class="value">
+                                    {gstinData.taxpayer_type}
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="result-card">
+                    <div class="section-title">
+                        <lightning-icon
+                            icon-name="utility:task"
+                            size="small">
+                        </lightning-icon>
+
+                        <h2>Verification Result</h2>
+                    </div>
+
+                    <div class="verification-grid">
+                        <div class="verification-row">
+                            <span class="label">PAN Match</span>
+                            <span class={panPillClass}>
+                                {result.panMatch}
+                            </span>
+                        </div>
+
+                        <div class="verification-row">
+                            <span class="label">
+                                Customer Name Match
+                            </span>
+
+                            <span class={namePillClass}>
+                                {result.nameMatch}
+                            </span>
+                        </div>
+
+                        <div class="verification-row">
+                            <span class="label">GSTIN Status</span>
+                            <span class={gstinStatusPillClass}>
+                                {result.gstinStatus}
+                            </span>
+                        </div>
+
+                        <div class="verification-row">
+                            <span class="label">Overall Result</span>
+                            <span class={overallPillClass}>
+                                {result.overallResult}
+                            </span>
+                        </div>
+                    </div>
+                </div>
+
+                <template if:true={result.infoMessage}>
+                    <div class={bannerClass}>
+                        <lightning-icon
+                            icon-name="utility:info"
+                            size="small">
+                        </lightning-icon>
+
+                        <p>{result.infoMessage}</p>
+                    </div>
+                </template>
+
+                <div class="action-footer">
+
+                    <!-- Eligible Account -->
+                    <template if:true={showDirectUpdateAction}>
+                        <lightning-button
+                            label="Cancel"
+                            onclick={handleCancel}
+                            disabled={disableActionButton}
+                            class="slds-m-right_small">
+                        </lightning-button>
+
+                        <lightning-button
+                            label="Proceed & Update"
+                            variant="brand"
+                            icon-name="utility:save"
+                            onclick={handleProceedUpdate}
+                            disabled={disableActionButton}>
+                        </lightning-button>
+                    </template>
+
+                    <!-- Ineligible Account -->
+                    <template if:true={showApprovalAction}>
+                        <lightning-button
+                            label="Cancel"
+                            onclick={handleCancel}
+                            disabled={disableActionButton}
+                            class="slds-m-right_small">
+                        </lightning-button>
+
+                        <lightning-button
+                            label="Send for Approval"
+                            variant="brand"
+                            icon-name="utility:approval"
+                            onclick={handleSendForApproval}
+                            disabled={disableActionButton}>
+                        </lightning-button>
+                    </template>
+
+                    <!-- Nothing different -->
+                    <template if:true={showNoChangeAction}>
+                        <lightning-button
+                            label="Cancel"
+                            onclick={handleCancel}
+                            disabled={disableActionButton}
+                            class="slds-m-right_small">
+                        </lightning-button>
+
+                        <lightning-button
+                            label="Review Details"
+                            variant="brand"
+                            icon-name="utility:preview"
+                            onclick={handleReviewNoChanges}
+                            disabled={disableActionButton}>
+                        </lightning-button>
+                    </template>
+
+                    <template if:true={showBlockedAction}>
+                        <lightning-button
+                            label="Close"
+                            variant="brand"
+                            onclick={handleCancel}
+                            disabled={disableActionButton}>
+                        </lightning-button>
+                    </template>
+                </div>
+
+                <template if:true={isUpdating}>
+                    <div class="spinner-box">
+                        <lightning-spinner
+                            alternative-text="Processing..."
+                            size="medium">
+                        </lightning-spinner>
+                    </div>
+                </template>
+            </template>
+
+            <!-- PAN Missing -->
+            <template if:true={showPanMissingPopup}>
+                <section
+                    role="dialog"
+                    tabindex="-1"
+                    aria-modal="true"
+                    class="slds-modal slds-fade-in-open">
+
+                    <div class="slds-modal__container custom-modal">
+                        <header class="slds-modal__header">
+                            <h2 class="slds-text-heading_medium">
+                                PAN Not Available
+                            </h2>
+                        </header>
+
+                        <div class="slds-modal__content slds-p-around_large modal-body-center">
+                            <lightning-icon
+                                icon-name="utility:warning"
+                                size="large"
+                                class="modal-warning-icon">
+                            </lightning-icon>
+
+                            <p>
+                                Please update PAN in the Customer Profile
+                                before verifying the GSTIN details.
+                            </p>
+                        </div>
+
+                        <footer class="slds-modal__footer modal-footer-center">
+                            <lightning-button
+                                label="Close"
+                                variant="brand"
+                                onclick={closeModals}>
+                            </lightning-button>
+                        </footer>
+                    </div>
+                </section>
+
+                <div class="slds-backdrop slds-backdrop_open"></div>
+            </template>
+
+            <!-- PAN Mismatch -->
+            <template if:true={showPanMismatchPopup}>
+                <section
+                    role="dialog"
+                    tabindex="-1"
+                    aria-modal="true"
+                    class="slds-modal slds-fade-in-open">
+
+                    <div class="slds-modal__container custom-modal">
+                        <header class="slds-modal__header">
+                            <h2 class="slds-text-heading_medium">
+                                PAN and GSTIN Mismatch
+                            </h2>
+                        </header>
+
+                        <div class="slds-modal__content slds-p-around_large modal-body-center">
+                            <lightning-icon
+                                icon-name="utility:warning"
+                                size="large"
+                                class="modal-warning-icon">
+                            </lightning-icon>
+
+                            <p>
+                                The PAN in the Customer Profile does not
+                                match the PAN contained in the provided
+                                GSTIN. Please verify and enter the correct
+                                GSTIN.
+                            </p>
+                        </div>
+
+                        <footer class="slds-modal__footer modal-footer-center">
+                            <lightning-button
+                                label="Close"
+                                variant="brand"
+                                onclick={closeModals}>
+                            </lightning-button>
+                        </footer>
+                    </div>
+                </section>
+
+                <div class="slds-backdrop slds-backdrop_open"></div>
+            </template>
+
+            <!-- MATCH / MISMATCH REVIEW -->
+            <template if:true={showReviewPopup}>
+                <section
+                    role="dialog"
+                    tabindex="-1"
+                    aria-modal="true"
+                    class="slds-modal slds-fade-in-open">
+
+                    <div class="slds-modal__container review-modal">
+                        <header class="slds-modal__header">
+                            <button
+                                class="slds-button slds-button_icon slds-modal__close slds-button_icon-inverse"
+                                title="Close"
+                                onclick={closeModals}>
+
+                                <lightning-icon
+                                    icon-name="utility:close"
+                                    alternative-text="Close"
+                                    variant="inverse"
+                                    size="small">
+                                </lightning-icon>
+                            </button>
+
+                            <h2 class="slds-text-heading_medium">
+                                {reviewModalTitle}
+                            </h2>
+                        </header>
+
+                        <div class="slds-modal__content slds-p-around_large">
+                            <div class="review-heading-area">
+                                <lightning-icon
+                                    icon-name={reviewModalIcon}
+                                    size="medium"
+                                    class={reviewModalIconClass}>
+                                </lightning-icon>
+
+                                <p>{reviewModalDescription}</p>
+                            </div>
+
+                            <div class="table-scroll">
+                                <table
+                                    class="slds-table slds-table_cell-buffer slds-table_bordered slds-table_col-bordered comparison-table">
+
+                                    <thead>
+                                        <tr>
+                                            <th scope="col">
+                                                Particulars
+                                            </th>
+
+                                            <th scope="col">
+                                                Current Account Details
+                                            </th>
+
+                                            <th scope="col">
+                                                Verified GSTIN Details
+                                            </th>
+                                        </tr>
+                                    </thead>
+
+                                    <tbody>
+                                        <template if:true={showNameComparisonRow}>
+                                            <tr>
+                                                <td>
+                                                    <strong>
+                                                        Customer Name
+                                                    </strong>
+                                                </td>
+
+                                                <td>
+                                                    {comparisonDetails.accountName}
+                                                </td>
+
+                                                <td>
+                                                    {comparisonDetails.verifiedName}
+                                                </td>
+                                            </tr>
+                                        </template>
+
+                                        <tr>
+                                            <td>
+                                                <strong>PAN</strong>
+                                            </td>
+
+                                            <td>
+                                                {comparisonDetails.accountPan}
+                                            </td>
+
+                                            <td>
+                                                {comparisonDetails.verifiedPan}
+                                            </td>
+                                        </tr>
+
+                                        <template if:true={showGstinComparisonRow}>
+                                            <tr>
+                                                <td>
+                                                    <strong>GSTIN</strong>
+                                                </td>
+
+                                                <td>
+                                                    {comparisonDetails.accountGstin}
+                                                </td>
+
+                                                <td>
+                                                    {comparisonDetails.verifiedGstin}
+                                                </td>
+                                            </tr>
+                                        </template>
+                                    </tbody>
+                                </table>
+                            </div>
+
+                            <template if:true={showApprovalInformation}>
+                                <div class="approval-info-box">
+                                    <lightning-icon
+                                        icon-name="utility:info"
+                                        size="small"
+                                        class="modal-info-icon">
+                                    </lightning-icon>
+
+                                    <p>
+                                        PAN matches and the GSTIN is Active, but
+                                        the Customer Name does not satisfy the
+                                        direct-match rule and is considered a
+                                        possible match. This is the only GSTIN
+                                        scenario that can be submitted for
+                                        approval. The Account will remain
+                                        unchanged until approval is completed.
+                                    </p>
+                                </div>
+                            </template>
+                        </div>
+
+                        <footer class="slds-modal__footer">
+                            <lightning-button
+                                label="Cancel"
+                                onclick={closeModals}
+                                class="slds-m-right_small">
+                            </lightning-button>
+
+                            <lightning-button
+                                label={reviewProceedButtonLabel}
+                                variant="brand"
+                                onclick={handleProceedFromReview}>
+                            </lightning-button>
+                        </footer>
+                    </div>
+                </section>
+
+                <div class="slds-backdrop slds-backdrop_open"></div>
+            </template>
+
+            <!-- CONFIRM DIRECT UPDATE -->
+            <template if:true={showConfirmUpdatePopup}>
+                <section
+                    role="dialog"
+                    tabindex="-1"
+                    aria-modal="true"
+                    class="slds-modal slds-fade-in-open">
+
+                    <div class="slds-modal__container custom-modal">
+                        <header class="slds-modal__header">
+                            <h2 class="slds-text-heading_medium">
+                                Confirm Update
+                            </h2>
+                        </header>
+
+                        <div class="slds-modal__content slds-p-around_large modal-body-center">
+                            <lightning-icon
+                                icon-name="utility:warning"
+                                size="large"
+                                class="modal-confirm-icon">
+                            </lightning-icon>
+
+                            <p>
+                                Are you sure you want to update the Account
+                                details with the verified GSTIN details?
+                            </p>
+                        </div>
+
+                        <footer class="slds-modal__footer modal-footer-center">
+                            <lightning-button
+                                label="Cancel"
+                                onclick={closeModals}
+                                class="slds-m-right_small">
+                            </lightning-button>
+
+                            <lightning-button
+                                label="Yes, Update"
+                                variant="brand"
+                                onclick={handleConfirmUpdate}>
+                            </lightning-button>
+                        </footer>
+                    </div>
+                </section>
+
+                <div class="slds-backdrop slds-backdrop_open"></div>
+            </template>
+
+            <!-- APPROVAL CONFIRMATION -->
+            <template if:true={showApprovalConfirmPopup}>
+                <section
+                    role="dialog"
+                    tabindex="-1"
+                    aria-modal="true"
+                    class="slds-modal slds-fade-in-open">
+
+                    <div class="slds-modal__container custom-modal">
+                        <header class="slds-modal__header">
+                            <h2 class="slds-text-heading_medium">
+                                Approval Required
+                            </h2>
+                        </header>
+
+                        <div class="slds-modal__content slds-p-around_large modal-body-center">
+                            <lightning-icon
+                                icon-name="utility:warning"
+                                size="large"
+                                class="modal-info-icon">
+                            </lightning-icon>
+
+                            <p>
+                                The PAN matches and the GSTIN is Active, but
+                                the Customer Name is only a possible match.
+                                The proposed GSTIN changes will be submitted
+                                for approval, and the Account will remain
+                                unchanged until the approval request is approved.
+                            </p>
+                        </div>
+
+                        <footer class="slds-modal__footer modal-footer-center">
+                            <lightning-button
+                                label="Cancel"
+                                onclick={closeModals}
+                                class="slds-m-right_small">
+                            </lightning-button>
+
+                            <lightning-button
+                                label="Send for Approval"
+                                variant="brand"
+                                onclick={handleConfirmSendForApproval}>
+                            </lightning-button>
+                        </footer>
+                    </div>
+                </section>
+
+                <div class="slds-backdrop slds-backdrop_open"></div>
+            </template>
+
+            <!-- APPROVAL SUBMITTED -->
+            <template if:true={showApprovalSubmittedPopup}>
+                <section
+                    role="dialog"
+                    tabindex="-1"
+                    aria-modal="true"
+                    class="slds-modal slds-fade-in-open">
+
+                    <div class="slds-modal__container custom-modal">
+                        <header class="slds-modal__header">
+                            <h2 class="slds-text-heading_medium">
+                                Approval Submitted
+                            </h2>
+                        </header>
+
+                        <div class="slds-modal__content slds-p-around_large modal-body-center">
+                            <lightning-icon
+                                icon-name="utility:info"
+                                size="large"
+                                class="modal-info-icon">
+                            </lightning-icon>
+
+                            <p>
+                                The GSTIN changes have been submitted for
+                                approval. The Customer Account will be
+                                updated only after the approval is completed.
+                            </p>
+                        </div>
+
+                        <footer class="slds-modal__footer modal-footer-center">
+                            <lightning-button
+                                label="Close"
+                                variant="brand"
+                                onclick={closeApprovalSubmitted}>
+                            </lightning-button>
+                        </footer>
+                    </div>
+                </section>
+
+                <div class="slds-backdrop slds-backdrop_open"></div>
+            </template>
+
+            <!-- SUCCESS / NO CHANGE -->
+            <template if:true={showSuccessPopup}>
+                <section
+                    role="dialog"
+                    tabindex="-1"
+                    aria-modal="true"
+                    class="slds-modal slds-fade-in-open">
+
+                    <div class="slds-modal__container custom-modal">
+                        <header class="slds-modal__header success-modal-header">
+                            <h2 class="slds-text-heading_medium">
+                                {successPopupTitle}
+                            </h2>
+                        </header>
+
+                        <div class="slds-modal__content slds-p-around_large modal-body-center success-modal-body">
+                            <lightning-icon
+                                icon-name="utility:success"
+                                size="large"
+                                class="modal-success-icon">
+                            </lightning-icon>
+
+                            <p>{successPopupDescription}</p>
+                        </div>
+
+                        <footer class="slds-modal__footer modal-footer-center">
+                            <lightning-button
+                                label="Close"
+                                variant="brand"
+                                onclick={closeSuccessPopup}>
+                            </lightning-button>
+                        </footer>
+                    </div>
+                </section>
+
+                <div class="slds-backdrop slds-backdrop_open"></div>
+            </template>
+
+        </div>
+    </lightning-card>
+</template>

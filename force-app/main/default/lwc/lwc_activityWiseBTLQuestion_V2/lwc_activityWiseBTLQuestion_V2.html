@@ -1,0 +1,166 @@
+<template>
+    <div class="page">
+
+        <template if:true={isLoading}>
+            <div class="spinner-box">
+                <lightning-spinner alternative-text="Loading..." size="medium"></lightning-spinner>
+            </div>
+        </template>
+
+        <template if:false={isLoading}>
+
+            <!-- Header -->
+            <section class="header-card">
+                <div class="header-left">
+                    <div class="main-icon">
+                        <lightning-icon icon-name="standard:question_feed" size="medium"></lightning-icon>
+                    </div>
+                    <div>
+                        <div class="eyebrow">BTL Activities</div>
+                        <h1>Manage Questions</h1>
+                        <p>Add or remove questions for this BTL activity.</p>
+                    </div>
+                </div>
+
+                <div class="header-right">
+                    <button class="refresh-btn" onclick={handleRefresh} disabled={isSaving}>
+                        <lightning-icon icon-name="utility:refresh" size="x-small"></lightning-icon>
+                        Refresh
+                    </button>
+                </div>
+            </section>
+
+            <!-- Summary -->
+            <section class="summary-grid">
+                <div class="summary-box">
+                    <div class="summary-icon blue">
+                        <lightning-icon icon-name="utility:list" size="small"></lightning-icon>
+                    </div>
+                    <div>
+                        <p>Total Questions</p>
+                        <h2>{totalQuestionCount}</h2>
+                    </div>
+                </div>
+
+                <div class="summary-box">
+                    <div class="summary-icon green">
+                        <lightning-icon icon-name="utility:check" size="small"></lightning-icon>
+                    </div>
+                    <div>
+                        <p>Selected</p>
+                        <h2>{selectedQuestionCount}</h2>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Search / Filter -->
+            <section class="filter-grid">
+                <div class="search-wrapper">
+                    <lightning-icon icon-name="utility:search" size="x-small"></lightning-icon>
+                    <input
+                        type="text"
+                        placeholder="Search questions..."
+                        value={searchKey}
+                        oninput={handleSearch}
+                    />
+                </div>
+
+                <div class="category-wrapper">
+                    <select value={selectedCategory} onchange={handleCategoryChange}>
+                        <template for:each={categoryOptions} for:item="cat">
+                            <option key={cat.value} value={cat.value}>{cat.label}</option>
+                        </template>
+                    </select>
+                </div>
+            </section>
+
+            <!-- Question Cards -->
+            <section class="question-list">
+                <template if:true={pagedQuestions.length}>
+                    <template for:each={pagedQuestions} for:item="ques">
+                        <article key={ques.questionId} class={ques.cardClass}>
+                            <div class="question-number">{ques.displayNumber}</div>
+
+                            <div class="question-content">
+                                <h3>{ques.questionText}</h3>
+
+                                <template if:true={ques.category}>
+                                    <span class="category-pill">{ques.category}</span>
+                                </template>
+                            </div>
+
+                            <div class="question-action">
+                                <template if:true={ques.isSelected}>
+                                    <div class="status-badge added">
+                                        <lightning-icon icon-name="utility:check" size="xx-small"></lightning-icon>
+                                        Added
+                                    </div>
+
+                                    <button
+                                        class="remove-btn"
+                                        data-id={ques.questionId}
+                                        onclick={handleToggleQuestion}>
+                                        <lightning-icon icon-name="utility:delete" size="x-small"></lightning-icon>
+                                        Remove
+                                    </button>
+                                </template>
+
+                                <template if:false={ques.isSelected}>
+                                    <div class="status-badge not-added">
+                                        Not Added
+                                    </div>
+
+                                    <button
+                                        class="add-btn"
+                                        data-id={ques.questionId}
+                                        onclick={handleToggleQuestion}>
+                                        <lightning-icon icon-name="utility:add" size="x-small"></lightning-icon>
+                                        Add
+                                    </button>
+                                </template>
+                            </div>
+                        </article>
+                    </template>
+                </template>
+
+                <template if:false={pagedQuestions.length}>
+                    <div class="empty-state">
+                        <lightning-icon icon-name="utility:search" size="medium"></lightning-icon>
+                        <h3>No questions found</h3>
+                        <p>Try changing your search text or category filter.</p>
+                    </div>
+                </template>
+            </section>
+
+            <!-- Pagination -->
+            <section class="pagination-bar">
+                <div>{paginationLabel}</div>
+
+                <div class="pagination-actions">
+                    <button onclick={handlePreviousPage} disabled={disablePrevious}>‹</button>
+                    <span>Page {currentPage} of {totalPages}</span>
+                    <button onclick={handleNextPage} disabled={disableNext}>›</button>
+                </div>
+            </section>
+
+            <!-- Sticky Footer -->
+            <section class="footer-bar">
+                <div class="selected-summary">
+                    <div class="summary-icon green small">
+                        <lightning-icon icon-name="utility:check" size="x-small"></lightning-icon>
+                    </div>
+                    <div>
+                        <strong>{selectedQuestionCount} Questions Selected</strong>
+                        <span>You can select more questions and then save.</span>
+                    </div>
+                </div>
+
+                <button class="save-btn" onclick={handleSave} disabled={isSaveDisabled}>
+                    <lightning-icon icon-name="utility:save" size="small"></lightning-icon>
+                    Save Questions
+                </button>
+            </section>
+
+        </template>
+    </div>
+</template>

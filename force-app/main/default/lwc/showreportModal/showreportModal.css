@@ -1,0 +1,7 @@
+/* Override modal content restrictions */
+.slds-modal__content {
+    max-height: none !important;
+    height: auto !important;
+    overflow: visible !important;
+    padding-bottom: 1rem;
+}

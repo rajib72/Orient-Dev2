@@ -1,0 +1,165 @@
+<apex:component controller="Ctrl_BTLEmailTemplateContent" access="global">
+    <apex:attribute name="transactionId"
+        type="Id"
+        assignTo="{!inputTransactionId}"
+        description="Anchor Tagged Approval Hierarchy Id" />
+
+    <apex:attribute name="mailType"
+        type="String"
+        assignTo="{!inputMailType}"
+        description="APPROVAL_REQUIRED / RETURNED / COMPLETED" />
+
+    <div style="font-family:Arial,Helvetica,sans-serif;color:#2e2e2e;font-size:14px;line-height:1.5;">
+        <div style="margin-bottom:18px;">
+            Hello <strong><apex:outputText value="{!recipientName}" /></strong>,
+            <br/>
+            <apex:outputText value="{!mailSubtitle}" />
+        </div>
+
+        <div style="margin-bottom:18px;padding:14px 16px;border:1px solid #d8dde6;border-radius:12px;background:#f7f9fc;">
+            <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="border-collapse:collapse;">
+                <tr>
+                    <td style="vertical-align:top;">
+                        <div style="color:#5f6b7a;font-size:11px;font-weight:bold;text-transform:uppercase;letter-spacing:.4px;">
+                            Status
+                        </div>
+                        <div style="margin-top:3px;font-size:18px;font-weight:bold;">
+                            <apex:outputText value="{!statusLabel}" />
+                        </div>
+                    </td>
+                    <td align="right" style="vertical-align:top;">
+                        <span style="display:inline-block;padding:5px 10px;border-radius:999px;background:#eef4ff;color:#0b5cab;font-size:11px;font-weight:bold;">
+                            <apex:outputText value="{!memberRows.size}" /> Approval Record(s)
+                        </span>
+                    </td>
+                </tr>
+            </table>
+        </div>
+
+        <div style="margin-bottom:18px;border:1px solid #d8dde6;border-radius:12px;background:#ffffff;padding:15px 16px;">
+            <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="border-collapse:collapse;">
+                <tr>
+                    <td width="50%" style="padding:4px 12px 10px 0;vertical-align:top;">
+                        <div style="color:#5f6b7a;font-size:11px;font-weight:bold;text-transform:uppercase;">Activity</div>
+                        <div style="margin-top:3px;font-size:15px;font-weight:bold;">
+                            <apex:outputText value="{!activityNumber}" />
+                            <apex:outputPanel rendered="{!activityName != '—'}" layout="inline">
+                                &nbsp;-&nbsp;<apex:outputText value="{!activityName}" />
+                            </apex:outputPanel>
+                        </div>
+                    </td>
+                    <td width="50%" style="padding:4px 0 10px 12px;vertical-align:top;">
+                        <div style="color:#5f6b7a;font-size:11px;font-weight:bold;text-transform:uppercase;">Store</div>
+                        <div style="margin-top:3px;font-weight:bold;"><apex:outputText value="{!storeName}" /></div>
+                    </td>
+                </tr>
+                <tr>
+                    <td width="50%" style="padding:8px 12px 4px 0;vertical-align:top;">
+                        <div style="color:#5f6b7a;font-size:11px;font-weight:bold;text-transform:uppercase;">Target Date</div>
+                        <div style="margin-top:3px;font-weight:bold;"><apex:outputText value="{!targetDate}" /></div>
+                    </td>
+                    <td width="50%" style="padding:8px 0 4px 12px;vertical-align:top;">
+                        <div style="color:#5f6b7a;font-size:11px;font-weight:bold;text-transform:uppercase;">Team</div>
+                        <div style="margin-top:3px;font-weight:bold;"><apex:outputText value="{!teamName}" /></div>
+                    </td>
+                </tr>
+                <tr>
+                    <td width="50%" style="padding:8px 12px 4px 0;vertical-align:top;">
+                        <div style="color:#5f6b7a;font-size:11px;font-weight:bold;text-transform:uppercase;">Location</div>
+                        <div style="margin-top:3px;font-weight:bold;"><apex:outputText value="{!activityLocation}" /></div>
+                    </td>
+                    <td width="50%" style="padding:8px 0 4px 12px;vertical-align:top;">
+                        <div style="color:#5f6b7a;font-size:11px;font-weight:bold;text-transform:uppercase;">Final Customize Form</div>
+                        <div style="margin-top:3px;font-weight:bold;"><apex:outputText value="{!finalCustomizeFormNo}" /></div>
+                    </td>
+                </tr>
+                <tr>
+                    <td width="50%" style="padding:8px 12px 4px 0;vertical-align:top;">
+                        <div style="color:#5f6b7a;font-size:11px;font-weight:bold;text-transform:uppercase;">Submitted By</div>
+                        <div style="margin-top:3px;font-weight:bold;"><apex:outputText value="{!submittedByName}" /></div>
+                    </td>
+                    <td width="50%" style="padding:8px 0 4px 12px;vertical-align:top;">
+                        <div style="color:#5f6b7a;font-size:11px;font-weight:bold;text-transform:uppercase;">Submitted Date &amp; Time</div>
+                        <div style="margin-top:3px;font-weight:bold;"><apex:outputText value="{!submittedDateTimeIST}" /></div>
+                    </td>
+                </tr>
+            </table>
+        </div>
+
+        <apex:outputPanel rendered="{!isApprovalRequired}" layout="block">
+            <div style="margin-bottom:18px;border:1px solid #b9d6f2;border-radius:12px;background:#f4f9ff;padding:14px 16px;">
+                <strong>Current Approval Level:</strong> <apex:outputText value="{!currentLevelName}" />
+                <span style="color:#9aa7b5;"> &nbsp;•&nbsp; </span>
+                <strong>Pending With:</strong> <apex:outputText value="{!pendingWithName}" />
+            </div>
+        </apex:outputPanel>
+
+        <apex:outputPanel rendered="{!isReturned}" layout="block">
+            <div style="margin-bottom:18px;border:1px solid #efb5bb;border-radius:12px;background:#fff4f5;padding:14px 16px;">
+                <div><strong>Returned From:</strong> <apex:outputText value="{!returnedFromLevelName}" /></div>
+                <div style="margin-top:4px;"><strong>Returned By:</strong> <apex:outputText value="{!lastActionByName}" /></div>
+                <div style="margin-top:4px;"><strong>Returned At:</strong> <apex:outputText value="{!lastActionDateTimeIST}" /></div>
+                <div style="margin-top:9px;color:#a31420;"><strong>Reason:</strong> <apex:outputText value="{!lastActionComments}" /></div>
+            </div>
+        </apex:outputPanel>
+
+        <apex:outputPanel rendered="{!isCompleted}" layout="block">
+            <div style="margin-bottom:18px;border:1px solid #b8dfc5;border-radius:12px;background:#f3fbf6;padding:14px 16px;">
+                <div><strong>Final Outcome:</strong> <apex:outputText value="{!statusLabel}" /></div>
+                <div style="margin-top:4px;"><strong>Process Completed By:</strong> <apex:outputText value="{!completedByName}" /></div>
+                <div style="margin-top:4px;"><strong>Process Completed At:</strong> <apex:outputText value="{!completedDateTimeIST}" /></div>
+                <apex:outputPanel rendered="{!isDropped}" layout="block" style="margin-top:9px;">
+                    <strong>Drop Reason:</strong> <apex:outputText value="{!lastActionComments}" />
+                </apex:outputPanel>
+            </div>
+        </apex:outputPanel>
+
+        <div style="margin-bottom:18px;border:1px solid #d8dde6;border-radius:12px;overflow:hidden;">
+            <div style="background:#eef4ff;color:#16325c;font-size:14px;font-weight:bold;padding:10px 14px;">
+                Assigned Manpower / Approval Records
+            </div>
+            <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="border-collapse:collapse;">
+                <tr style="background:#f7f9fc;">
+                    <th align="left" style="padding:8px 10px;border-bottom:1px solid #d8dde6;font-size:11px;">APPROVAL</th>
+                    <th align="left" style="padding:8px 10px;border-bottom:1px solid #d8dde6;font-size:11px;">SALES EXECUTIVE</th>
+                    <th align="left" style="padding:8px 10px;border-bottom:1px solid #d8dde6;font-size:11px;">ASSIGNED PERSON</th>
+                    <th align="left" style="padding:8px 10px;border-bottom:1px solid #d8dde6;font-size:11px;">CYCLE</th>
+                    <th align="left" style="padding:8px 10px;border-bottom:1px solid #d8dde6;font-size:11px;">STATUS</th>
+                </tr>
+                <apex:repeat value="{!memberRows}" var="member">
+                    <tr>
+                        <td style="padding:9px 10px;border-bottom:1px solid #eeeeee;"><apex:outputText value="{!member.transactionNo}" /></td>
+                        <td style="padding:9px 10px;border-bottom:1px solid #eeeeee;"><apex:outputText value="{!member.executiveName}" /></td>
+                        <td style="padding:9px 10px;border-bottom:1px solid #eeeeee;"><apex:outputText value="{!member.assignedPersonNo}" /></td>
+                        <td style="padding:9px 10px;border-bottom:1px solid #eeeeee;"><apex:outputText value="{!member.submissionCycle}" /></td>
+                        <td style="padding:9px 10px;border-bottom:1px solid #eeeeee;font-weight:bold;"><apex:outputText value="{!member.approvalStatus}" /></td>
+                    </tr>
+                </apex:repeat>
+            </table>
+        </div>
+
+        <apex:outputPanel rendered="{!isApprovalRequired}" layout="block" style="margin-bottom:16px;">
+            <div style="padding:12px 14px;border-radius:10px;background:#fff8e6;border:1px solid #f5c451;color:#5c3b00;">
+                Please review the BTL activity in the Approval Workspace and complete the required action.
+            </div>
+        </apex:outputPanel>
+
+        <apex:outputPanel rendered="{!isReturned}" layout="block" style="margin-bottom:16px;">
+            <div style="padding:12px 14px;border-radius:10px;background:#fff8e6;border:1px solid #f5c451;color:#5c3b00;">
+                Please correct the returned activity and resubmit it when ready.
+            </div>
+        </apex:outputPanel>
+
+        <apex:outputPanel rendered="{!NOT(isReturned)}"
+            layout="block">
+
+            <div style="margin:24px 0 8px;text-align:center;">
+                <apex:outputLink value="{!workspaceUrl}"
+                    style="display:inline-block;background:#0176d3;color:#ffffff;text-decoration:none;font-weight:bold;padding:11px 24px;border-radius:22px;">
+                    View in BTL Approval Workspace
+                </apex:outputLink>
+            </div>
+
+        </apex:outputPanel>
+    </div>
+</apex:component>

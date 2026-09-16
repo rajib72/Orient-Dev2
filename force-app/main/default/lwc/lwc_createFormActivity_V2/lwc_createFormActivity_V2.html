@@ -1,0 +1,567 @@
+<template>
+    <lightning-quick-action-panel header="Create Activity">
+
+        <template if:true={isLoading}>
+            <div class="spinnerOverlay">
+                <lightning-spinner
+                    alternative-text="Processing..."
+                    size="medium">
+                </lightning-spinner>
+            </div>
+        </template>
+
+        <div class="mainWrapper">
+
+            <div class="headerCard">
+                <div class="iconCircle">
+                    <lightning-icon
+                        icon-name="standard:event"
+                        size="small">
+                    </lightning-icon>
+                </div>
+
+                <div>
+                    <h2>Create Form Activity</h2>
+
+                    <p>
+                        Select Stores, Teams, Sales Executives, target dates
+                        and date-wise Activity Locations.
+                    </p>
+                </div>
+            </div>
+
+            <div class="formCard">
+
+                <div class="sectionTitle">
+                    Activity Information
+                </div>
+
+                <div class="slds-grid slds-wrap slds-gutters">
+
+                    <div class="slds-col slds-size_1-of-1 inputGap">
+                        <lightning-input
+                            type="text"
+                            label="Activity Name"
+                            value={activityName}
+                            onchange={handleActivityNameChange}
+                            disabled={isSaving}
+                            required>
+                        </lightning-input>
+                    </div>
+
+                    <div
+                        class="slds-col slds-size_1-of-1
+                               slds-medium-size_1-of-2 inputGap">
+
+                        <lightning-input
+                            type="date"
+                            label="Activity Start Date"
+                            value={activityDate}
+                            onchange={handleActivityDateChange}
+                            disabled={isSaving}
+                            required>
+                        </lightning-input>
+                    </div>
+
+                    <div
+                        class="slds-col slds-size_1-of-1
+                               slds-medium-size_1-of-2 inputGap">
+
+                        <lightning-input
+                            type="date"
+                            label="Activity End Date"
+                            data-id="activityEndDate"
+                            value={activityEndDate}
+                            onchange={handleActivityEndDateChange}
+                            disabled={isSaving}
+                            required>
+                        </lightning-input>
+                    </div>
+
+                    <div class="slds-col slds-size_1-of-1 inputGap">
+
+                        <div class="storeMultiWrapper">
+
+                            <label class="customLabel">
+                                <abbr
+                                    class="slds-required"
+                                    title="required">*</abbr>
+                                Assigned Stores
+                            </label>
+
+                            <div class="slds-combobox_container">
+
+                                <div class={storeDropdownClass}>
+
+                                    <div
+                                        class="slds-combobox__form-element
+                                               slds-input-has-icon
+                                               slds-input-has-icon_right"
+                                        onclick={toggleStoreDropdown}>
+
+                                        <div class="multiSelectBox">
+
+                                            <span class={selectedStoreTextClass}>
+                                                {selectedStoreDisplay}
+                                            </span>
+
+                                            <lightning-icon
+                                                icon-name="utility:chevrondown"
+                                                size="xx-small"
+                                                class="dropdownIcon">
+                                            </lightning-icon>
+                                        </div>
+                                    </div>
+
+                                    <template if:true={isStoreDropdownOpen}>
+
+                                        <div
+                                            class="slds-dropdown
+                                                   slds-dropdown_fluid
+                                                   storeDropdown">
+
+                                            <ul
+                                                class="slds-listbox
+                                                       slds-listbox_vertical"
+                                                role="presentation">
+
+                                                <template
+                                                    for:each={storeOptions}
+                                                    for:item="store">
+
+                                                    <li
+                                                        key={store.value}
+                                                        role="presentation">
+
+                                                        <div
+                                                            class={store.optionClass}
+                                                            data-id={store.value}
+                                                            onclick={handleStoreOptionClick}>
+
+                                                            <div class="storeCheck">
+
+                                                                <template if:true={store.selected}>
+                                                                    <lightning-icon
+                                                                        icon-name="utility:check"
+                                                                        size="xx-small"
+                                                                        class="storeCheckIcon">
+                                                                    </lightning-icon>
+                                                                </template>
+
+                                                            </div>
+
+                                                            <span class="storeOptionLabel">
+                                                                {store.label}
+                                                            </span>
+                                                        </div>
+                                                    </li>
+                                                </template>
+                                            </ul>
+                                        </div>
+                                    </template>
+                                </div>
+                            </div>
+
+                            <template if:true={storeError}>
+                                <div class="storeError">
+                                    {storeError}
+                                </div>
+                            </template>
+
+                            <template if:true={hasSelectedStores}>
+
+                                <div class="selectedStorePills">
+
+                                    <template
+                                        for:each={selectedStorePills}
+                                        for:item="store">
+
+                                        <span
+                                            key={store.value}
+                                            class="storePill">
+
+                                            {store.label}
+
+                                            <button
+                                                type="button"
+                                                class="pillClose"
+                                                data-id={store.value}
+                                                onclick={handleRemoveStore}>
+                                                ×
+                                            </button>
+                                        </span>
+                                    </template>
+                                </div>
+                            </template>
+                        </div>
+                    </div>
+                </div>
+
+                <template if:true={hasSelectedStores}>
+
+                    <div class="sectionTitle secondSection">
+                        Assign Teams and Sales Executives
+                    </div>
+
+                    <div class="executiveBox">
+
+                        <div class="executiveHeader">
+
+                            <div>
+                                <h3>Select Teams and Sales Executives</h3>
+
+                                <p>
+                                    Add one or more Teams under each Store,
+                                    then select Sales Executives for each Team.
+                                </p>
+                            </div>
+
+                            <div class="selectedBadge">
+                                {selectedCount} Selected
+                            </div>
+                        </div>
+
+                        <template if:false={hasTeams}>
+                            <div class="emptyMsg">
+                                No Team records were found in Team
+                                Custom Metadata.
+                            </div>
+                        </template>
+
+                        <template if:true={hasSalesExecutives}>
+
+                            <template
+                                for:each={storeExecutiveGroups}
+                                for:item="group">
+
+                                <div
+                                    key={group.storeId}
+                                    class="storeExecutiveGroup">
+
+                                    <div class="storeGroupHeader">
+
+                                        <div>
+                                            <h4>{group.storeName}</h4>
+
+                                            <p>
+                                                {group.selectedCount} of
+                                                {group.totalCount} selected
+                                            </p>
+                                        </div>
+
+                                        <lightning-button
+                                            label="Add Team"
+                                            icon-name="utility:add"
+                                            variant="brand-outline"
+                                            data-store-id={group.storeId}
+                                            onclick={handleAddTeam}
+                                            disabled={group.disableAddTeam}>
+                                        </lightning-button>
+                                    </div>
+
+                                    <template
+                                        for:each={group.teamSections}
+                                        for:item="teamSection">
+
+                                        <div
+                                            key={teamSection.id}
+                                            class="teamAssignmentCard">
+
+                                            <div class="teamAssignmentHeader">
+
+                                                <div>
+                                                    <h5>
+                                                        Team Assignment
+                                                        {teamSection.indexLabel}
+                                                    </h5>
+
+                                                    <p>
+                                                        Select a Team and then
+                                                        assign Sales Executives.
+                                                    </p>
+                                                </div>
+
+                                                <template if:true={teamSection.canRemove}>
+
+                                                    <lightning-button-icon
+                                                        icon-name="utility:delete"
+                                                        alternative-text="Remove Team"
+                                                        title="Remove Team"
+                                                        variant="border-filled"
+                                                        data-store-id={group.storeId}
+                                                        data-section-id={teamSection.id}
+                                                        onclick={handleRemoveTeam}>
+                                                    </lightning-button-icon>
+
+                                                </template>
+                                            </div>
+
+                                            <div
+                                                class="teamSelectionBox"
+                                                onclick={stopEvent}>
+
+                                                <lightning-combobox
+                                                    name="team"
+                                                    label="Team"
+                                                    data-store-id={group.storeId}
+                                                    data-section-id={teamSection.id}
+                                                    value={teamSection.selectedTeamName}
+                                                    placeholder="Select Team"
+                                                    options={teamSection.teamOptions}
+                                                    onchange={handleTeamChange}
+                                                    disabled={isSaving}>
+                                                </lightning-combobox>
+
+                                                <p class="teamHelpText">
+                                                    The same Team cannot be
+                                                    selected twice under one Store.
+                                                    Additional Team sections are
+                                                    optional.
+                                                </p>
+                                            </div>
+
+                                            <template if:true={teamSection.hasExecutives}>
+
+                                                <div class="executiveList">
+
+                                                    <template
+                                                        for:each={teamSection.executives}
+                                                        for:item="exec">
+
+                                                        <div
+                                                            key={exec.value}
+                                                            class={exec.cardClass}
+                                                            data-id={exec.value}
+                                                            data-store-id={group.storeId}
+                                                            data-section-id={teamSection.id}
+                                                            onclick={handleExecutiveCardClick}>
+
+                                                            <div class="avatarCircle">
+                                                                {exec.initial}
+                                                            </div>
+
+                                                            <div class="executiveInfo">
+
+                                                                <div class="executiveName">
+                                                                    {exec.label}
+                                                                </div>
+
+                                                                <div class="executiveSubText">
+                                                                    {exec.assignmentSubText}
+                                                                </div>
+                                                            </div>
+
+                                                            <div class="checkArea">
+
+                                                                <template if:true={exec.selected}>
+                                                                    <lightning-icon
+                                                                        icon-name="utility:check"
+                                                                        size="x-small"
+                                                                        class="checkIcon">
+                                                                    </lightning-icon>
+                                                                </template>
+                                                            </div>
+
+                                                            <template if:true={exec.selected}>
+
+                                                                <div
+                                                                    class="assignmentDateBox"
+                                                                    onclick={stopEvent}>
+
+                                                                    <div class="dateMultiWrapper">
+
+                                                                        <label class="customLabel">
+                                                                            <abbr
+                                                                                class="slds-required"
+                                                                                title="required">*</abbr>
+                                                                            Target Dates
+                                                                        </label>
+
+                                                                        <div
+                                                                            class="dateMultiSelectBox"
+                                                                            data-id={exec.value}
+                                                                            onclick={toggleExecutiveDateDropdown}>
+
+                                                                            <span class={exec.dateTextClass}>
+                                                                                {exec.assignedDateDisplay}
+                                                                            </span>
+
+                                                                            <lightning-icon
+                                                                                icon-name="utility:chevrondown"
+                                                                                size="xx-small"
+                                                                                class="dateDropdownIcon">
+                                                                            </lightning-icon>
+                                                                        </div>
+
+                                                                        <template if:true={exec.isDateDropdownOpen}>
+
+                                                                            <div class="dateDropdownPanel">
+
+                                                                                <template
+                                                                                    for:each={exec.dateOptions}
+                                                                                    for:item="dateOpt">
+
+                                                                                    <div
+                                                                                        key={dateOpt.value}
+                                                                                        class={dateOpt.optionClass}
+                                                                                        data-exec-id={exec.value}
+                                                                                        data-date={dateOpt.value}
+                                                                                        onclick={handleExecutiveDateOptionClick}>
+
+                                                                                        <div class="dateCheckBox">
+
+                                                                                            <template if:true={dateOpt.selected}>
+                                                                                                <lightning-icon
+                                                                                                    icon-name="utility:check"
+                                                                                                    size="xx-small"
+                                                                                                    class="dateCheckIcon">
+                                                                                                </lightning-icon>
+                                                                                            </template>
+                                                                                        </div>
+
+                                                                                        <span>
+                                                                                            {dateOpt.label}
+                                                                                        </span>
+                                                                                    </div>
+                                                                                </template>
+                                                                            </div>
+                                                                        </template>
+
+                                                                        <template if:true={exec.hasAssignedDates}>
+
+                                                                            <div class="selectedDatePills">
+
+                                                                                <template
+                                                                                    for:each={exec.selectedDatePills}
+                                                                                    for:item="datePill">
+
+                                                                                    <span
+                                                                                        key={datePill.value}
+                                                                                        class="datePill">
+
+                                                                                        {datePill.label}
+
+                                                                                        <button
+                                                                                            type="button"
+                                                                                            class="datePillClose"
+                                                                                            data-exec-id={exec.value}
+                                                                                            data-date={datePill.value}
+                                                                                            onclick={handleRemoveExecutiveDate}>
+                                                                                            ×
+                                                                                        </button>
+                                                                                    </span>
+                                                                                </template>
+                                                                            </div>
+                                                                        </template>
+                                                                    </div>
+
+                                                                    <template if:true={exec.hasAssignedDates}>
+
+                                                                        <div class="dateLocationList">
+
+                                                                            <div class="dateLocationTitle">
+                                                                                Date-wise Activity Location
+                                                                            </div>
+
+                                                                            <template
+                                                                                for:each={exec.dateAssignmentRows}
+                                                                                for:item="dateRow">
+
+                                                                                <div
+                                                                                    key={dateRow.key}
+                                                                                    class="dateLocationRow">
+
+                                                                                    <div class="dateLabelBox">
+
+                                                                                        <lightning-icon
+                                                                                            icon-name="utility:event"
+                                                                                            size="x-small">
+                                                                                        </lightning-icon>
+
+                                                                                        <span>
+                                                                                            {dateRow.targetDateLabel}
+                                                                                        </span>
+                                                                                    </div>
+
+                                                                                    <div class="dateLocationInput">
+
+                                                                                        <lightning-input
+                                                                                            type="text"
+                                                                                            label="Activity Location"
+                                                                                            data-exec-id={exec.value}
+                                                                                            data-date={dateRow.targetDate}
+                                                                                            value={dateRow.activityLocation}
+                                                                                            onchange={handleDateLocationChange}
+                                                                                            disabled={dateRow.isLocationDisabled}
+                                                                                            required>
+                                                                                        </lightning-input>
+                                                                                    </div>
+                                                                                </div>
+                                                                            </template>
+                                                                        </div>
+                                                                    </template>
+                                                                </div>
+                                                            </template>
+                                                        </div>
+                                                    </template>
+                                                </div>
+                                            </template>
+
+                                            <template if:false={teamSection.hasExecutives}>
+                                                <div class="emptyMsg">
+                                                    No Sales Executives were found
+                                                    for this Store.
+                                                </div>
+                                            </template>
+                                        </div>
+                                    </template>
+                                </div>
+                            </template>
+                        </template>
+
+                        <template if:false={hasSalesExecutives}>
+                            <div class="emptyMsg">
+                                No Sales Executives were found for the
+                                selected Stores.
+                            </div>
+                        </template>
+                    </div>
+                </template>
+
+                <div class="noteBox">
+
+                    <lightning-icon
+                        icon-name="utility:info"
+                        size="x-small">
+                    </lightning-icon>
+
+                    <span>
+                        One Form Activity is created per selected Store.
+                        Multiple Teams can be added under a Store. Team is
+                        stored on the Assigned Person record. Every selected
+                        Target Date creates a child record with its own
+                        Activity Location.
+                    </span>
+                </div>
+            </div>
+
+            <div class="footerBtn">
+
+                <lightning-button
+                    label="Cancel"
+                    variant="neutral"
+                    onclick={handleCancel}
+                    disabled={isSaving}>
+                </lightning-button>
+
+                <lightning-button
+                    class="slds-m-left_small"
+                    label="Save Activity"
+                    variant="brand"
+                    onclick={handleSave}
+                    disabled={isSaveDisabled}>
+                </lightning-button>
+            </div>
+        </div>
+    </lightning-quick-action-panel>
+</template>

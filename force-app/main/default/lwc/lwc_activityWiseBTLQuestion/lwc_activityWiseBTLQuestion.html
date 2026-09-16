@@ -1,0 +1,243 @@
+<template>
+    <div class="page">
+
+        <!-- Header -->
+        <div class="top-header">
+            <div class="header-left">
+                <div class="icon-box">
+                    <lightning-icon icon-name="standard:question_feed" size="medium"></lightning-icon>
+                </div>
+                <div>
+                    <h1>Manage BTL Questions</h1>
+                    <p>Add or remove questions for this BTL Activity.</p>
+                </div>
+            </div>
+
+            <div class="header-actions">
+                <lightning-button 
+                    label="Refresh"
+                    icon-name="utility:refresh"
+                    onclick={handleRefresh}>
+                </lightning-button>
+            </div>
+        </div>
+
+        <template if:true={isLoading}>
+            <div class="spinner-box">
+                <lightning-spinner alternative-text="Loading questions..." size="medium"></lightning-spinner>
+            </div>
+        </template>
+
+        <template if:false={isLoading}>
+            <div class="main-grid">
+
+                <!-- Available Questions -->
+                <section class="panel">
+                    <div class="panel-header">
+                        <div>
+                            <h2>Available Questions</h2>
+                            <p>Select questions to add to this activity.</p>
+                        </div>
+                        <span class="count-pill">{availableQuestions.length}</span>
+                    </div>
+
+                    <div class="search-box">
+                        <lightning-input
+                            type="search"
+                            label="Search Available Questions"
+                            variant="label-hidden"
+                            placeholder="Search questions..."
+                            value={availableSearchKey}
+                            onchange={handleAvailableSearch}>
+                        </lightning-input>
+                    </div>
+
+                    <div class="table-wrap">
+                        <table class="custom-table">
+                            <thead>
+                                <tr>
+                                    <th class="check-col">
+                                        <lightning-input
+                                            type="checkbox"
+                                            variant="label-hidden"
+                                            checked={isAllAvailableChecked}
+                                            onchange={handleSelectAllAvailable}>
+                                        </lightning-input>
+                                    </th>
+                                    <th>Question</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <template if:true={pagedAvailableQuestions.length}>
+                                    <template for:each={pagedAvailableQuestions} for:item="ques">
+                                        <tr key={ques.questionId}>
+                                            <td>
+                                                <lightning-input
+                                                    type="checkbox"
+                                                    variant="label-hidden"
+                                                    data-id={ques.questionId}
+                                                    checked={ques.isChecked}
+                                                    onchange={handleAvailableCheck}>
+                                                </lightning-input>
+                                            </td>
+                                            <td>
+                                                <div class="question-text">{ques.questionText}</div>
+                                            </td>
+                                        </tr>
+                                    </template>
+                                </template>
+
+                                <template if:false={pagedAvailableQuestions.length}>
+                                    <tr>
+                                        <td colspan="2">
+                                            <div class="empty-state">
+                                                No available questions found.
+                                            </div>
+                                        </td>
+                                    </tr>
+                                </template>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div class="pagination">
+                        <span>{availablePaginationLabel}</span>
+                        <div>
+                            <button class="page-btn" onclick={previousAvailablePage} disabled={disableAvailablePrevious}>‹</button>
+                            <button class="page-btn" onclick={nextAvailablePage} disabled={disableAvailableNext}>›</button>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Middle Actions -->
+                <section class="action-panel">
+                    <button class="primary-action" onclick={handleAddSelected}>
+                        Add
+                        <span>›</span>
+                    </button>
+
+                    <button class="secondary-action" onclick={handleAddAll}>
+                        Add All
+                        <span>»</span>
+                    </button>
+
+                    <button class="secondary-action margin-top" onclick={handleRemoveSelected}>
+                        <span>‹</span>
+                        Remove
+                    </button>
+
+                    <button class="secondary-action" onclick={handleRemoveAll}>
+                        <span>«</span>
+                        Remove All
+                    </button>
+                </section>
+
+                <!-- Selected Questions -->
+                <section class="panel">
+                    <div class="panel-header">
+                        <div>
+                            <h2>Selected Questions</h2>
+                            <p>These questions will be linked to this activity.</p>
+                        </div>
+                        <span class="count-pill selected-pill">{selectedQuestions.length}</span>
+                    </div>
+
+                    <div class="search-box">
+                        <lightning-input
+                            type="search"
+                            label="Search Selected Questions"
+                            variant="label-hidden"
+                            placeholder="Search selected questions..."
+                            value={selectedSearchKey}
+                            onchange={handleSelectedSearch}>
+                        </lightning-input>
+                    </div>
+
+                    <div class="table-wrap">
+                        <table class="custom-table">
+                            <thead>
+                                <tr>
+                                    <th class="check-col">
+                                        <lightning-input
+                                            type="checkbox"
+                                            variant="label-hidden"
+                                            checked={isAllSelectedChecked}
+                                            onchange={handleSelectAllSelected}>
+                                        </lightning-input>
+                                    </th>
+                                    <th class="number-col">#</th>
+                                    <th>Question</th>
+                                    <th class="remove-col"></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <template if:true={pagedSelectedQuestions.length}>
+                                    <template for:each={pagedSelectedQuestions} for:item="ques">
+                                        <tr key={ques.questionId}>
+                                            <td>
+                                                <lightning-input
+                                                    type="checkbox"
+                                                    variant="label-hidden"
+                                                    data-id={ques.questionId}
+                                                    checked={ques.isChecked}
+                                                    onchange={handleSelectedCheck}>
+                                                </lightning-input>
+                                            </td>
+                                            <td>{ques.rowNumber}</td>
+                                            <td>
+                                                <div class="question-text">{ques.questionText}</div>
+                                            </td>
+                                            <td>
+                                                <button 
+                                                    class="icon-remove"
+                                                    title="Remove"
+                                                    data-id={ques.questionId}
+                                                    onclick={handleSingleRemove}>
+                                                    ×
+                                                </button>
+                                            </td>
+                                        </tr>
+                                    </template>
+                                </template>
+
+                                <template if:false={pagedSelectedQuestions.length}>
+                                    <tr>
+                                        <td colspan="4">
+                                            <div class="empty-state">
+                                                No questions selected yet.
+                                            </div>
+                                        </td>
+                                    </tr>
+                                </template>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div class="pagination">
+                        <span>{selectedPaginationLabel}</span>
+                        <div>
+                            <button class="page-btn" onclick={previousSelectedPage} disabled={disableSelectedPrevious}>‹</button>
+                            <button class="page-btn" onclick={nextSelectedPage} disabled={disableSelectedNext}>›</button>
+                        </div>
+                    </div>
+                </section>
+            </div>
+
+            <!-- Footer -->
+            <div class="footer">
+                <lightning-button 
+                    label="Cancel"
+                    onclick={handleCancel}>
+                </lightning-button>
+
+                <lightning-button 
+                    variant="brand"
+                    label="Save Questions"
+                    icon-name="utility:save"
+                    onclick={handleSave}
+                    disabled={isSaveDisabled}>
+                </lightning-button>
+            </div>
+        </template>
+    </div>
+</template>

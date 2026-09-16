@@ -1,0 +1,81 @@
+<template>
+    <lightning-quick-action-panel header="Add Customer">
+
+        <template if:true={isLoading}>
+            <div class="spinner-container">
+                <lightning-spinner alternative-text="Loading..." size="medium">
+                </lightning-spinner>
+            </div>
+        </template>
+
+        <div class="premium-container">
+
+            <div class="premium-header">
+                <div class="header-icon">
+                    👤
+                </div>
+                <div>
+                    <div class="header-title">Add Customer</div>
+                    <div class="header-subtitle">Search existing customer or create a new one</div>
+                </div>
+            </div>
+
+            <div class="field-card">
+                <lightning-input type="tel" label="Customer Phone Number" value={phoneNumber}
+                    onchange={handlePhoneChange} placeholder="Enter customer phone number" maxlength="10" required>
+                </lightning-input>
+            </div>
+
+            <template if:true={showSearchHint}>
+                <div class="hint-box">
+                    Enter at least 3 digits to search existing customers.
+                </div>
+            </template>
+
+            <template if:true={showCustomerTable}>
+                <div class="result-card">
+                    <div class="result-header">
+                        <span class="result-title">Matching Customers</span>
+                        <span class="result-count">{customerList.length} found</span>
+                    </div>
+
+                    <div class="table-container">
+                        <lightning-datatable key-field="customerId" data={customerList} columns={columns}
+                            max-row-selection="1" selected-rows={selectedCustomerIds}
+                            onrowselection={handleCustomerSelection}>
+                        </lightning-datatable>
+                    </div>
+                </div>
+            </template>
+
+            <template if:true={showNoCustomerMessage}>
+                <div class="info-box">
+                    No existing customer found. Please enter customer name manually.
+                </div>
+            </template>
+
+            <template if:true={isExistingCustomer}>
+                <div class="success-box">
+                    Existing customer selected. Customer name has been auto-filled.
+                </div>
+            </template>
+
+            <div class="field-card">
+                <lightning-input type="text" label="Customer Name" value={customerName} onchange={handleNameChange}
+                    disabled={isExistingCustomer} placeholder="Enter customer name" required>
+                </lightning-input>
+            </div>
+
+        </div>
+
+        <div slot="footer" class="premium-footer">
+            <lightning-button label="Cancel" variant="neutral" onclick={handleCancel}>
+            </lightning-button>
+
+            <lightning-button label="Add Customer" variant="brand" onclick={handleAdd} disabled={disableAdd}
+                class="slds-m-left_small">
+            </lightning-button>
+        </div>
+
+    </lightning-quick-action-panel>
+</template>

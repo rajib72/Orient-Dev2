@@ -1,0 +1,284 @@
+.related-list-container {
+    background: #ffffff;
+    padding: 12px;
+    border-radius: 10px;
+}
+
+/* Header */
+
+.list-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding-bottom: 10px;
+    border-bottom: 1px solid #dddbda;
+}
+
+.header-left {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.icon-circle {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: #ffe7eb;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.icon-circle lightning-icon {
+    --slds-c-icon-color-foreground-default: #ff4d6d;
+}
+
+.list-title {
+    font-size: 15px;
+    font-weight: 700;
+    color: #2f0f08;
+    margin: 0;
+}
+
+/* Spinner */
+
+.spinner-area {
+    position: relative;
+    min-height: 120px;
+}
+
+/* Tile Layout */
+
+.tile-wrapper {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
+    margin-top: 12px;
+}
+
+.line-item-tile {
+    border: 1px solid #dddbda;
+    border-radius: 10px;
+    background: #ffffff;
+    padding: 12px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+}
+
+.tile-top {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 8px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid #f0f0f0;
+}
+
+.record-link {
+    font-size: 13px;
+    color: #c00000;
+    font-weight: 700;
+    text-decoration: underline;
+}
+
+.tile-body {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px 14px;
+    padding-top: 10px;
+}
+
+.info-block {
+    min-width: 0;
+}
+
+.full-width {
+    grid-column: 1 / -1;
+}
+
+.tile-label {
+    font-size: 10px;
+    color: #706e6b;
+    margin: 0 0 3px 0;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.2px;
+}
+
+.tile-value {
+    font-size: 12px;
+    color: #2f2f2f;
+    margin: 0;
+    line-height: 1.35;
+}
+
+.wrap-text {
+    white-space: normal;
+    word-break: break-word;
+}
+
+.price-text {
+    font-weight: 700;
+    color: #2f0f08;
+}
+
+/* Status */
+
+.status-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 5px 8px;
+    border-radius: 14px;
+    font-size: 11px;
+    font-weight: 700;
+    line-height: 1;
+    white-space: nowrap;
+    flex-shrink: 0;
+}
+
+.status-dot {
+    width: 9px;
+    height: 9px;
+    border-radius: 50%;
+    display: inline-block;
+    flex-shrink: 0;
+}
+
+.status-ready {
+    background: #e9f8ee;
+    color: #087a18;
+    border: 1px solid #81d898;
+}
+
+.dot-ready {
+    background: #159947;
+}
+
+.status-removed {
+    background: #fff0f0;
+    color: #d40000;
+    border: 1px solid #ff9999;
+}
+
+.dot-removed {
+    background: #e60000;
+}
+
+.status-sent-pre {
+    background: #eaf3ff;
+    color: #005fb2;
+    border: 1px solid #8cc7ff;
+}
+
+.dot-sent-pre {
+    background: #0176d3;
+}
+
+.status-finalize-pre {
+    background: #fff5d9;
+    color: #8a6100;
+    border: 1px solid #f5c542;
+}
+
+.dot-finalize-pre {
+    background: #c98a00;
+}
+
+.status-finalize-post {
+    background: #f1e9ff;
+    color: #5b2bbd;
+    border: 1px solid #b79cff;
+}
+
+.dot-finalize-post {
+    background: #6b3fc9;
+}
+
+.status-removed-erp {
+    background: #fde7e9;
+    color: #b00020;
+    border: 1px solid #ff9aa5;
+}
+
+.status-new {
+    background: #e6f7ff;
+    color: #0070a8;
+    border: 1px solid #7dd8ff;
+}
+
+.dot-new {
+    background: #00a1e0;
+}
+
+.status-default {
+    background: #f3f3f3;
+    color: #444444;
+    border: 1px solid #c9c9c9;
+}
+
+.dot-default {
+    background: #8a8a8a;
+}
+
+/* Empty */
+
+.no-records {
+    padding: 22px;
+    text-align: center;
+    color: #706e6b;
+    font-size: 13px;
+}
+
+.barcode-text {
+    font-size: 13px;
+    font-weight: 800;
+    color: #0d09e4;
+    letter-spacing: 0.3px;
+}
+
+/* Tablet portrait */
+
+@media only screen and (max-width: 900px) {
+    .tile-wrapper {
+        grid-template-columns: 1fr;
+    }
+
+    .line-item-tile {
+        padding: 11px;
+    }
+
+    .barcode-text {
+        font-size: 12px;
+    }
+
+    .list-title {
+        font-size: 14px;
+    }
+
+    .tile-value {
+        font-size: 11.5px;
+    }
+
+    .status-pill {
+        font-size: 10.5px;
+        padding: 5px 7px;
+    }
+}
+
+/* Small mobile */
+
+@media only screen and (max-width: 600px) {
+    .related-list-container {
+        padding: 10px;
+    }
+
+    .tile-body {
+        grid-template-columns: 1fr;
+    }
+
+    .tile-top {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+}

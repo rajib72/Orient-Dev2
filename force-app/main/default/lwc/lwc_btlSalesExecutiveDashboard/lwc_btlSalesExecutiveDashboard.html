@@ -1,0 +1,1391 @@
+<template>
+    <template if:true={isLoading}>
+        <div class="loading-overlay">
+            <lightning-spinner
+                alternative-text="Loading BTL activities"
+                size="medium">
+            </lightning-spinner>
+        </div>
+    </template>
+
+    <div class="dashboard-shell">
+
+        <aside class="sidebar">
+            <div class="brand-icon">
+                <lightning-icon
+                    icon-name="standard:store"
+                    size="large">
+                </lightning-icon>
+            </div>
+
+            <button
+                type="button"
+                class={todayTabClass}
+                data-tab="TODAY"
+                onclick={handleTabChange}>
+
+                <span class="sidebar-icon">
+                    <lightning-icon
+                        icon-name="utility:today"
+                        size="small"
+                        variant="inverse"
+                        alternative-text="Today's Activities">
+                    </lightning-icon>
+                </span>
+
+                <span>Today's Activities</span>
+            </button>
+
+            <button
+                type="button"
+                class={pastTabClass}
+                data-tab="PAST"
+                onclick={handleTabChange}>
+
+                <span class="sidebar-icon">
+                    <lightning-icon
+                        icon-name="utility:history"
+                        size="small"
+                        variant="inverse"
+                        alternative-text="Past Activities">
+                    </lightning-icon>
+                </span>
+
+                <span>Past Activities</span>
+            </button>
+        </aside>
+
+        <main class="main-content">
+
+            <header class="page-header">
+                <div>
+                    <h1>BTL Sales Executive</h1>
+                    <p>Perform BTL Activities</p>
+                </div>
+
+                <div class="header-date">
+                    <lightning-icon
+                        icon-name="utility:event"
+                        size="small">
+                    </lightning-icon>
+
+                    <div>
+                        <strong>{currentDateLabel}</strong>
+                        <span>{currentDayLabel}</span>
+                    </div>
+                </div>
+
+                <div class="store-selector">
+                    <lightning-combobox
+                        label="Store"
+                        value={selectedStoreId}
+                        options={storeOptions}
+                        onchange={handleStoreChange}
+                        disabled={storeSelectionDisabled}>
+                    </lightning-combobox>
+                </div>
+            </header>
+
+            <section class="information-banner">
+                <lightning-icon
+                    icon-name="utility:info"
+                    size="small">
+                </lightning-icon>
+
+                <span>
+                    Today’s activities remain available for response
+                    capture until 11:59 PM. After 12:00 AM they move
+                    to Past Activities and become read-only.
+                </span>
+            </section>
+
+            <section class="content-card">
+
+                <div class="section-heading">
+                    <h2>{sectionTitle}</h2>
+
+                    <span class="count-badge">
+                        {activityCount}
+                    </span>
+
+                    <lightning-button-icon
+                        class="refresh-button"
+                        icon-name="utility:refresh"
+                        alternative-text="Refresh"
+                        title="Refresh Dashboard"
+                        variant="border-filled"
+                        disabled={isLoading}
+                        onclick={handleRefresh}>
+                    </lightning-button-icon>
+                </div>
+
+                <template if:true={isTodayTab}>
+                    <div class="summary-grid">
+
+                        <div class="summary-card total-card">
+                            <lightning-icon
+                                icon-name="utility:event"
+                                size="medium">
+                            </lightning-icon>
+
+                            <div>
+                                <span>Total Activities</span>
+                                <strong>{totalActivities}</strong>
+                            </div>
+                        </div>
+
+                        <div class="summary-card ready-card">
+                            <lightning-icon
+                                icon-name="utility:play"
+                                size="medium">
+                            </lightning-icon>
+
+                            <div>
+                                <span>Ready to Start</span>
+                                <strong>{readyToStartActivities}</strong>
+                            </div>
+                        </div>
+
+                        <div class="summary-card progress-card">
+                            <lightning-icon
+                                icon-name="utility:clock"
+                                size="medium">
+                            </lightning-icon>
+
+                            <div>
+                                <span>In Progress</span>
+                                <strong>{inProgressActivities}</strong>
+                            </div>
+                        </div>
+
+                        <div class="summary-card completed-card">
+                            <lightning-icon
+                                icon-name="utility:success"
+                                size="medium">
+                            </lightning-icon>
+
+                            <div>
+                                <span>Completed</span>
+                                <strong>{completedActivities}</strong>
+                            </div>
+                        </div>
+
+                    </div>
+                </template>
+
+                <template if:true={hasActivities}>
+                    <div class="table-wrapper">
+                        <table class="activity-table">
+                            <thead>
+                                <tr>
+                                    <th>#</th>
+                                    <th>Activity</th>
+                                    <th>Activity Code</th>
+                                    <th>Members</th>
+                                    <th>Activity Location</th>
+                                    <th>Activity Date</th>
+                                    <th>Status</th>
+                                    <th>Start Time</th>
+                                    <th>Completed Time</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+
+                            <tbody>
+                                <template
+                                    for:each={activities}
+                                    for:item="activity">
+
+                                    <tr key={activity.rowKey}>
+                                        <td>{activity.serialNo}</td>
+
+                                        <td>
+                                            <div class="activity-name">
+                                                <strong>
+                                                    {activity.activityName}
+                                                </strong>
+
+                                                <span>
+                                                    {activity.storeName}
+                                                </span>
+
+                                            </div>
+                                        </td>
+
+                                        <td>{activity.activityNo}</td>
+
+                                        <td>
+                                            <div class="member-list">
+                                                <template
+                                                    for:each={activity.members}
+                                                    for:item="member">
+
+                                                    <div
+                                                        key={member.dateAssignmentId}
+                                                        class="member-row">
+
+                                                        <span>
+                                                            {member.memberName}
+                                                        </span>
+
+                                                        <template
+                                                            if:true={member.present}>
+
+                                                            <lightning-icon
+                                                                icon-name="utility:success"
+                                                                size="xx-small"
+                                                                alternative-text="Present">
+                                                            </lightning-icon>
+                                                        </template>
+                                                    </div>
+                                                </template>
+                                            </div>
+                                        </td>
+
+                                        <td>
+                                            <div class="activity-location-cell">
+                                                <lightning-icon
+                                                    icon-name="utility:location"
+                                                    size="xx-small"
+                                                    alternative-text="Activity Location">
+                                                </lightning-icon>
+
+                                                <span>
+                                                    {activity.activityLocationLabel}
+                                                </span>
+                                            </div>
+                                        </td>
+
+                                        <td>{activity.formattedDate}</td>
+
+                                        <td>
+                                            <span class={activity.statusClass}>
+                                                {activity.displayStatus}
+                                            </span>
+                                        </td>
+
+                                        <td>
+                                            {activity.formattedStartTime}
+                                        </td>
+
+                                        <td>
+                                            {activity.formattedCompletedTime}
+                                        </td>
+
+                                        <td>
+                                            <div class="action-group">
+
+                                                <template
+                                                    if:true={activity.canStart}>
+
+                                                    <button
+                                                        type="button"
+                                                        class="action-button primary-button"
+                                                        data-key={activity.rowKey}
+                                                        onclick={handleStart}>
+
+                                                        <lightning-icon
+                                                            icon-name="utility:play"
+                                                            size="xx-small"
+                                                            variant="inverse">
+                                                        </lightning-icon>
+
+                                                        Start
+                                                    </button>
+                                                </template>
+
+                                                <template
+                                                    if:true={activity.canContinue}>
+
+                                                    <button
+                                                        type="button"
+                                                        class="action-button secondary-button"
+                                                        data-key={activity.rowKey}
+                                                        onclick={handleContinue}>
+
+                                                        <lightning-icon
+                                                            icon-name="utility:play"
+                                                            size="xx-small">
+                                                        </lightning-icon>
+
+                                                        Continue
+                                                    </button>
+                                                </template>
+
+                                                <template
+                                                    if:true={activity.canComplete}>
+
+                                                    <button
+                                                        type="button"
+                                                        class="action-button complete-button"
+                                                        data-key={activity.rowKey}
+                                                        onclick={handleComplete}>
+
+                                                        <lightning-icon
+                                                            icon-name="utility:success"
+                                                            size="xx-small">
+                                                        </lightning-icon>
+
+                                                        Complete
+                                                    </button>
+                                                </template>
+
+                                                <template
+                                                    if:true={activity.canViewResponses}>
+
+                                                    <button
+                                                        type="button"
+                                                        class="action-button secondary-button"
+                                                        data-key={activity.rowKey}
+                                                        onclick={handleViewResponses}>
+
+                                                        <lightning-icon
+                                                            icon-name="utility:preview"
+                                                            size="xx-small">
+                                                        </lightning-icon>
+
+                                                        View Responses
+                                                    </button>
+                                                </template>
+
+                                                <template
+                                                    if:true={activity.showExpiredMessage}>
+
+                                                    <span class="expired-message">
+                                                        Response capture closed
+                                                    </span>
+                                                </template>
+
+                                            </div>
+                                        </td>
+                                    </tr>
+                                </template>
+                            </tbody>
+                        </table>
+                    </div>
+                </template>
+
+                <template if:false={hasActivities}>
+                    <div class="empty-state">
+                        <lightning-icon
+                            icon-name="utility:info_alt"
+                            size="large">
+                        </lightning-icon>
+
+                        <h3>No activities found</h3>
+                        <p>{emptyStateMessage}</p>
+                    </div>
+                </template>
+            </section>
+
+            <template if:true={isTodayTab}>
+                <section class="instruction-card">
+                    <h3>
+                        <lightning-icon
+                            icon-name="utility:info"
+                            size="small">
+                        </lightning-icon>
+
+                        Instructions
+                    </h3>
+
+                    <p>
+                        Click Start, mark attendance, and then begin
+                        capturing BTL responses.
+                    </p>
+
+                    <p>
+                        Ready to Start means the Store Manager has made
+                        the activity live, but the BTL team has not started
+                        attendance and response capture yet.
+                    </p>
+
+                    <p>
+                        Use Continue to capture additional customer
+                        responses for an activity already in progress.
+                    </p>
+
+                    <p>
+                        Click Complete only after all BTL response
+                        capturing has finished for the day.
+                    </p>
+                </section>
+            </template>
+        </main>
+    </div>
+
+    <template if:true={showExecutionModal}>
+        <section
+            role="dialog"
+            tabindex="-1"
+            aria-modal="true"
+            class="slds-modal slds-fade-in-open execution-modal">
+
+            <div class="slds-modal__container">
+
+                <header class="slds-modal__header modal-header">
+
+                    <button
+                        type="button"
+                        class="modal-close-button"
+                        title="Close"
+                        onclick={closeExecutionModal}>
+
+                        <lightning-icon
+                            icon-name="utility:close"
+                            alternative-text="Close"
+                            size="x-small">
+                        </lightning-icon>
+                    </button>
+
+                    <h2>{executionModalTitle}</h2>
+
+                    <div class="step-indicator">
+                        <div class={attendanceStepClass}>
+                            <span>1</span>
+                            Attendance
+                        </div>
+
+                        <div class="step-line"></div>
+
+                        <div class={formStepClass}>
+                            <span>2</span>
+                            BTL Response Form
+                        </div>
+                    </div>
+                </header>
+
+                <div class="slds-modal__content modal-content">
+
+                    <template if:true={isAttendanceStep}>
+
+                        <div class="activity-summary">
+                            <div>
+                                <span>Activity</span>
+
+                                <strong>
+                                    {selectedActivity.activityName}
+                                </strong>
+                            </div>
+
+                            <div>
+                                <span>Activity Code</span>
+
+                                <strong>
+                                    {selectedActivity.activityNo}
+                                </strong>
+                            </div>
+
+                            <div>
+                                <span>Store</span>
+
+                                <strong>
+                                    {selectedActivity.storeName}
+                                </strong>
+                            </div>
+
+                            <div>
+                                <span>Date</span>
+
+                                <strong>
+                                    {selectedActivity.formattedDate}
+                                </strong>
+                            </div>
+
+                            <div>
+                                <span>Location</span>
+
+                                <strong>
+                                    {selectedActivity.activityLocationLabel}
+                                </strong>
+                            </div>
+                        </div>
+
+                        <div class="attendance-heading">
+                            <div>
+                                <h3>Mark Attendance</h3>
+
+                                <p>
+                                    Select every BTL member who is
+                                    present for this activity.
+                                </p>
+                            </div>
+
+                            <span>
+                                {selectedAttendanceCount} Present
+                            </span>
+                        </div>
+
+                        <div class="attendance-list">
+                            <template
+                                for:each={attendanceMembers}
+                                for:item="member">
+
+                                <label
+                                    key={member.dateAssignmentId}
+                                    class={member.attendanceClass}>
+
+                                    <div class="member-avatar">
+                                        {member.initials}
+                                    </div>
+
+                                    <div class="member-details">
+                                        <strong>
+                                            {member.memberName}
+                                        </strong>
+
+                                        <span>
+                                            BTL Sales Executive
+                                        </span>
+                                    </div>
+
+                                    <lightning-input
+                                        type="checkbox"
+                                        label="Present"
+                                        variant="label-inline"
+                                        data-id={member.dateAssignmentId}
+                                        checked={member.checked}
+                                        onchange={handleAttendanceChange}>
+                                    </lightning-input>
+                                </label>
+                            </template>
+                        </div>
+
+                    </template>
+
+                    <template if:true={isFormStep}>
+                        <c-lwc_interactive-customer-form
+                            form-id={selectedActivity.finalCustomizeFormId}
+                            activity-id={selectedActivity.activityId}
+                            daily-execution-id={selectedActivity.dailyExecutionId}
+                            is-modal-view={interactiveFormModalView}
+                            onbacktodashboard={handleFormBack}>
+                        </c-lwc_interactive-customer-form>
+                    </template>
+                </div>
+
+                <template if:true={isAttendanceStep}>
+                    <footer class="slds-modal__footer">
+                        <lightning-button
+                            label="Cancel"
+                            onclick={closeExecutionModal}>
+                        </lightning-button>
+
+                        <lightning-button
+                            class="slds-m-left_small"
+                            label="Start Activity"
+                            variant="brand"
+                            onclick={handleStartActivity}
+                            disabled={disableStartActivity}>
+                        </lightning-button>
+                    </footer>
+                </template>
+            </div>
+        </section>
+
+        <div class="slds-backdrop slds-backdrop_open"></div>
+    </template>
+
+    <template if:true={showResponseModal}>
+        <section
+            role="dialog"
+            tabindex="-1"
+            aria-modal="true"
+            class="slds-modal slds-fade-in-open response-modal">
+
+            <div class="slds-modal__container">
+
+                <header class="slds-modal__header response-modal-header">
+
+                    <button
+                        type="button"
+                        class="modal-close-button"
+                        title="Close"
+                        onclick={closeResponseModal}>
+
+                        <lightning-icon
+                            icon-name="utility:close"
+                            alternative-text="Close"
+                            size="x-small">
+                        </lightning-icon>
+                    </button>
+
+                    <h2 class="slds-text-heading_medium">
+                        BTL Responses
+                    </h2>
+
+                    <p class="slds-m-top_x-small">
+                        {selectedActivity.activityName}
+                    </p>
+                </header>
+
+                <div class="slds-modal__content slds-p-around_medium">
+
+                    <template if:true={isResponseLoading}>
+                        <lightning-spinner
+                            alternative-text="Loading responses"
+                            size="medium">
+                        </lightning-spinner>
+                    </template>
+
+                    <template if:true={hasResponses}>
+                        <div class="table-wrapper">
+                            <table class="activity-table response-table">
+                                <thead>
+                                    <tr>
+                                        <th>Response No.</th>
+                                        <th>Customer</th>
+                                        <th>Phone</th>
+                                        <th>Executives</th>
+                                        <th>Captured At</th>
+                                        <th>Action</th>
+                                    </tr>
+                                </thead>
+
+                                <tbody>
+                                    <template
+                                        for:each={responses}
+                                        for:item="response">
+
+                                        <tr key={response.responseId}>
+                                            <td>
+                                                {response.responseNo}
+                                            </td>
+
+                                            <td>
+                                                {response.customerName}
+                                            </td>
+
+                                            <td>
+                                                {response.phoneNo}
+                                            </td>
+
+                                            <td>
+                                                {response.executiveNames}
+                                            </td>
+
+                                            <td>
+                                                {response.formattedDateTime}
+                                            </td>
+
+                                            <td>
+                                                <lightning-button
+                                                    label="Open"
+                                                    variant="base"
+                                                    data-id={response.responseId}
+                                                    onclick={handleOpenResponse}>
+                                                </lightning-button>
+                                            </td>
+                                        </tr>
+                                    </template>
+                                </tbody>
+                            </table>
+                        </div>
+                    </template>
+
+                    <template if:true={showNoResponses}>
+                        <div class="empty-state response-empty-state">
+                            <h3>No responses found</h3>
+                        </div>
+                    </template>
+                </div>
+
+                <footer class="slds-modal__footer">
+                    <lightning-button
+                        label="Close"
+                        onclick={closeResponseModal}>
+                    </lightning-button>
+                </footer>
+            </div>
+        </section>
+
+        <div class="slds-backdrop slds-backdrop_open"></div>
+    </template>
+</template>
+<!-- <template>
+    <template if:true={isLoading}>
+        <div class="loading-overlay">
+            <lightning-spinner
+                alternative-text="Loading BTL activities"
+                size="medium">
+            </lightning-spinner>
+        </div>
+    </template>
+
+    <div class="dashboard-shell">
+
+        <aside class="sidebar">
+            <div class="brand-icon">
+                <lightning-icon
+                    icon-name="standard:store"
+                    size="large">
+                </lightning-icon>
+            </div>
+
+            <button
+                type="button"
+                class={todayTabClass}
+                data-tab="TODAY"
+                onclick={handleTabChange}>
+
+                <span class="sidebar-icon">
+                    <lightning-icon
+                        icon-name="utility:today"
+                        size="small"
+                        variant="inverse"
+                        alternative-text="Today's Activities">
+                    </lightning-icon>
+                </span>
+
+                <span>Today's Activities</span>
+            </button>
+
+            <button
+                type="button"
+                class={pastTabClass}
+                data-tab="PAST"
+                onclick={handleTabChange}>
+
+                <span class="sidebar-icon">
+                    <lightning-icon
+                        icon-name="utility:history"
+                        size="small"
+                        variant="inverse"
+                        alternative-text="Past Activities">
+                    </lightning-icon>
+                </span>
+
+                <span>Past Activities</span>
+            </button>
+        </aside>
+
+        <main class="main-content">
+
+            <header class="page-header">
+                <div>
+                    <h1>BTL Sales Executive</h1>
+                    <p>Perform BTL Activities</p>
+                </div>
+
+                <div class="header-date">
+                    <lightning-icon
+                        icon-name="utility:event"
+                        size="small">
+                    </lightning-icon>
+
+                    <div>
+                        <strong>{currentDateLabel}</strong>
+                        <span>{currentDayLabel}</span>
+                    </div>
+                </div>
+
+                <div class="store-selector">
+                    <lightning-combobox
+                        label="Store"
+                        value={selectedStoreId}
+                        options={storeOptions}
+                        onchange={handleStoreChange}
+                        disabled={storeSelectionDisabled}>
+                    </lightning-combobox>
+                </div>
+            </header>
+
+            <section class="information-banner">
+                <lightning-icon
+                    icon-name="utility:info"
+                    size="small">
+                </lightning-icon>
+
+                <span>
+                    Today’s activities remain available for response
+                    capture until 11:59 PM. After 12:00 AM they move
+                    to Past Activities and become read-only.
+                </span>
+            </section>
+
+            <section class="content-card">
+
+                <div class="section-heading">
+                    <h2>{sectionTitle}</h2>
+
+                    <span class="count-badge">
+                        {activityCount}
+                    </span>
+
+                    <lightning-button-icon
+                        class="refresh-button"
+                        icon-name="utility:refresh"
+                        alternative-text="Refresh"
+                        title="Refresh Dashboard"
+                        variant="border-filled"
+                        disabled={isLoading}
+                        onclick={handleRefresh}>
+                    </lightning-button-icon>
+                </div>
+
+                <template if:true={isTodayTab}>
+                    <div class="summary-grid">
+
+                        <div class="summary-card total-card">
+                            <lightning-icon
+                                icon-name="utility:event"
+                                size="medium">
+                            </lightning-icon>
+
+                            <div>
+                                <span>Total Activities</span>
+                                <strong>{totalActivities}</strong>
+                            </div>
+                        </div>
+
+                        <div class="summary-card ready-card">
+                            <lightning-icon
+                                icon-name="utility:play"
+                                size="medium">
+                            </lightning-icon>
+
+                            <div>
+                                <span>Ready to Start</span>
+                                <strong>{readyToStartActivities}</strong>
+                            </div>
+                        </div>
+
+                        <div class="summary-card progress-card">
+                            <lightning-icon
+                                icon-name="utility:clock"
+                                size="medium">
+                            </lightning-icon>
+
+                            <div>
+                                <span>In Progress</span>
+                                <strong>{inProgressActivities}</strong>
+                            </div>
+                        </div>
+
+                        <div class="summary-card completed-card">
+                            <lightning-icon
+                                icon-name="utility:success"
+                                size="medium">
+                            </lightning-icon>
+
+                            <div>
+                                <span>Completed</span>
+                                <strong>{completedActivities}</strong>
+                            </div>
+                        </div>
+
+                    </div>
+                </template>
+
+                <template if:true={hasActivities}>
+                    <div class="table-wrapper">
+                        <table class="activity-table">
+                            <thead>
+                                <tr>
+                                    <th>#</th>
+                                    <th>Activity</th>
+                                    <th>Activity Code</th>
+                                    <th>Members</th>
+                                    <th>Activity Date</th>
+                                    <th>Status</th>
+                                    <th>Start Time</th>
+                                    <th>Completed Time</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+
+                            <tbody>
+                                <template
+                                    for:each={activities}
+                                    for:item="activity">
+
+                                    <tr key={activity.rowKey}>
+                                        <td>{activity.serialNo}</td>
+
+                                        <td>
+                                            <div class="activity-name">
+                                                <strong>
+                                                    {activity.activityName}
+                                                </strong>
+
+                                                <span>
+                                                    {activity.storeName}
+                                                </span>
+
+                                                <template
+                                                    if:true={activity.activityLocation}>
+
+                                                    <span>
+                                                        {activity.activityLocation}
+                                                    </span>
+                                                </template>
+                                            </div>
+                                        </td>
+
+                                        <td>{activity.activityNo}</td>
+
+                                        <td>
+                                            <div class="member-list">
+                                                <template
+                                                    for:each={activity.members}
+                                                    for:item="member">
+
+                                                    <div
+                                                        key={member.dateAssignmentId}
+                                                        class="member-row">
+
+                                                        <span>
+                                                            {member.memberName}
+                                                        </span>
+
+                                                        <template
+                                                            if:true={member.present}>
+
+                                                            <lightning-icon
+                                                                icon-name="utility:success"
+                                                                size="xx-small"
+                                                                alternative-text="Present">
+                                                            </lightning-icon>
+                                                        </template>
+                                                    </div>
+                                                </template>
+                                            </div>
+                                        </td>
+
+                                        <td>{activity.formattedDate}</td>
+
+                                        <td>
+                                            <span class={activity.statusClass}>
+                                                {activity.displayStatus}
+                                            </span>
+                                        </td>
+
+                                        <td>
+                                            {activity.formattedStartTime}
+                                        </td>
+
+                                        <td>
+                                            {activity.formattedCompletedTime}
+                                        </td>
+
+                                        <td>
+                                            <div class="action-group">
+
+                                                <template
+                                                    if:true={activity.canStart}>
+
+                                                    <button
+                                                        type="button"
+                                                        class="action-button primary-button"
+                                                        data-key={activity.rowKey}
+                                                        onclick={handleStart}>
+
+                                                        <lightning-icon
+                                                            icon-name="utility:play"
+                                                            size="xx-small"
+                                                            variant="inverse">
+                                                        </lightning-icon>
+
+                                                        Start
+                                                    </button>
+                                                </template>
+
+                                                <template
+                                                    if:true={activity.canContinue}>
+
+                                                    <button
+                                                        type="button"
+                                                        class="action-button secondary-button"
+                                                        data-key={activity.rowKey}
+                                                        onclick={handleContinue}>
+
+                                                        <lightning-icon
+                                                            icon-name="utility:play"
+                                                            size="xx-small">
+                                                        </lightning-icon>
+
+                                                        Continue
+                                                    </button>
+                                                </template>
+
+                                                <template
+                                                    if:true={activity.canComplete}>
+
+                                                    <button
+                                                        type="button"
+                                                        class="action-button complete-button"
+                                                        data-key={activity.rowKey}
+                                                        onclick={handleComplete}>
+
+                                                        <lightning-icon
+                                                            icon-name="utility:success"
+                                                            size="xx-small">
+                                                        </lightning-icon>
+
+                                                        Complete
+                                                    </button>
+                                                </template>
+
+                                                <template
+                                                    if:true={activity.canViewResponses}>
+
+                                                    <button
+                                                        type="button"
+                                                        class="action-button secondary-button"
+                                                        data-key={activity.rowKey}
+                                                        onclick={handleViewResponses}>
+
+                                                        <lightning-icon
+                                                            icon-name="utility:preview"
+                                                            size="xx-small">
+                                                        </lightning-icon>
+
+                                                        View Responses
+                                                    </button>
+                                                </template>
+
+                                                <template
+                                                    if:true={activity.showExpiredMessage}>
+
+                                                    <span class="expired-message">
+                                                        Response capture closed
+                                                    </span>
+                                                </template>
+
+                                            </div>
+                                        </td>
+                                    </tr>
+                                </template>
+                            </tbody>
+                        </table>
+                    </div>
+                </template>
+
+                <template if:false={hasActivities}>
+                    <div class="empty-state">
+                        <lightning-icon
+                            icon-name="utility:info_alt"
+                            size="large">
+                        </lightning-icon>
+
+                        <h3>No activities found</h3>
+                        <p>{emptyStateMessage}</p>
+                    </div>
+                </template>
+            </section>
+
+            <template if:true={isTodayTab}>
+                <section class="instruction-card">
+                    <h3>
+                        <lightning-icon
+                            icon-name="utility:info"
+                            size="small">
+                        </lightning-icon>
+
+                        Instructions
+                    </h3>
+
+                    <p>
+                        Click Start, mark attendance, and then begin
+                        capturing BTL responses.
+                    </p>
+
+                    <p>
+                        Ready to Start means the Store Manager has made
+                        the activity live, but the BTL team has not started
+                        attendance and response capture yet.
+                    </p>
+
+                    <p>
+                        Use Continue to capture additional customer
+                        responses for an activity already in progress.
+                    </p>
+
+                    <p>
+                        Click Complete only after all BTL response
+                        capturing has finished for the day.
+                    </p>
+                </section>
+            </template>
+        </main>
+    </div>
+
+    <template if:true={showExecutionModal}>
+        <section
+            role="dialog"
+            tabindex="-1"
+            aria-modal="true"
+            class="slds-modal slds-fade-in-open execution-modal">
+
+            <div class="slds-modal__container">
+
+                <header class="slds-modal__header modal-header">
+
+                    <button
+                        type="button"
+                        class="modal-close-button"
+                        title="Close"
+                        onclick={closeExecutionModal}>
+
+                        <lightning-icon
+                            icon-name="utility:close"
+                            alternative-text="Close"
+                            size="x-small">
+                        </lightning-icon>
+                    </button>
+
+                    <h2>{executionModalTitle}</h2>
+
+                    <div class="step-indicator">
+                        <div class={attendanceStepClass}>
+                            <span>1</span>
+                            Attendance
+                        </div>
+
+                        <div class="step-line"></div>
+
+                        <div class={formStepClass}>
+                            <span>2</span>
+                            BTL Response Form
+                        </div>
+                    </div>
+                </header>
+
+                <div class="slds-modal__content modal-content">
+
+                    <template if:true={isAttendanceStep}>
+
+                        <div class="activity-summary">
+                            <div>
+                                <span>Activity</span>
+
+                                <strong>
+                                    {selectedActivity.activityName}
+                                </strong>
+                            </div>
+
+                            <div>
+                                <span>Activity Code</span>
+
+                                <strong>
+                                    {selectedActivity.activityNo}
+                                </strong>
+                            </div>
+
+                            <div>
+                                <span>Store</span>
+
+                                <strong>
+                                    {selectedActivity.storeName}
+                                </strong>
+                            </div>
+
+                            <div>
+                                <span>Date</span>
+
+                                <strong>
+                                    {selectedActivity.formattedDate}
+                                </strong>
+                            </div>
+                        </div>
+
+                        <div class="attendance-heading">
+                            <div>
+                                <h3>Mark Attendance</h3>
+
+                                <p>
+                                    Select every BTL member who is
+                                    present for this activity.
+                                </p>
+                            </div>
+
+                            <span>
+                                {selectedAttendanceCount} Present
+                            </span>
+                        </div>
+
+                        <div class="attendance-list">
+                            <template
+                                for:each={attendanceMembers}
+                                for:item="member">
+
+                                <label
+                                    key={member.dateAssignmentId}
+                                    class={member.attendanceClass}>
+
+                                    <div class="member-avatar">
+                                        {member.initials}
+                                    </div>
+
+                                    <div class="member-details">
+                                        <strong>
+                                            {member.memberName}
+                                        </strong>
+
+                                        <span>
+                                            BTL Sales Executive
+                                        </span>
+                                    </div>
+
+                                    <lightning-input
+                                        type="checkbox"
+                                        label="Present"
+                                        variant="label-inline"
+                                        data-id={member.dateAssignmentId}
+                                        checked={member.checked}
+                                        onchange={handleAttendanceChange}>
+                                    </lightning-input>
+                                </label>
+                            </template>
+                        </div>
+
+                    </template>
+
+                    <template if:true={isFormStep}>
+                        <c-lwc_interactive-customer-form
+                            form-id={selectedActivity.finalCustomizeFormId}
+                            activity-id={selectedActivity.activityId}
+                            is-modal-view={interactiveFormModalView}
+                            onbacktodashboard={handleFormBack}>
+                        </c-lwc_interactive-customer-form>
+                    </template>
+                </div>
+
+                <template if:true={isAttendanceStep}>
+                    <footer class="slds-modal__footer">
+                        <lightning-button
+                            label="Cancel"
+                            onclick={closeExecutionModal}>
+                        </lightning-button>
+
+                        <lightning-button
+                            class="slds-m-left_small"
+                            label="Start Activity"
+                            variant="brand"
+                            onclick={handleStartActivity}
+                            disabled={disableStartActivity}>
+                        </lightning-button>
+                    </footer>
+                </template>
+            </div>
+        </section>
+
+        <div class="slds-backdrop slds-backdrop_open"></div>
+    </template>
+
+    <template if:true={showResponseModal}>
+        <section
+            role="dialog"
+            tabindex="-1"
+            aria-modal="true"
+            class="slds-modal slds-fade-in-open response-modal">
+
+            <div class="slds-modal__container">
+
+                <header class="slds-modal__header response-modal-header">
+
+                    <button
+                        type="button"
+                        class="modal-close-button"
+                        title="Close"
+                        onclick={closeResponseModal}>
+
+                        <lightning-icon
+                            icon-name="utility:close"
+                            alternative-text="Close"
+                            size="x-small">
+                        </lightning-icon>
+                    </button>
+
+                    <h2 class="slds-text-heading_medium">
+                        BTL Responses
+                    </h2>
+
+                    <p class="slds-m-top_x-small">
+                        {selectedActivity.activityName}
+                    </p>
+                </header>
+
+                <div class="slds-modal__content slds-p-around_medium">
+
+                    <template if:true={isResponseLoading}>
+                        <lightning-spinner
+                            alternative-text="Loading responses"
+                            size="medium">
+                        </lightning-spinner>
+                    </template>
+
+                    <template if:true={hasResponses}>
+                        <div class="table-wrapper">
+                            <table class="activity-table response-table">
+                                <thead>
+                                    <tr>
+                                        <th>Response No.</th>
+                                        <th>Customer</th>
+                                        <th>Phone</th>
+                                        <th>Executives</th>
+                                        <th>Captured At</th>
+                                        <th>Action</th>
+                                    </tr>
+                                </thead>
+
+                                <tbody>
+                                    <template
+                                        for:each={responses}
+                                        for:item="response">
+
+                                        <tr key={response.responseId}>
+                                            <td>
+                                                {response.responseNo}
+                                            </td>
+
+                                            <td>
+                                                {response.customerName}
+                                            </td>
+
+                                            <td>
+                                                {response.phoneNo}
+                                            </td>
+
+                                            <td>
+                                                {response.executiveNames}
+                                            </td>
+
+                                            <td>
+                                                {response.formattedDateTime}
+                                            </td>
+
+                                            <td>
+                                                <lightning-button
+                                                    label="Open"
+                                                    variant="base"
+                                                    data-id={response.responseId}
+                                                    onclick={handleOpenResponse}>
+                                                </lightning-button>
+                                            </td>
+                                        </tr>
+                                    </template>
+                                </tbody>
+                            </table>
+                        </div>
+                    </template>
+
+                    <template if:true={showNoResponses}>
+                        <div class="empty-state response-empty-state">
+                            <h3>No responses found</h3>
+                        </div>
+                    </template>
+                </div>
+
+                <footer class="slds-modal__footer">
+                    <lightning-button
+                        label="Close"
+                        onclick={closeResponseModal}>
+                    </lightning-button>
+                </footer>
+            </div>
+        </section>
+
+        <div class="slds-backdrop slds-backdrop_open"></div>
+    </template>
+</template> -->

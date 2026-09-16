@@ -1,0 +1,114 @@
+<template>
+    <lightning-card>
+        <div class="related-list-container">
+
+            <!-- Header -->
+            <div class="list-header">
+                <div class="header-left">
+                    <div class="icon-circle">
+                        <lightning-icon icon-name="utility:favorite" size="x-small" alternative-text="Line Items">
+                        </lightning-icon>
+                    </div>
+
+                    <div>
+                        <h2 class="list-title">
+                            Estimation Order Line Items ({recordCount})
+                        </h2>
+                    </div>
+                </div>
+
+                <lightning-button-icon icon-name="utility:refresh" variant="border-filled" alternative-text="Refresh"
+                    title="Refresh" onclick={handleRefresh}>
+                </lightning-button-icon>
+            </div>
+
+            <!-- Loading -->
+            <template if:true={isLoading}>
+                <div class="spinner-area">
+                    <lightning-spinner alternative-text="Loading" size="medium">
+                    </lightning-spinner>
+                </div>
+            </template>
+
+            <!-- Tiles -->
+            <template if:false={isLoading}>
+                <template if:true={hasRecords}>
+                    <div class="tile-wrapper">
+                        <template for:each={lineItems} for:item="item">
+                            <div key={item.Id} class="line-item-tile">
+
+                                <div class="tile-top">
+                                    <div>
+                                        <p class="tile-label">Estimation Line Item No</p>
+                                        <a href={item.recordUrl} target="_blank" class="record-link">
+                                            {item.Name}
+                                        </a>
+                                    </div>
+
+                                    
+
+                                    <span class={item.statusClass}>
+                                        <span class={item.statusDotClass}></span>
+                                    {item.statusLabel}
+                                    </span>
+
+                                </div>
+
+                                <div class="tile-body">
+
+                                    <div class="info-block full-width">
+                                        <p class="tile-label">Barcode</p>
+                                        <p class="tile-value barcode-text">
+                                            {item.Barcode_Value__c}
+                                        </p>
+                                    </div>
+
+                                    <div class="info-block full-width">
+                                        <p class="tile-label">SKU Details</p>
+                                        <p class="tile-value wrap-text">
+                                            {item.SKU_Details__c}
+                                        </p>
+                                    </div>
+
+                                    <div class="info-block">
+                                        <p class="tile-label">Active Sales Executive</p>
+                                        <p class="tile-value">
+                                            {item.Active_Sales_Executive_Details__c}
+                                        </p>
+                                    </div>
+
+                                    <div class="info-block">
+                                        <p class="tile-label">Total Price</p>
+                                        <p class="tile-value price-text">
+                                            <lightning-formatted-number value={item.Total_Price_Incl_GST__c}
+                                                format-style="currency" currency-code="INR" minimum-fraction-digits="2">
+                                            </lightning-formatted-number>
+                                        </p>
+                                    </div>
+
+                                    <div class="info-block">
+                                        <p class="tile-label">Created Date</p>
+                                        <p class="tile-value">
+                                            <lightning-formatted-date-time value={item.CreatedDate} year="numeric"
+                                                month="2-digit" day="2-digit" hour="2-digit" minute="2-digit">
+                                            </lightning-formatted-date-time>
+                                        </p>
+                                    </div>
+
+                                </div>
+
+                            </div>
+                        </template>
+                    </div>
+                </template>
+
+                <template if:false={hasRecords}>
+                    <div class="no-records">
+                        No Estimation Line Items found.
+                    </div>
+                </template>
+            </template>
+
+        </div>
+    </lightning-card>
+</template>

@@ -1,0 +1,79 @@
+<template>
+    <lightning-card>
+
+        <!-- FILTER SECTION WITH BACKGROUND -->
+        <div class="modal-safe-wrapper">
+            <div class="filter-section slds-p-around_small slds-grid slds-gutters slds-wrap">
+
+                <div class="slds-col slds-size_1-of-3 date-wrapper">
+                    <lightning-input type="date" label="Start Date" value={startDate} onchange={updateStart}>
+                    </lightning-input>
+                </div>
+
+                <div class="slds-col slds-size_1-of-3 date-wrapper">
+                    <lightning-input type="date" label="End Date" value={endDate} onchange={updateEnd}>
+                    </lightning-input>
+                </div>
+
+                <div class="slds-col slds-size_1-of-3 slds-m-top_large big-search-btn">
+                    <lightning-button label="Search" variant="brand" onclick={searchRecords}>
+                    </lightning-button>
+                    <!-- Only show when data exists -->
+                    <template if:true={records.length}>
+                        <lightning-button label="Download Excel" variant="success" class="slds-m-left_small"
+                            onclick={exportToExcel}>
+                        </lightning-button>
+                        <lightning-button
+    label="Cancel"
+    variant="neutral"
+    class="slds-m-left_small"
+    onclick={handleCancel}>
+</lightning-button>
+
+                    </template>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- TABLE SECTION WITH SCROLLABLE BODY -->
+        <div class="table-wrapper">
+            <template if:true={records.length}>
+                <table class="slds-table slds-table_cell-buffer slds-table_bordered">
+                    <thead>
+                        <tr>
+                            <th>Customer</th>
+                            <th>Phone</th>
+                            <th>Description</th>
+                            <th>Entry Time</th>
+                            <th>Exit Time</th>
+                            <th>Visit Date</th>
+                            <th>Visit Purpose</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <template for:each={records} for:item="rec">
+                            <tr key={rec.Id}>
+                                <td>{rec.Customer_Name__c}</td>
+                                <td>{rec.Phone__c}</td>
+                                <td>{rec.Store_Interaction_Details__c}</td>
+                                <td>{rec.Entry_Time__c}</td>
+                                <td>{rec.Exit_Time__c}</td>
+                                <td>{rec.Visit_Date__c}</td>
+                                <td>{rec.Visit_Purpose__c}</td>
+                            </tr>
+                        </template>
+                    </tbody>
+                </table>
+            </template>
+
+            <template if:true={noData}>
+                <div class="no-data-box">
+                    <lightning-icon icon-name="utility:warning" size="small" class="no-data-icon"></lightning-icon>
+                    <p>No records found</p>
+                </div>
+            </template>
+        </div>
+
+    </lightning-card>
+</template>

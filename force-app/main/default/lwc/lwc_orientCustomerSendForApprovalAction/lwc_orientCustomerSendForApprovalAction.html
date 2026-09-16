@@ -1,0 +1,500 @@
+<template>
+    <lightning-quick-action-panel class={quickActionPanelClass}>
+        <div class="approval-shell">
+            <template if:true={showSpinner}>
+                <div class="busy-overlay">
+                    <lightning-spinner
+                        alternative-text="Processing Customer Profile approval..."
+                        size="medium">
+                    </lightning-spinner>
+                </div>
+            </template>
+
+            <div class="theme-header">
+                <div class="theme-header-copy">
+                    <div class="theme-title">{headerTitle}</div>
+                    <div class="theme-subtitle">{headerSubtitle}</div>
+                </div>
+
+                <lightning-button
+                    class="header-refresh-button"
+                    label={refreshButtonLabel}
+                    icon-name="utility:refresh"
+                    onclick={handleRefreshData}
+                    disabled={showSpinner}>
+                </lightning-button>
+            </div>
+
+            <template if:true={hasLoadError}>
+                <div class="state-card error-state">
+                    <lightning-icon
+                        icon-name="utility:error"
+                        size="small"
+                        variant="error"
+                        alternative-text="Error">
+                    </lightning-icon>
+
+                    <div class="state-copy">
+                        <div class="state-title">
+                            Unable to load Customer Profile approval
+                        </div>
+                        <div class="state-message">{loadError}</div>
+
+                        <lightning-button
+                            class="slds-m-top_small retry-button"
+                            label="Retry"
+                            icon-name="utility:refresh"
+                            onclick={handleRetry}>
+                        </lightning-button>
+                    </div>
+                </div>
+            </template>
+
+            <template if:true={showContent}>
+                <!-- =========================================================
+                     NEW REQUEST MODE
+                     ========================================================= -->
+                
+                    
+
+                    <div class="customer-summary">
+                        <div class="summary-item customer-summary-name">
+                            <div class="summary-label">Customer Name</div>
+                            <div class="summary-value">{customerName}</div>
+                        </div>
+
+                        <div class="summary-item">
+                            <div class="summary-label">Approval Fields</div>
+                            <div class="summary-value">{fieldCountLabel}</div>
+                        </div>
+
+                        <div class="summary-item">
+                            <div class="summary-label">Selected Changes</div>
+                            <div class="summary-value selected-value">
+                                {changeCountLabel}
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="intro-note">
+                        Only fields currently locked through Customer Tracking are shown here.
+                        Enter the requested new value for the required field(s). Address API Only
+                        fields must be selected from the Business Central address lookup. The Account
+                        is not updated at this stage; the proposed values are stored in the Customer
+                        Change Request for approval.
+                    </div>
+
+                    <section class="supporting-documents-card">
+                        <div class="supporting-documents-header">
+                            <div>
+                                <div class="supporting-documents-title">
+                                    Supporting Documents
+                                </div>
+                                <div class="supporting-documents-help">
+                                    Optional. Upload proof or supporting documents for the approvers.
+                                    Before submission the files remain private to you. After the Change Request is created, they are linked to that request automatically.
+                                </div>
+                            </div>
+
+                            <template if:true={hasUploadedSupportingFiles}>
+                                <lightning-button
+                                    class="document-preview-button"
+                                    label={supportingDocumentButtonLabel}
+                                    icon-name="utility:preview"
+                                    onclick={handlePreviewSupportingDocuments}>
+                                </lightning-button>
+                            </template>
+                        </div>
+
+                        <lightning-file-upload
+                            label="Upload Supporting Documents"
+                            record-id={supportingUploadRecordId}
+                            multiple={allowMultipleFileUpload}
+                            onuploadfinished={handleSupportingUploadFinished}>
+                        </lightning-file-upload>
+
+                        
+
+                        <template if:true={hasUploadedSupportingFiles}>
+                            <div class="uploaded-file-list">
+                                <template
+                                    for:each={uploadedSupportingFiles}
+                                    for:item="file">
+                                    <div
+                                        key={file.documentId}
+                                        class="uploaded-file-pill">
+
+                                        <lightning-icon
+                                            icon-name="utility:file"
+                                            size="xx-small"
+                                            alternative-text="File">
+                                        </lightning-icon>
+
+                                        <button
+                                            type="button"
+                                            class="file-name-button"
+                                            data-document-id={file.documentId}
+                                            title={file.name}
+                                            onclick={handlePreviewSupportingFile}>
+                                            {file.name}
+                                        </button>
+
+                                        <lightning-button-icon
+                                            class="file-remove-button"
+                                            icon-name="utility:close"
+                                            variant="bare"
+                                            alternative-text="Remove supporting document"
+                                            title="Remove"
+                                            data-document-id={file.documentId}
+                                            onclick={handleRemoveSupportingFile}
+                                            disabled={isRemovingDocument}>
+                                        </lightning-button-icon>
+                                    </div>
+                                </template>
+                            </div>
+                        </template>
+                    </section>
+
+                    <template if:true={hasWarnings}>
+                        <lightning-accordion class="warning-accordion">
+                            <lightning-accordion-section
+                                name="configurationWarnings"
+                                label={warningLabel}>
+
+                                <div class="warning-list">
+                                    <template
+                                        for:each={configurationWarnings}
+                                        for:item="warning">
+
+                                        <div
+                                            key={warning}
+                                            class="warning-row">
+
+                                            <lightning-icon
+                                                icon-name="utility:warning"
+                                                size="xx-small"
+                                                alternative-text="Warning">
+                                            </lightning-icon>
+
+                                            <span>{warning}</span>
+                                        </div>
+                                    </template>
+                                </div>
+                            </lightning-accordion-section>
+                        </lightning-accordion>
+                    </template>
+
+                    <template if:true={hasApprovalFields}>
+                        <lightning-record-edit-form
+                            record-id={recordId}
+                            object-api-name="Account">
+
+                            <template
+                                for:each={sections}
+                                for:item="section">
+
+                                <section
+                                    key={section.key}
+                                    class="profile-section">
+
+                                    <div class="section-heading">
+                                        <span>{section.label}</span>
+                                    </div>
+
+                                    <div class="section-body">
+                                        <template if:true={section.isAddressSection}>
+                                            <div class="minimal-address-action">
+                                                <div class="minimal-address-action-copy">
+                                                    <div class="minimal-address-action-title">
+                                                        <lightning-icon
+                                                            icon-name="utility:location"
+                                                            size="xx-small"
+                                                            alternative-text="BC Address">
+                                                        </lightning-icon>
+                                                        <span>Business Central Address</span>
+                                                    </div>
+
+                                                    <div class="minimal-address-action-help">
+                                                        {addressSelectorStatusLabel}
+                                                    </div>
+                                                </div>
+
+                                                <div class="minimal-address-action-buttons">
+                                                    <template if:true={hasSelectedAddress}>
+                                                        <button
+                                                            type="button"
+                                                            class="slds-button slds-button_neutral minimal-address-button"
+                                                            onclick={handleClearAddressSelection}
+                                                            disabled={showSpinner}>
+                                                            Clear
+                                                        </button>
+                                                    </template>
+
+                                                    <button
+                                                        type="button"
+                                                        class="slds-button slds-button_brand minimal-address-button"
+                                                        onclick={handleOpenAddressSelector}
+                                                        disabled={showSpinner}>
+                                                        <lightning-icon
+                                                            icon-name="utility:location"
+                                                            size="xx-small"
+                                                            alternative-text="Select Address">
+                                                        </lightning-icon>
+                                                        <span>{addressSelectorButtonLabel}</span>
+                                                    </button>
+                                                </div>
+                                            </div>
+
+                                            <template if:true={showAddressSelector}>
+                                                <div class="minimal-address-selector">
+                                                    <c-lwc-orient-customer-address-selector
+                                                        initial-pin-code={currentAddressPinCode}
+                                                        onaddressselected={handleAddressSelected}
+                                                        oncanceladdress={handleCancelAddressSelector}>
+                                                    </c-lwc-orient-customer-address-selector>
+                                                </div>
+                                            </template>
+                                        </template>
+
+                                            <template
+                                                for:each={section.fields}
+                                                for:item="field">
+
+                                                <article
+                                                    key={field.accountFieldApi}
+                                                    class={field.cardClass}>
+
+                                                    <div class="change-card-title">
+                                                        <span>{field.fieldLabel}</span>
+
+                                                        <div class="field-statuses">
+                                                            <template if:true={field.isChanged}>
+                                                                <span class="changed-pill">
+                                                                    <lightning-icon
+                                                                        icon-name="utility:edit"
+                                                                        size="xx-small"
+                                                                        alternative-text="Changed">
+                                                                    </lightning-icon>
+                                                                    Changed
+                                                                </span>
+                                                            </template>
+
+                                                            <template if:true={field.verified}>
+                                                                <span class="verified-pill">
+                                                                    <lightning-icon
+                                                                        icon-name="utility:success"
+                                                                        variant="success"
+                                                                        size="xx-small"
+                                                                        alternative-text="Verified">
+                                                                    </lightning-icon>
+                                                                    Verified
+                                                                </span>
+                                                            </template>
+                                                        </div>
+                                                    </div>
+
+                                                    <div class="comparison-grid">
+                                                        <div class="value-panel existing-panel">
+                                                            <div class="value-label">
+                                                                Existing Value
+                                                            </div>
+
+                                                            <div
+                                                                class="existing-value"
+                                                                title={field.currentDisplayValue}>
+                                                                {field.currentDisplayValue}
+                                                            </div>
+                                                        </div>
+
+                                                        <div
+                                                            class="comparison-arrow"
+                                                            aria-hidden="true">
+
+                                                            <span class="arrow-circle">
+                                                                <lightning-icon
+                                                                    icon-name="utility:forward"
+                                                                    size="xx-small"
+                                                                    alternative-text="To">
+                                                                </lightning-icon>
+                                                            </span>
+                                                        </div>
+
+                                                        <div class={field.requestedPanelClass}>
+                                                            <div class="value-label">
+                                                                Requested New Value
+                                                            </div>
+
+                                                            <template if:true={field.addressApiOnly}>
+                                                                <div
+                                                                    class="address-api-requested-value"
+                                                                    title={field.requestedDisplayValue}>
+                                                                    {field.requestedDisplayValue}
+                                                                </div>
+                                                            </template>
+
+                                                            <template if:false={field.addressApiOnly}>
+                                                                <template if:true={field.editableForApproval}>
+                                                                    <lightning-input-field
+                                                                        field-name={field.accountFieldApi}
+                                                                        data-field-api={field.accountFieldApi}
+                                                                        variant="label-hidden"
+                                                                        onchange={handleFieldChange}>
+                                                                    </lightning-input-field>
+
+                                                                    <template if:true={field.isValidating}>
+                                                                        <div class="field-validation-checking">
+                                                                            <lightning-spinner
+                                                                                alternative-text="Checking mobile number"
+                                                                                size="xx-small">
+                                                                            </lightning-spinner>
+                                                                            <span>
+                                                                                Checking whether this mobile number already exists...
+                                                                            </span>
+                                                                        </div>
+                                                                    </template>
+
+                                                                    <template if:true={field.validationMessage}>
+                                                                        <div class="field-validation-error">
+                                                                            <lightning-icon
+                                                                                icon-name="utility:error"
+                                                                                size="xx-small"
+                                                                                alternative-text="Error">
+                                                                            </lightning-icon>
+                                                                            <span>{field.validationMessage}</span>
+                                                                        </div>
+                                                                    </template>
+                                                                </template>
+
+                                                                <template if:false={field.editableForApproval}>
+                                                                    <div class="locked-value">
+                                                                        <lightning-icon
+                                                                            icon-name="utility:lock"
+                                                                            size="xx-small"
+                                                                            alternative-text="Locked">
+                                                                        </lightning-icon>
+                                                                        <span>{field.lockedMessage}</span>
+                                                                    </div>
+                                                                </template>
+                                                            </template>
+                                                        </div>
+                                                    </div>
+                                                </article>
+                                            </template>
+                                    </div>
+                                </section>
+                            </template>
+                        </lightning-record-edit-form>
+
+                        <template if:false={hasEditableFields}>
+                            <div class="state-card neutral-state">
+                                <lightning-icon
+                                    icon-name="utility:lock"
+                                    size="small"
+                                    alternative-text="Locked">
+                                </lightning-icon>
+
+                                <div class="state-copy">
+                                    <div class="state-title">
+                                        No editable approval field
+                                    </div>
+                                    <div class="state-message">
+                                        All Customer Profile fields currently controlled by approval
+                                        are already verified or otherwise locked from further change.
+                                    </div>
+                                </div>
+                            </div>
+                        </template>
+
+                        <div class={reasonCardClass}>
+                            <div class="reason-heading">
+                                Change Reason<span class="required-mark">*</span>
+                            </div>
+
+                            <lightning-textarea
+                                data-id="changeReason"
+                                name="changeReason"
+                                label="Change Reason"
+                                variant="label-hidden"
+                                value={changeReason}
+                                maxlength="32768"
+                                placeholder="Explain why these Customer Profile values need to be changed..."
+                                onchange={handleReasonInput}>
+                            </lightning-textarea>
+
+                            <template if:true={reasonError}>
+                                <div class="reason-error">
+                                    <lightning-icon
+                                        icon-name="utility:error"
+                                        size="xx-small"
+                                        alternative-text="Error">
+                                    </lightning-icon>
+                                    <span>{reasonError}</span>
+                                </div>
+                            </template>
+
+                            <div class="reason-help">
+                                This reason will be stored with the request and shown to the approver
+                                together with the existing and requested values.
+                            </div>
+                        </div>
+                    </template>
+
+                    <template if:false={hasApprovalFields}>
+                        <div class="state-card neutral-state">
+                            <lightning-icon
+                                icon-name="utility:info"
+                                size="small"
+                                alternative-text="Information">
+                            </lightning-icon>
+
+                            <div class="state-copy">
+                                <div class="state-title">
+                                    No fields require approval
+                                </div>
+
+                                <div class="state-message">
+                                    No Customer Profile field is currently locked for approval on this customer.
+                                </div>
+                            </div>
+                        </div>
+                    </template>
+</template>
+        </div>
+
+        <div slot="footer" class="footer-bar">
+            <div class="footer-status">{footerStatus}</div>
+
+            <div class="footer-actions">
+                
+
+                <lightning-button
+                    class="cancel-button"
+                    label="Cancel"
+                    onclick={handleCancel}
+                    disabled={isSubmitting}>
+                </lightning-button>
+
+                
+                    <lightning-button
+                        class="submit-button"
+                        variant="brand"
+                        label={submitButtonLabel}
+                        icon-name="utility:send"
+                        onclick={handleSubmit}
+                        disabled={disableSubmit}>
+                    </lightning-button>
+                
+
+                
+            </div>
+        </div>
+    </lightning-quick-action-panel>
+
+    <template if:true={showSupportingDocumentPreview}>
+        <c-lwc-orient-supporting-document-preview
+            documents={supportingDocumentPreviewFiles}
+            selected-document-id={supportingDocumentPreviewSelectedId}
+            onclosepreview={handleCloseSupportingDocumentPreview}>
+        </c-lwc-orient-supporting-document-preview>
+    </template>
+</template>

@@ -1,0 +1,423 @@
+<template>
+    <template if:false={isReviewScreen}>
+        <lightning-card title="BTL Question Selection" icon-name="custom:custom63">
+            <div class="main-container">
+
+                <!-- Activity Selection - NOW STICKY TO THE TOP -->
+                <div class="section-card sticky-activity-section">
+                    <div class="heading-row">
+                        <div class="step-badge">1</div>
+                        <div class="section-heading">
+                            Select BTL Activities
+                        </div>
+                    </div>
+
+                    <!-- Search Box -->
+                    <div class="search-wrapper">
+                        <div class="search-box" onclick={toggleDropdown}>
+                            <lightning-icon icon-name="utility:search" size="x-small" class="search-icon">
+                            </lightning-icon>
+
+                            <input
+                            type="text"
+                            class="custom-input"
+                            placeholder="Search and select activities..."
+                            value={searchKey}
+                            onkeyup={handleSearchChange}
+                            onclick={handleInputClick} />
+
+                            <span class="dropdown-icon-wrapper">
+                            <lightning-icon
+                                icon-name={dropdownIcon}
+                                size="x-small"
+                                class="dropdown-icon">
+                            </lightning-icon>
+                        </span>
+                        </div>
+
+                        <!-- Empty State -->
+                        <template if:true={showEmptyState}>
+                            <div class="empty-state-box">
+                                <div class="empty-icon-circle">
+                                    <lightning-icon icon-name="utility:search" size="large" class="empty-search-icon">
+                                    </lightning-icon>
+                                </div>
+                                <div class="empty-title">
+                                    Search and select activities
+                                </div>
+                                <div class="empty-subtitle">
+                                    Start typing to search and select one or more BTL activities.
+                                </div>
+                            </div>
+                        </template>
+
+                        <!-- Dropdown -->
+                        <template if:true={showDropdown}>
+                            <div class="dropdown-container">
+                                <template if:true={activityList.length}>
+                                    <template for:each={activityList} for:item="act">
+                                        <div key={act.activityId} class="dropdown-row" data-id={act.activityId}
+                                            data-name={act.activityName} onclick={handleActivityRowClick}>
+
+                                            <lightning-input type="checkbox" label={act.activityName}
+                                                data-id={act.activityId} data-name={act.activityName}
+                                                checked={act.isSelected} onclick={stopCheckboxClick}
+                                                onchange={handleActivitySelect}>
+                                            </lightning-input>
+                                        </div>
+                                    </template>
+                                </template>
+
+                                <template if:false={activityList.length}>
+                                    <div class="empty-search">
+                                        No Activities Found
+                                    </div>
+                                </template>
+                            </div>
+                        </template>
+                    </div>
+
+                    <!-- Selected Pills -->
+                    <template if:true={selectedActivities.length}>
+                        <div class="pill-wrapper">
+                            <template for:each={selectedActivities} for:item="act">
+                                <div key={act.activityId} class="activity-pill">
+                                    <span>{act.activityName}</span>
+                                    <button
+                                    class="remove-pill"
+                                    data-id={act.activityId}
+                                    onclick={removeSelectedActivity}>
+                                    ×
+                                </button>
+                                </div>
+                            </template>
+                        </div>
+                    </template>
+                </div>
+
+                <!-- Question Section -->
+                <template if:true={questionList.length}>
+                    <div class="section-card question-card">
+                        <div class="question-header">
+                            <div class="heading-row">
+                                <div class="step-badge">
+                                    2
+                                </div>
+                                <div class="section-heading">
+                                    Related BTL Questions
+                                </div>
+                            </div>
+
+                            <div class="question-right-actions">
+                                <lightning-combobox class="activity-filter-combobox" name="activityFilter"
+                                    variant="label-hidden" value={selectedActivityFilter} placeholder="None"
+                                    options={selectedActivityOptions} onchange={handleSelectedActivityFilterChange}>
+                                </lightning-combobox>
+
+                                <div class="question-count">
+                                    {filteredQuestionList.length} Questions
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Scrollable Table Container -->
+                        <div class="table-container questions-scroll-container">
+                            <!-- <table class="modern-table">
+                                <thead>
+                                    <tr>
+                                        <th>#</th>
+                                        <th>Activity Type</th>
+                                        <th>Question</th>
+                                        <th>Answer Type</th>
+                                        <th>Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <template for:each={filteredQuestionList} for:item="ques">
+                                        <tr key={ques.questionId}>
+                                            <td>{ques.serialNo}</td>
+                                            <td>
+                                                <span class="activity-badge">
+                                                {ques.activityName}
+                                            </span>
+                                            </td>
+                                            <td>{ques.questionName}</td>
+                                            <td>
+                                                <span class="answer-type-badge">
+                                                {ques.answerType}
+                                            </span>
+                                            </td>
+                                            <td>
+                                                <lightning-button-icon icon-name="utility:delete"
+                                                    alternative-text="Remove" title="Remove" variant="border-filled"
+                                                    class="delete-btn" data-id={ques.questionId}
+                                                    onclick={removeQuestion}>
+                                                </lightning-button-icon>
+                                            </td>
+                                        </tr>
+                                    </template>
+                                </tbody>
+                            </table> -->
+                            <table class="modern-table">
+                                <thead>
+                                    <tr>
+                                        <!-- <th>#</th> -->
+                                        <th class="serial-number-column">Sl. No.</th>
+                                        <th>Activity Type</th>
+                                        <th>Question</th>
+                                        <th>Answer Type</th>
+                                        <th class="required-column">Mandatory</th>
+                                        <th>Action</th>
+                                    </tr>
+                                </thead>
+
+                                <tbody>
+                                    <template for:each={filteredQuestionList} for:item="ques">
+                                        <tr key={ques.questionId}>
+                                            <!-- <td>{ques.serialNo}</td> -->
+                                            <td class="serial-number-column">
+                                                <lightning-input type="number" variant="label-hidden"
+                                                    value={ques.serialNo} min="1" max={maxSerialNumber} step="1"
+                                                    data-id={ques.questionId} onblur={handleSerialNumberChange}
+                                                    class="serial-number-input">
+                                                </lightning-input>
+                                            </td>
+
+                                            <td>
+                                                <span class="activity-badge">{ques.activityName}</span>
+                                            </td>
+
+                                            <td>{ques.questionName}</td>
+
+                                            <td>
+                                                <span class="answer-type-badge">{ques.answerType}</span>
+                                            </td>
+
+                                            <!-- <td class="required-column">
+                                                <div class="required-checkbox">
+                                                    <lightning-input type="checkbox" variant="label-hidden"
+                                                        checked={ques.isRequired} data-id={ques.questionId}
+                                                        onchange={handleRequiredChange}>
+                                                    </lightning-input>
+                                                </div>
+                                            </td> -->
+
+                                            <td class="required-column">
+                                                <div class="required-icon-wrapper">
+                                                    <template if:true={ques.isRequired}>
+                                                        <button type="button" class="required-toggle-btn" data-id={ques.questionId} onclick={handleRequiredToggle} title="Marked as Required">
+                                                <lightning-icon icon-name="utility:check" size="x-small" class="required-green-icon"></lightning-icon>
+                                            </button>
+                                                    </template>
+
+                                                    <template if:false={ques.isRequired}>
+                                                        <button
+                                                type="button"
+                                                class="required-toggle-btn"
+                                                data-id={ques.questionId}
+                                                onclick={handleRequiredToggle}
+                                                title="Marked as Not Required">
+                                                <lightning-icon
+                                                    icon-name="utility:close"
+                                                    size="x-small"
+                                                    class="required-red-icon">
+                                                </lightning-icon>
+                                            </button>
+                                                    </template>
+                                                </div>
+                                            </td>
+
+                                            <td>
+                                                <lightning-button-icon icon-name="utility:delete"
+                                                    alternative-text="Remove" title="Remove" variant="border-filled"
+                                                    class="delete-btn" data-id={ques.questionId}
+                                                    onclick={removeQuestion}>
+                                                </lightning-button-icon>
+                                            </td>
+                                        </tr>
+                                    </template>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </template>
+
+                <!-- Final Review Fixed Button -->
+                <template if:true={hasQuestionsForReview}>
+                    <div
+                        style="position: sticky; bottom: 0; z-index: 9999; width: 100%; background: #ffffff; padding: 14px 18px; margin-top: 1rem; border-top: 1px solid #dbe4f0; box-shadow: 0 -8px 22px rgba(15, 23, 42, 0.12);">
+
+                        <button
+                        type="button"
+                        onclick={handleFinalReview}
+                        style="width: 100%; height: 52px; border: none; border-radius: 10px; background: linear-gradient(135deg, #003b7a, #005fb2); color: #ffffff; font-size: 16px; font-weight: 700; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px; box-shadow: 0 6px 16px rgba(0, 95, 178, 0.28);">
+                        👁️ Final Review
+                    </button>
+                    </div>
+                </template>
+            </div>
+        </lightning-card>
+    </template>
+
+    <!-- Final Review Screen -->
+    <template if:true={isReviewScreen}>
+
+        <!-- Section 1: Sticky Top Header (Replaced inline bottom styling) -->
+        <div class="sticky-review-header">
+
+            <!-- Title Section -->
+            <div
+                style="background:linear-gradient(135deg,#eef6ff,#ffffff); padding:20px 22px; border-bottom:1px solid #dbe4f0;">
+                <div style="font-size:24px; font-weight:800; color:#111827; line-height:1.2;">
+                    Final Review - Selected Questions
+                </div>
+                <div style="font-size:13px; color:#64748b; margin-top:6px;">
+                    Please review the selected questions before saving the form.
+                </div>
+            </div>
+
+            <!-- Form Name Section -->
+            <div style="background:#ffffff; padding:18px 22px; border-bottom:1px solid #dbe4f0;">
+                <label style="font-weight:700; color:#111827; font-size:14px; display:block; margin-bottom:6px;">
+                        <span style="color:#dc2626;">*</span> Form Name
+                    </label>
+                <lightning-input type="text" variant="label-hidden" value={formName} placeholder="Enter form name..."
+                    onchange={handleFormNameChange}>
+                </lightning-input>
+
+                <template if:true={formNameError}>
+                    <div style="color:#ef4444; font-size:14px; margin-top:8px; font-weight:600;">
+                        {formNameError}
+                    </div>
+                </template>
+            </div>
+
+            <!-- Total Questions Box -->
+            <div style="padding:14px 22px;">
+                <div
+                    style="background:#eef6ff; color:#005fb2; border:1px solid #93c5fd; padding:14px 16px; border-radius:8px; font-weight:700; display:flex; align-items:center; gap:12px;">
+
+                    <span style="width:24px; height:24px; min-width:24px; border-radius:50%; background:#2563eb; color:#ffffff; display:inline-flex; align-items:center; justify-content:center; font-size:14px; font-weight:800; line-height:1;">
+                            i
+                        </span>
+                    <span>
+                            Total Questions: {reviewQuestionList.length}
+                        </span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Section 2: Scrollable Content -->
+        <div class="review-page-layout">
+            <div class="table-container review-table-container">
+                <!-- <table class="modern-table">
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>Activity Type</th>
+                            <th>Question</th>
+                            <th>Answer Type</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <template for:each={reviewQuestionList} for:item="ques">
+                            <tr key={ques.questionId}>
+                                <td>{ques.serialNo}</td>
+                                <td>
+                                    <span class="activity-badge">
+                                            {ques.activityName}
+                                        </span>
+                                </td>
+                                <td>{ques.questionName}</td>
+                                <td>
+                                    <span class="answer-type-badge">
+                                            {ques.answerType}
+                                        </span>
+                                </td>
+                            </tr>
+                        </template>
+                    </tbody>
+                </table> -->
+                <table class="modern-table">
+                    <thead>
+                        <tr>
+                            <!-- <th>#</th> -->
+                            <th class="serial-number-column">Sl. No.</th>
+                            <th>Activity Type</th>
+                            <th>Question</th>
+                            <th>Answer Type</th>
+                            <th class="required-column">Mandatory</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        <template for:each={reviewQuestionList} for:item="ques">
+                            <tr key={ques.questionId}>
+                                <td>{ques.serialNo}</td>
+
+                                <td>
+                                    <span class="activity-badge">{ques.activityName}</span>
+                                </td>
+
+                                <td>{ques.questionName}</td>
+
+                                <td>
+                                    <span class="answer-type-badge">{ques.answerType}</span>
+                                </td>
+
+                                <!-- <td class="required-column">
+                                    <div class="required-checkbox">
+                                        <lightning-input type="checkbox" variant="label-hidden"
+                                            checked={ques.isRequired} disabled>
+                                        </lightning-input>
+                                    </div>
+                                </td> -->
+                                <td class="required-column">
+                                    <div class="required-icon-wrapper">
+                                        <template if:true={ques.isRequired}>
+                                            <lightning-icon icon-name="utility:check" size="x-small"
+                                                class="required-green-icon">
+                                            </lightning-icon>
+                                        </template>
+
+                                        <template if:false={ques.isRequired}>
+                                            <lightning-icon icon-name="utility:close" size="x-small"
+                                                class="required-red-icon">
+                                            </lightning-icon>
+                                        </template>
+                                    </div>
+                                </td>
+                            </tr>
+                        </template>
+                    </tbody>
+                </table>
+            </div>
+
+            <div
+                style="margin: 14px 18px 12px; background: #fff8e6; border: 1px solid #facc15; color: #92400e; padding: 13px 16px; border-radius: 8px; font-weight: 600;">
+                Please enter Form Name and click Save to finish.
+            </div>
+        </div>
+
+        <!-- Section 3: Fixed Save & Back Button (Footer) -->
+        <div
+            style="position: sticky; left: 0; right: 0; bottom: 0; z-index: 9999; width: 100%; background: #ffffff; padding: 14px 24px; border-top: 1px solid #dbe4f0; box-shadow: 0 -8px 22px rgba(15, 23, 42, 0.12);">
+
+            <div style="display:flex; gap:24px; align-items:center; width:100%;">
+                <button
+                    type="button"
+                    onclick={handleSave}
+                    style="flex:1; height:54px; border:none; border-radius:10px; background:#243f82; color:white; font-size:17px; font-weight:700; cursor:pointer;">
+                    💾 Save
+                </button>
+
+                <button
+                    type="button"
+                    onclick={handleBackToMain}
+                    style="flex:1; height:54px; border:none; border-radius:10px; background:#d92716; color:white; font-size:17px; font-weight:700; cursor:pointer;">
+                    ← Back
+                </button>
+            </div>
+        </div>
+    </template>
+</template>

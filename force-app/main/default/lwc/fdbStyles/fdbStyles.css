@@ -1,0 +1,3396 @@
+:host {
+    display: block;
+
+    /* ---- Orient brand tokens ---- */
+    --oj-maroon-top: #55100f;
+    --oj-maroon-deep: #3b0a0a;
+    --oj-maroon-ink: #7a0f14;
+    --oj-maroon-warm: #78201d;
+    --oj-gold: #c9a24d;
+    --oj-gold-lt: #f3e0af;
+    --oj-gold-dk: #7d5320;
+    --oj-cream: #fdf5e9;
+    --oj-line: #e6d2b2;
+    --oj-ink: #4a3728;
+    --oj-ink-soft: #7c6752;
+
+    /* Height of the maroon base band. The decorative frames stop short of it,
+       so the two have to be read from one place or they drift apart and the
+       frame ends up buried under the band. */
+    --oj-base-h: 48px;
+
+    /* One percent of the height we actually have, which is not the same as 1vh.
+       vh measures the browser viewport, and on a Lightning tab the Salesforce
+       chrome above us means our usable height is a good deal less than that -
+       so anything scaled in vh overshoots by exactly the chrome. Scale against
+       this instead. fdbScreen.js keeps --oj-vh current. */
+    --oj-vhu: calc(var(--oj-vh, 100dvh) / 100);
+}
+
+/* =====================================================================
+   SHARED SHELL
+   Every screen sits on the same cream-and-gold ground, inside the same
+   thin gold frame, under a centred logo header and above the same
+   maroon base band.
+   ===================================================================== */
+/* At least as tall as the space we are given, and free to grow past it - the
+   page then scrolls, which is how every screen behaves except the two that are
+   laid out to fill the screen exactly. Those add .ojp_fit below.
+
+   --oj-vh is measured and published by fdbScreen.js because 100vh is wrong
+   here: it counts the Salesforce chrome above us and the navigation bar below
+   as ours. The dvh fallback covers the first frame before the measurement. */
+.oj-screen,
+.ojw,
+.ojp,
+.ojn {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    min-height: var(--oj-vh, 100dvh);
+    width: 100%;
+    box-sizing: border-box;
+    overflow: hidden;
+    font-family: "Salesforce Sans", Arial, sans-serif;
+
+    background:
+        /* fine damask weave */
+        repeating-linear-gradient(135deg,
+            rgba(201, 162, 77, 0.035) 0 2px,
+            transparent 2px 10px),
+        /* corner glow */
+        radial-gradient(circle at 3% 5%, rgba(201, 162, 77, 0.20), transparent 18%),
+        radial-gradient(circle at 97% 7%, rgba(201, 162, 77, 0.22), transparent 20%),
+        radial-gradient(circle at 6% 88%, rgba(201, 162, 77, 0.16), transparent 18%),
+        /* warm vignette so the page edges settle */
+        radial-gradient(ellipse at 50% 42%, transparent 52%, rgba(122, 15, 20, 0.07) 100%),
+        linear-gradient(180deg, #fffaf2 0%, var(--oj-cream) 42%, #f8ecda 100%);
+}
+
+/* Outer gold frame just inside the page edge.
+   Its bottom clears the base band: the band paints over the frame, so a frame
+   that reached the page edge would have its bottom edge and both lower corners
+   swallowed, leaving two gold lines running down the page and stopping dead. */
+.oj-screen::before,
+.ojw::before,
+.ojp::before,
+.ojn::before {
+    content: "";
+    position: absolute;
+    top: 9px;
+    right: 9px;
+    bottom: calc(var(--oj-base-h) + 9px);
+    left: 9px;
+    border: 1.5px solid rgba(201, 162, 77, 0.55);
+    border-radius: 20px;
+    pointer-events: none;
+    z-index: 1;
+}
+
+/* Inner hairline frame with a gold diamond set into each corner */
+.oj-screen::after,
+.ojw::after,
+.ojp::after,
+.ojn::after {
+    content: "";
+    position: absolute;
+    top: 16px;
+    right: 16px;
+    bottom: calc(var(--oj-base-h) + 16px);
+    left: 16px;
+    border: 1px solid rgba(201, 162, 77, 0.26);
+    border-radius: 14px;
+    pointer-events: none;
+    z-index: 1;
+
+    background-image:
+        url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='13' height='13'%3E%3Cpath d='M6.5 0L13 6.5 6.5 13 0 6.5z' fill='%23c9a24d'/%3E%3C/svg%3E"),
+        url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='13' height='13'%3E%3Cpath d='M6.5 0L13 6.5 6.5 13 0 6.5z' fill='%23c9a24d'/%3E%3C/svg%3E"),
+        url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='13' height='13'%3E%3Cpath d='M6.5 0L13 6.5 6.5 13 0 6.5z' fill='%23c9a24d'/%3E%3C/svg%3E"),
+        url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='13' height='13'%3E%3Cpath d='M6.5 0L13 6.5 6.5 13 0 6.5z' fill='%23c9a24d'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position:
+        left -6.5px top -6.5px,
+        right -6.5px top -6.5px,
+        left -6.5px bottom -6.5px,
+        right -6.5px bottom -6.5px;
+}
+
+/* ---------------- SHARED HEADER ---------------- */
+/* Three columns so the logo stays centred whether or not the side
+   buttons are present. */
+.oj-head {
+    position: relative;
+    z-index: 2;
+    flex: 0 0 auto;
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+    align-items: center;
+    gap: 10px;
+    padding: 24px 22px 16px 22px;
+}
+
+/* Engraved gold rule closing the header, with a diamond set at its centre */
+.oj-head::after {
+    content: "";
+    position: absolute;
+    left: 50%;
+    bottom: 4px;
+    width: 74%;
+    max-width: 420px;
+    height: 9px;
+    transform: translateX(-50%);
+    pointer-events: none;
+
+    background-image:
+        linear-gradient(90deg,
+            transparent 0%,
+            rgba(201, 162, 77, 0.75) 22%,
+            rgba(201, 162, 77, 0.75) 78%,
+            transparent 100%),
+        url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='9' height='9'%3E%3Cpath d='M4.5 0L9 4.5 4.5 9 0 4.5z' fill='%23c9a24d'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: center center, center center;
+    background-size: 100% 1px, 9px 9px;
+}
+
+.oj-head__logo {
+    grid-column: 2;
+    display: block;
+    max-height: 78px;
+    max-width: 100%;
+    margin: 0 auto;
+    filter: drop-shadow(0 3px 6px rgba(85, 16, 15, 0.18));
+}
+
+.oj-head__btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 15px;
+    border: 1.5px solid rgba(201, 162, 77, 0.75);
+    border-radius: 999px;
+    background: linear-gradient(180deg, #fffdf8 0%, var(--oj-cream) 100%);
+    color: var(--oj-gold-dk);
+    font-size: 12.5px;
+    font-weight: 800;
+    letter-spacing: 0.4px;
+    cursor: pointer;
+    white-space: nowrap;
+    box-shadow:
+        0 2px 6px rgba(84, 50, 24, 0.10),
+        inset 0 1px 0 rgba(255, 255, 255, 0.9);
+    transition: background 0.2s ease, color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.oj-head__btn:hover {
+    background: linear-gradient(180deg, #fff 0%, #fdf5e5 100%);
+    color: var(--oj-maroon-ink);
+    box-shadow: 0 4px 10px rgba(84, 50, 24, 0.16);
+}
+
+.oj-head__btn svg { width: 16px; height: 16px; flex: 0 0 auto; }
+
+.oj-head__btn_left { grid-column: 1; justify-self: start; }
+.oj-head__btn_right { grid-column: 3; justify-self: end; }
+
+/* ---------------- SHARED BASE BAND ---------------- */
+/* The maroon matches the primary buttons exactly. It is the same lacquer in
+   both places, so any drift between them reads as a printing error. */
+.oj-base {
+    position: relative;
+    z-index: 2;
+    flex: 0 0 auto;
+    height: var(--oj-base-h);
+    overflow: hidden;
+    background:
+        radial-gradient(ellipse at 50% 132%, rgba(201, 162, 77, 0.38), transparent 58%),
+        linear-gradient(180deg, #7d1418 0%, #5c0e11 55%, #430a0c 100%);
+}
+
+/* Cream dome cut out of the band, edged in gold foil.
+   Three stacked rules rather than one: a white catch-light, the foil itself,
+   then a soft echo below it. Gilding on a lacquered box is never a single
+   line - it is a lit edge, the metal, and the shadow it throws. */
+.oj-base__dip {
+    position: absolute;
+    left: -14%;
+    right: -14%;
+    top: -1px;
+    bottom: 24px;
+    display: block;
+    background: #f8ecda;
+    border-radius: 0 0 50% 50% / 0 0 100% 100%;
+    box-shadow:
+        0 1px 0 0 rgba(255, 255, 255, 0.75),
+        0 2.5px 0 0 var(--oj-gold),
+        0 4px 0 0 rgba(201, 162, 77, 0.30);
+}
+
+.oj-base__orn {
+    position: absolute;
+    left: 50%;
+    bottom: 6px;
+    width: 36px;
+    height: 18px;
+    margin-left: -18px;
+    fill: var(--oj-gold);
+    filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.35));
+}
+
+/* =====================================================================
+   SEARCH SCREEN  (oj-*)
+   ===================================================================== */
+/* ---------------- BODY ---------------- */
+.oj-body {
+    position: relative;
+    z-index: 2;
+    flex: 1 1 auto;
+}
+
+.oj-body__inner {
+    max-width: 520px;
+    margin: 0 auto;
+    padding: 4px 24px 34px 24px;
+    text-align: center;
+}
+
+/* ---------------- ORNAMENTS ---------------- */
+.oj-orn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    margin: 18px auto 0 auto;
+    max-width: 260px;
+}
+
+.oj-orn__line {
+    height: 1px;
+    flex: 1 1 auto;
+    background: linear-gradient(90deg, transparent, var(--oj-gold));
+}
+
+.oj-orn__line:last-child {
+    background: linear-gradient(90deg, var(--oj-gold), transparent);
+}
+
+.oj-orn__lotus {
+    width: 42px;
+    height: 21px;
+    fill: var(--oj-gold);
+    flex: 0 0 auto;
+}
+
+.oj-orn__diamond {
+    width: 8px;
+    height: 8px;
+    flex: 0 0 auto;
+    background: var(--oj-gold);
+    transform: rotate(45deg);
+}
+
+.oj-orn_sm { max-width: 170px; margin-top: 14px; }
+
+/* ---------------- HEADINGS ---------------- */
+.oj-welcome {
+    margin: 14px 0 0 0;
+    font-family: Georgia, "Times New Roman", serif;
+    font-size: 42px;
+    line-height: 1.1;
+    font-weight: 700;
+    color: var(--oj-maroon-ink);
+    letter-spacing: 0.2px;
+}
+
+.oj-welcome__sub {
+    margin: 8px 0 0 0;
+    font-size: 15px;
+    font-weight: 600;
+    color: #2b2b2b;
+}
+
+.oj-instruction {
+    margin: 16px 0 0 0;
+    font-size: 14px;
+    line-height: 1.5;
+    color: var(--oj-ink-soft);
+}
+
+/* ---------------- MOBILE FIELD ---------------- */
+.oj-field {
+    margin-top: 24px;
+    text-align: left;
+}
+
+.oj-field__label {
+    display: block;
+    margin: 0 0 8px 2px;
+    font-size: 13px;
+    font-weight: 700;
+    color: #2f2f2f;
+}
+
+.oj-field__req { color: #c8102e; }
+
+.oj-inputrow {
+    display: flex;
+    align-items: stretch;
+    gap: 10px;
+}
+
+.oj-cc {
+    flex: 0 0 74px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 52px;
+    box-sizing: border-box;
+    border: 1px solid var(--oj-line);
+    border-radius: 12px;
+    background: #fff;
+    color: #2f2f2f;
+    font-size: 15px;
+    font-weight: 600;
+    letter-spacing: 0.3px;
+    user-select: none;
+    box-shadow: 0 2px 6px rgba(84, 50, 24, 0.05);
+}
+
+.oj-phone {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex: 1 1 auto;
+    min-width: 0;
+    height: 52px;
+    padding: 0 14px;
+    box-sizing: border-box;
+    border: 1px solid var(--oj-line);
+    border-radius: 12px;
+    background: #fff;
+    box-shadow: 0 2px 6px rgba(84, 50, 24, 0.05);
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.oj-phone:focus-within {
+    border-color: var(--oj-gold);
+    box-shadow: 0 0 0 3px rgba(201, 162, 77, 0.22);
+}
+
+.oj-phone__icon {
+    width: 18px;
+    height: 18px;
+    flex: 0 0 auto;
+    color: #a3202a;
+}
+
+.oj-phone__input {
+    flex: 1 1 auto;
+    min-width: 0;
+    border: none;
+    outline: none;
+    background: transparent;
+    font-size: 15px;
+    color: #1f1f1f;
+    letter-spacing: 0.3px;
+}
+
+.oj-phone__input::placeholder { color: #a89684; }
+
+.oj-error {
+    margin: 8px 0 0 2px;
+    font-size: 13px;
+    font-weight: 600;
+    color: #c8102e;
+}
+
+/* ---------------- PRIMARY CTA ---------------- */
+.oj-cta {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    width: 100%;
+    margin-top: 18px;
+    padding: 16px 20px;
+    border: none;
+    border-radius: 12px;
+    background: linear-gradient(135deg, #7d1418 0%, #5c0e11 55%, #430a0c 100%);
+    color: #fff;
+    font-size: 16px;
+    font-weight: 700;
+    letter-spacing: 0.2px;
+    cursor: pointer;
+    box-shadow:
+        0 10px 22px rgba(59, 10, 10, 0.28),
+        inset 0 1px 0 rgba(255, 255, 255, 0.14);
+    transition: transform 0.15s ease, box-shadow 0.2s ease, filter 0.2s ease;
+}
+
+.oj-cta:hover:not(:disabled) {
+    filter: brightness(1.1);
+    box-shadow: 0 14px 26px rgba(59, 10, 10, 0.34);
+}
+
+.oj-cta:active:not(:disabled) { transform: translateY(1px); }
+
+.oj-cta:disabled {
+    background: linear-gradient(135deg, #8a7566 0%, #6e5c50 100%);
+    opacity: 0.6;
+    cursor: not-allowed;
+    box-shadow: none;
+}
+
+.oj-cta__icon { width: 19px; height: 19px; flex: 0 0 auto; }
+
+.oj-cta_result { margin-top: 22px; }
+
+/* ---------------- RESULT CARDS ---------------- */
+.oj-result {
+    margin-top: 22px;
+    text-align: left;
+    border-radius: 16px;
+    overflow: hidden;
+    background: #fff;
+    border: 1px solid var(--oj-line);
+    box-shadow: 0 10px 26px rgba(84, 50, 24, 0.10);
+}
+
+.oj-result__head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    padding: 14px 18px;
+    background: linear-gradient(135deg, #fff7ea 0%, #f6e4c8 100%);
+    border-bottom: 1px solid var(--oj-line);
+}
+
+.oj-result__head h3 {
+    margin: 0;
+    font-size: 15px;
+    font-weight: 800;
+    color: var(--oj-maroon-ink);
+}
+
+.oj-result__head span {
+    padding: 5px 12px;
+    border-radius: 999px;
+    background: linear-gradient(135deg, #7d1418, #5c0e11);
+    color: #fff;
+    font-size: 11px;
+    font-weight: 700;
+    white-space: nowrap;
+}
+
+.oj-result__body { padding: 6px 18px 20px 18px; }
+
+.table-scroll {
+    width: 100%;
+    padding: 12px;
+    overflow-x: auto;
+    background: #fffdf9;
+}
+
+/* ---------------- TRUST STRIP ---------------- */
+.oj-trust {
+    display: flex;
+    align-items: stretch;
+    margin-top: 26px;
+    padding: 14px 6px;
+    border-radius: 14px;
+    background: rgba(255, 255, 255, 0.5);
+    border: 1px solid rgba(201, 162, 77, 0.35);
+}
+
+.oj-trust__item {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    flex: 1 1 0;
+    min-width: 0;
+    padding: 0 10px;
+    text-align: left;
+}
+
+.oj-trust__item + .oj-trust__item {
+    border-left: 1px solid rgba(201, 162, 77, 0.35);
+}
+
+.oj-trust__icon {
+    flex: 0 0 auto;
+    width: 26px;
+    height: 26px;
+    color: var(--oj-maroon-ink);
+}
+
+.oj-trust__icon svg { width: 100%; height: 100%; }
+
+.oj-trust__text { min-width: 0; }
+
+.oj-trust__text strong {
+    display: block;
+    font-size: 11px;
+    font-weight: 800;
+    line-height: 1.3;
+    color: var(--oj-maroon-ink);
+}
+
+.oj-trust__text span {
+    display: block;
+    margin-top: 2px;
+    font-size: 10.5px;
+    line-height: 1.35;
+    color: var(--oj-ink-soft);
+}
+
+/* ---------------- FOOTER ---------------- */
+/* Closing reassurance strip. Sits at the foot of every screen, either as the
+   last child of the page body or as a direct child of the screen shell. */
+/* The bottom padding clears the frames rather than the page edge. The base
+   band owns the last 48px and the inner hairline stops 16px short of that
+   again, so 20px left the footer's diamond sitting on the line - the diamond
+   is rotated 45deg and overhangs its own box by about 2px on the way. */
+.oj-footer {
+    position: relative;
+    z-index: 2;
+    flex: 0 0 auto;
+    padding: 22px 24px 26px 24px;
+}
+
+.oj-footer__row {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    max-width: 420px;
+    margin: 0 auto;
+}
+
+.oj-footer__lock {
+    flex: 0 0 auto;
+    width: 30px;
+    height: 30px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid rgba(201, 162, 77, 0.55);
+    background: rgba(255, 255, 255, 0.6);
+    color: var(--oj-gold-dk);
+}
+
+.oj-footer__lock svg { width: 16px; height: 16px; }
+
+.oj-footer__row p {
+    margin: 0;
+    font-size: 12px;
+    line-height: 1.45;
+    color: var(--oj-ink-soft);
+    text-align: left;
+}
+
+.oj-orn_footer { margin-top: 12px; max-width: 150px; }
+.oj-orn_footer .oj-orn__line { opacity: 0.55; }
+
+/* =====================================================================
+   SHARED DIALOG
+   The card every dialog in the journey is built on - the passcode
+   challenge and the profile-update notice. It lives here rather than in
+   either component so the two cannot drift: a second dialog that is
+   almost but not quite the first one reads as a different application.
+   Each component adds only what is its own.
+   ===================================================================== */
+.ojo__backdrop {
+    position: fixed;
+    inset: 0;
+    z-index: 9000;
+    background: rgba(59, 10, 10, 0.55);
+    backdrop-filter: blur(2px);
+}
+
+.ojo {
+    position: fixed;
+    inset: 0;
+    z-index: 9001;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    box-sizing: border-box;
+}
+
+.ojo__card {
+    position: relative;
+    width: 100%;
+    max-width: 400px;
+    padding: 28px 24px 22px 24px;
+    box-sizing: border-box;
+    text-align: center;
+    border: 1.5px solid rgba(201, 162, 77, 0.65);
+    border-radius: 18px;
+    background:
+        radial-gradient(ellipse at 50% 0%, rgba(201, 162, 77, 0.16), transparent 60%),
+        linear-gradient(180deg, #fffaf1 0%, var(--oj-cream) 100%);
+    box-shadow:
+        0 24px 60px -18px rgba(59, 10, 10, 0.6),
+        inset 0 1px 0 rgba(255, 255, 255, 0.9);
+}
+
+/* Gold foil capping the card, matching the submitted screen */
+.ojo__card::before {
+    content: "";
+    position: absolute;
+    left: 18%;
+    right: 18%;
+    top: -1px;
+    height: 3px;
+    border-radius: 0 0 3px 3px;
+    background: linear-gradient(90deg,
+        transparent 0%,
+        var(--oj-gold) 20%,
+        #f7e8c0 50%,
+        var(--oj-gold) 80%,
+        transparent 100%);
+}
+
+.ojo__mark {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 56px;
+    height: 56px;
+    margin: 0 auto;
+    border: 2px solid var(--oj-gold);
+    border-radius: 50%;
+    background: #fff;
+    color: var(--oj-gold-dk);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.9);
+}
+
+.ojo__mark svg { width: 28px; height: 28px; }
+
+.ojo__title {
+    margin: 14px 0 0 0;
+    font-family: Georgia, "Times New Roman", serif;
+    font-size: 23px;
+    line-height: 1.2;
+    font-weight: 700;
+    color: var(--oj-maroon-ink);
+    text-shadow: 0 1px 0 rgba(255, 255, 255, 0.7);
+}
+
+.ojo__text {
+    margin: 12px 0 0 0;
+    font-size: 13px;
+    line-height: 1.55;
+    color: var(--oj-ink-soft);
+}
+
+.ojo__text strong {
+    font-weight: 800;
+    color: var(--oj-maroon-ink);
+}
+
+/* ---------------- TWO-WAY ACTIONS ----------------
+   The way out on the left, the way on to the right. Below a narrow phone
+   they stack rather than squeeze, because "Continue to Feedback" cannot
+   be shortened without losing what it promises. */
+.ojo__actions {
+    display: flex;
+    align-items: stretch;
+    gap: 10px;
+    margin-top: 20px;
+}
+
+.ojo__btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    flex: 1 1 0;
+    min-width: 0;
+    padding: 13px 14px;
+    border-radius: 12px;
+    font-family: inherit;
+    font-size: 13.5px;
+    font-weight: 800;
+    letter-spacing: 0.2px;
+    cursor: pointer;
+    transition: transform 0.15s ease, box-shadow 0.2s ease, filter 0.2s ease;
+}
+
+.ojo__btn:active { transform: translateY(1px); }
+
+.ojo__btn svg { width: 17px; height: 17px; flex: 0 0 auto; }
+
+.ojo__btn_ghost {
+    border: 1.5px solid rgba(122, 15, 20, 0.45);
+    background: #fff;
+    color: var(--oj-maroon-ink);
+}
+
+.ojo__btn_ghost:hover {
+    background: #fff6ef;
+    border-color: var(--oj-maroon-ink);
+}
+
+.ojo__btn_primary {
+    border: none;
+    background: linear-gradient(135deg, #7d1418 0%, #5c0e11 55%, #430a0c 100%);
+    color: #fff;
+    box-shadow:
+        0 10px 22px rgba(59, 10, 10, 0.28),
+        inset 0 1px 0 rgba(255, 255, 255, 0.14);
+}
+
+.ojo__btn_primary:hover {
+    filter: brightness(1.1);
+    box-shadow: 0 14px 26px rgba(59, 10, 10, 0.34);
+}
+
+@media only screen and (max-width: 400px) {
+    .ojo__actions { flex-direction: column; }
+}
+
+@media only screen and (min-width: 768px) {
+    .ojo__card { max-width: 460px; padding: 34px 30px 26px 30px; }
+    .ojo__title { font-size: 27px; }
+    .ojo__text { font-size: 14.5px; }
+    .ojo__btn { font-size: 14.5px; padding: 14px 16px; }
+}
+
+/* ---------------- RESPONSIVE ---------------- */
+@media only screen and (max-width: 480px) {
+    .oj-body__inner { padding: 4px 16px 28px 16px; }
+    .oj-welcome { font-size: 34px; }
+    .oj-head { padding: 18px 14px 6px 14px; }
+    .oj-head__logo { max-height: 56px; }
+    .oj-head__btn { padding: 6px 10px; font-size: 11.5px; }
+    .oj-trust { flex-direction: column; gap: 12px; }
+    .oj-trust__item + .oj-trust__item {
+        border-left: none;
+        border-top: 1px solid rgba(201, 162, 77, 0.35);
+        padding-top: 12px;
+    }
+    .oj-trust__text strong { font-size: 12px; }
+    .oj-trust__text span { font-size: 11.5px; }
+}
+
+/* ================= MODAL ================= */
+.custom-create-modal .custom-modal-container {
+    width: 90%;
+    max-width: 1200px;
+}
+
+.custom-modal-header {
+    background:
+        linear-gradient(135deg, #25150f 0%, #9b6b3f 58%, #ed1c24 100%);
+    border-bottom: none;
+    border-radius: 12px 12px 0 0;
+}
+
+.custom-modal-header h2 {
+    color: #ffffff;
+    font-weight: 900;
+}
+
+.custom-close-btn lightning-icon {
+    --slds-c-icon-color-foreground-default: #ffffff;
+}
+
+.modal-body-fixed {
+    max-height: 72vh;
+    overflow-y: auto;
+    background: #fffaf2;
+}
+
+/* ================= DATATABLE PREMIUM ================= */
+.slds-table {
+    border-radius: 14px;
+    overflow: hidden;
+    border: 1px solid #e6d2b8;
+}
+
+.slds-table thead th {
+    background: #fbf4eb;
+    color: #25150f;
+    font-weight: 800;
+    border-color: #e3ccb0;
+}
+
+.slds-table tbody td {
+    color: #352217;
+    border-color: #eadccc;
+    background: #ffffff;
+}
+
+.slds-table tbody tr:nth-child(even) td {
+    background: #fffaf4;
+}
+
+.slds-table tbody tr:hover > td {
+    background: #fff1e2;
+}
+
+/* Phone value/link */
+.slds-table a {
+    color: #ed1c24;
+    font-weight: 750;
+}
+
+/* ================= INPUT ================= */
+lightning-input {
+    --slds-c-input-radius-border: 13px;
+    --slds-c-input-color-border: #d7b991;
+    --slds-c-input-color-border-focus: #ed1c24;
+    --slds-c-input-shadow-focus: 0 0 0 2px rgba(237, 28, 36, 0.12);
+}
+
+/* ================= BUTTONS ================= */
+lightning-button {
+    --slds-c-button-brand-color-background: #ed1c24;
+    --slds-c-button-brand-color-border: #ed1c24;
+    --slds-c-button-brand-color-background-hover: #c9151b;
+    --slds-c-button-brand-color-border-hover: #c9151b;
+    --slds-c-button-brand-radius-border: 999px;
+}
+
+lightning-datatable {
+    --slds-c-button-brand-color-background: #ed1c24;
+    --slds-c-button-brand-color-border: #ed1c24;
+    --slds-c-button-brand-color-background-hover: #c9151b;
+    --slds-c-button-brand-color-border-hover: #c9151b;
+    --slds-c-button-brand-radius-border: 999px;
+}
+
+/* ================= MOBILE ================= */
+@media only screen and (max-width: 768px) {
+    .oj-result__head {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 8px;
+    }
+
+    .table-scroll {
+        padding: 10px;
+    }
+
+    .custom-create-modal .custom-modal-container {
+        width: 96%;
+        max-width: 96%;
+    }
+}
+
+/* ================= DETAILS CARD ================= */
+.detail-row {
+    display: flex;
+    justify-content: space-between;
+    padding: 14px 0;
+    border-bottom: 1px solid #f2e6d6;
+}
+.detail-row:last-of-type {
+    border-bottom: none;
+}
+.detail-label {
+    color: #765941;
+    font-weight: 600;
+    font-size: 15px;
+}
+.detail-value {
+    color: #25150f;
+    font-weight: 800;
+    font-size: 15px;
+}
+/* =====================================================================
+   FEEDBACK SCREEN  (ojf-*)
+   Shares the ojp-* shell: topbar, gold rule, body, sections, notes, CTA.
+   ===================================================================== */
+.language-toggle {
+    display: flex;
+    justify-content: center;
+    gap: 4px;
+    width: fit-content;
+    margin: 14px auto 0 auto;
+    padding: 4px;
+    border: 1px solid var(--oj-line);
+    border-radius: 10px;
+    background: rgba(255, 255, 255, 0.75);
+}
+
+.lang-btn {
+    border: 1px solid transparent;
+    background: transparent;
+    padding: 7px 20px;
+    border-radius: 7px;
+    cursor: pointer;
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--oj-ink-soft);
+    transition: background 0.2s ease, color 0.2s ease;
+}
+
+.lang-btn:hover { color: var(--oj-gold-dk); }
+
+.lang-btn.active {
+    background: linear-gradient(180deg, #94151b 0%, #6d0f13 55%, #4d0a0d 100%);
+    border-color: transparent;
+    color: #fff;
+    box-shadow: 0 3px 10px rgba(77, 10, 13, 0.25);
+}
+
+/* ---------------- QUESTIONS ---------------- */
+.ojf__q {
+    padding: 15px 16px 16px 16px;
+    border-top: 1px solid #f0ece5;
+}
+
+.ojf__q:first-child { border-top: none; }
+.ojf__q:nth-child(even) { background: #fbfaf8; }
+
+.ojf__q-head {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+}
+
+.ojf__q-no {
+    flex: 0 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    border: 1.5px solid rgba(201, 162, 77, 0.75);
+    background: linear-gradient(180deg, #fffdf8 0%, var(--oj-cream) 100%);
+    color: var(--oj-gold-dk);
+    font-size: 12px;
+    font-weight: 800;
+    line-height: 1;
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.9);
+}
+
+.ojf__q-text {
+    margin: 3px 0 0 0;
+    font-size: 14.5px;
+    font-weight: 700;
+    line-height: 1.45;
+    color: var(--oj-ink);
+}
+
+.options-group {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 9px;
+    margin: 14px 0 0 36px;
+}
+
+/* Star scale. The star is only the face of the number - the button still
+   carries 1..5 and that is what is saved and averaged. Every star up to the
+   chosen one is lit, so the row reads as "four stars", not "the fourth star". */
+.options-group_stars {
+    align-items: center;
+    gap: 4px;
+}
+
+.star-btn {
+    flex: 1 1 0;
+    max-width: 72px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 6px 0;
+    border: 0;
+    background: none;
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+    transition: transform 0.12s ease;
+}
+
+.star-btn__icon {
+    width: 100%;
+    max-width: 42px;
+    height: auto;
+    fill: #fffdf8;
+    stroke: var(--oj-line);
+    stroke-width: 1.3;
+    stroke-linejoin: round;
+    transition: fill 0.18s ease, stroke 0.18s ease, filter 0.18s ease;
+}
+
+.star-btn:hover .star-btn__icon {
+    fill: var(--oj-gold-lt);
+    stroke: var(--oj-gold);
+}
+
+.star-btn:active { transform: translateY(1px) scale(0.96); }
+
+.star-btn:focus-visible {
+    outline: 2px solid var(--oj-gold);
+    outline-offset: 2px;
+    border-radius: 10px;
+}
+
+.star-btn.filled .star-btn__icon {
+    fill: var(--oj-gold);
+    stroke: var(--oj-gold-dk);
+    filter: drop-shadow(0 3px 6px rgba(201, 162, 77, 0.45));
+}
+
+/* "Not applicable" on the clarity question - the one answer a star cannot say */
+.na-btn {
+    flex: 0 0 auto;
+    margin-left: 6px;
+    padding: 10px 14px;
+    border: 1.5px solid var(--oj-line);
+    border-radius: 10px;
+    background: linear-gradient(180deg, #fff 0%, #fffdf8 100%);
+    color: var(--oj-ink);
+    font-size: 13.5px;
+    font-weight: 800;
+    cursor: pointer;
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.9);
+    transition: background 0.2s ease, border-color 0.2s ease, color 0.2s ease,
+                box-shadow 0.2s ease, transform 0.12s ease;
+}
+
+.na-btn:hover {
+    border-color: var(--oj-gold);
+    background: linear-gradient(180deg, #fffdf8 0%, var(--oj-cream) 100%);
+}
+
+.na-btn:active { transform: translateY(1px); }
+
+.na-btn.selected {
+    border-color: rgba(201, 162, 77, 0.75);
+    background:
+        radial-gradient(ellipse at 50% 0%, rgba(201, 162, 77, 0.26), transparent 66%),
+        linear-gradient(180deg, #94151b 0%, #6d0f13 55%, #4d0a0d 100%);
+    color: #fff;
+    box-shadow:
+        0 8px 18px -6px rgba(77, 10, 13, 0.55),
+        inset 0 1px 0 rgba(255, 255, 255, 0.20);
+}
+
+/* ---------------- OPTIONAL COMMENT ---------------- */
+.ojf__comment {
+    padding: 15px 16px 16px 16px;
+    background: linear-gradient(180deg, #fffaf1 0%, var(--oj-cream) 100%);
+}
+
+.ojf__textarea {
+    display: block;
+    margin-top: 10px;
+    --slds-c-textarea-sizing-min-height: 92px;
+    --slds-c-textarea-color-border: var(--oj-line);
+    --slds-c-textarea-color-border-focus: var(--oj-gold);
+    --slds-c-textarea-color-background: #fff;
+    --slds-c-textarea-radius-border: 8px;
+    --slds-c-textarea-shadow-focus: 0 0 0 2px rgba(201, 162, 77, 0.35);
+}
+
+@media only screen and (max-width: 420px) {
+    .options-group { margin-left: 0; }
+
+    .star-btn__icon { max-width: 38px; }
+    .na-btn { padding: 9px 11px; font-size: 12.5px; }
+}
+
+/* =====================================================================
+   WELCOME SCREEN  (ojw-*)
+   ===================================================================== */
+.ojw__inner {
+    position: relative;
+    z-index: 2;
+    flex: 1 1 auto;
+    /* Without this a flex child refuses to shrink below its content, which is
+       how a "no scrolling" layout springs a scrollbar. */
+    min-height: 0;
+    max-width: 560px;
+    width: 100%;
+    margin: 0 auto;
+    padding: 4px 22px 30px 22px;
+    box-sizing: border-box;
+    text-align: center;
+}
+
+/* Landscape groups the body into two columns. Everywhere else the wrappers
+   dissolve, so the children stack as though they were never there. */
+.ojw__col {
+    display: contents;
+}
+
+/* ---------------- HEADINGS ---------------- */
+.ojw__title {
+    margin: 20px 0 0 0;
+    font-family: Georgia, "Times New Roman", serif;
+    font-size: 42px;
+    line-height: 1.05;
+    font-weight: 700;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: #8c1015;
+    text-shadow: 0 1px 0 rgba(255, 255, 255, 0.75);
+}
+
+.ojw__subtitle {
+    margin: 6px 0 0 0;
+    font-size: 19px;
+    line-height: 1.25;
+    font-weight: 700;
+    letter-spacing: 0.4px;
+    text-transform: uppercase;
+    color: #231f20;
+}
+
+.ojw__lede {
+    margin: 12px 0 0 0;
+    font-size: 15px;
+    font-weight: 500;
+    color: #3d3d3d;
+}
+
+/* ---------------- VIDEO ---------------- */
+.ojw__video {
+    position: relative;
+    margin: 22px auto 0 auto;
+    border: 3px solid var(--oj-gold);
+    border-radius: 14px;
+    overflow: hidden;
+    cursor: pointer;
+    box-shadow: 0 12px 28px rgba(84, 50, 24, 0.20);
+}
+
+.ojw__video-img {
+    display: block;
+    width: 100%;
+    height: auto;
+}
+
+.ojw__play {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 64px;
+    height: 64px;
+    margin: -32px 0 0 -32px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(255, 255, 255, 0.92);
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.28);
+    transition: transform 0.2s ease, background 0.2s ease;
+}
+
+.ojw__play svg {
+    width: 30px;
+    height: 30px;
+    margin-left: 3px;
+    fill: #2b2b2b;
+}
+
+.ojw__video:hover .ojw__play {
+    transform: scale(1.08);
+    background: #fff;
+}
+
+/* ---------------- BENEFITS ---------------- */
+.ojw__section {
+    margin: 26px 0 0 0;
+    font-size: 15px;
+    font-weight: 800;
+    letter-spacing: 1.2px;
+    text-transform: uppercase;
+    color: var(--oj-maroon-warm);
+}
+
+.ojw__benefits {
+    display: flex;
+    align-items: flex-start;
+    margin-top: 16px;
+}
+
+.ojw__benefit {
+    flex: 1 1 0;
+    min-width: 0;
+    padding: 0 8px;
+}
+
+.ojw__benefit + .ojw__benefit {
+    border-left: 1px solid rgba(201, 162, 77, 0.45);
+}
+
+.ojw__benefit-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 46px;
+    height: 46px;
+    margin: 0 auto 9px auto;
+    border: 2px solid var(--oj-gold);
+    border-radius: 50%;
+    background: #fff;
+    --slds-c-icon-color-foreground-default: var(--oj-maroon-warm);
+}
+
+.ojw__benefit p {
+    margin: 0;
+    font-size: 11px;
+    line-height: 1.35;
+    font-weight: 700;
+    letter-spacing: 0.2px;
+    text-transform: uppercase;
+    color: #3c3c3c;
+}
+
+/* ---------------- TIMER ---------------- */
+.ojw__timer {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 9px;
+    margin-top: 24px;
+}
+
+.ojw__timer-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 30px;
+    height: 30px;
+    border: 2px solid var(--oj-gold);
+    border-radius: 50%;
+    background: #fff;
+    --slds-c-icon-color-foreground-default: var(--oj-maroon-warm);
+}
+
+.ojw__timer p {
+    margin: 0;
+    font-size: 14px;
+    font-weight: 700;
+    letter-spacing: 0.4px;
+    text-transform: uppercase;
+    color: #3c3c3c;
+}
+
+.ojw__timer strong {
+    color: #c8102e;
+    font-weight: 800;
+}
+
+/* ---------------- CTA ---------------- */
+.ojw__cta {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    width: 100%;
+    max-width: 440px;
+    margin: 20px auto 0 auto;
+    padding: 17px 24px;
+    border: none;
+    border-radius: 9px;
+    background: linear-gradient(180deg, #94151b 0%, #6d0f13 55%, #4d0a0d 100%);
+    color: #fff;
+    font-size: 19px;
+    font-weight: 800;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    cursor: pointer;
+    box-shadow:
+        0 12px 26px rgba(77, 10, 13, 0.32),
+        inset 0 1px 0 rgba(255, 255, 255, 0.16);
+    transition: transform 0.15s ease, box-shadow 0.2s ease, filter 0.2s ease;
+}
+
+.ojw__cta:hover {
+    filter: brightness(1.1);
+    box-shadow: 0 16px 32px rgba(77, 10, 13, 0.38);
+}
+
+.ojw__cta:active { transform: translateY(1px); }
+
+.ojw__cta-chev {
+    width: 20px;
+    height: 20px;
+    flex: 0 0 auto;
+}
+
+/* ---------------- PRIVACY ---------------- */
+/* ---------------- RESPONSIVE ---------------- */
+@media only screen and (max-width: 420px) {
+    .ojw__inner { padding: 4px 16px 24px 16px; }
+    .ojw__title { font-size: 32px; }
+    .ojw__subtitle { font-size: 16px; }
+    .ojw__benefit { padding: 0 5px; }
+    .ojw__benefit p { font-size: 10px; }
+    .ojw__benefit-icon { width: 40px; height: 40px; }
+    .ojw__cta { font-size: 16px; padding: 15px 18px; }
+}
+
+
+/* =====================================================================
+   PROFILE / CUSTOMER SUMMARY SCREEN  (ojp-*)
+   ===================================================================== */
+/* ---------------- BODY ---------------- */
+.ojp__body {
+    position: relative;
+    z-index: 2;
+    flex: 1 1 auto;
+    width: 100%;
+    max-width: 640px;
+    margin: 0 auto;
+    padding: 6px 16px 26px 16px;
+    box-sizing: border-box;
+}
+
+.ojp__card {
+    background: #fff;
+    border: 1px solid rgba(201, 162, 77, 0.40);
+    border-radius: 14px;
+    box-shadow:
+        0 1px 2px rgba(60, 45, 30, 0.05),
+        0 10px 24px -14px rgba(85, 16, 15, 0.30);
+}
+
+/* ---------------- FOUND BANNER ---------------- */
+.ojp__banner {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 13px 15px;
+    border-radius: 10px;
+    background: #f0f9f2;
+    border: 1px solid #cbe8d3;
+}
+
+.ojp__banner-icon {
+    flex: 0 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: #2e9c53;
+    color: #fff;
+}
+
+.ojp__banner-icon svg { width: 18px; height: 18px; }
+
+.ojp__banner-text strong {
+    display: block;
+    font-size: 15px;
+    font-weight: 700;
+    color: #1f7a41;
+}
+
+.ojp__banner-text span {
+    display: block;
+    margin-top: 2px;
+    font-size: 12.5px;
+    color: #5a6b60;
+}
+
+/* ---------------- IDENTITY + PROMPT ---------------- */
+.ojp__split {
+    display: flex;
+    gap: 12px;
+    margin-top: 12px;
+}
+
+.ojp__identity {
+    flex: 1 1 42%;
+    min-width: 0;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 14px;
+}
+
+.ojp__avatar {
+    flex: 0 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 46px;
+    height: 46px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #f3e2c2, #dfc08a);
+    color: #6d0f13;
+}
+
+.ojp__avatar svg { width: 26px; height: 26px; }
+
+.ojp__identity-text { min-width: 0; }
+
+.ojp__identity-hi {
+    display: block;
+    font-size: 11.5px;
+    color: #8a7b6b;
+}
+
+.ojp__identity-name {
+    display: block;
+    margin: 1px 0 3px 0;
+    font-size: 17px;
+    font-weight: 800;
+    line-height: 1.2;
+    color: #7a0f14;
+    word-break: break-word;
+}
+
+.ojp__identity-id {
+    display: block;
+    font-size: 11.5px;
+    color: #7c6752;
+}
+
+.ojp__prompt {
+    flex: 1 1 58%;
+    min-width: 0;
+    padding: 13px 14px;
+    background: #fdf4e3;
+    border-color: #ecd3a6;
+}
+
+.ojp__prompt-head {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+}
+
+.ojp__prompt-icon {
+    flex: 0 0 auto;
+    color: #b9822c;
+}
+
+.ojp__prompt-icon svg { width: 18px; height: 18px; display: block; }
+
+.ojp__prompt-head strong {
+    font-size: 12.5px;
+    font-weight: 800;
+    line-height: 1.35;
+    color: #6b4a15;
+}
+
+.ojp__prompt p {
+    margin: 7px 0 0 0;
+    font-size: 11.5px;
+    line-height: 1.45;
+    color: #7b6647;
+}
+
+.ojp__prompt em {
+    font-style: normal;
+    font-weight: 700;
+    color: #6b4a15;
+}
+
+/* ---------------- SECTIONS ---------------- */
+.ojp__section {
+    margin-top: 16px;
+    border: 1px solid rgba(201, 162, 77, 0.45);
+    border-radius: 14px;
+    overflow: hidden;
+    background: #fff;
+    box-shadow:
+        0 1px 2px rgba(60, 45, 30, 0.05),
+        0 10px 26px -12px rgba(85, 16, 15, 0.28);
+}
+
+/* Maroon plate with a gold-foil edge along the bottom */
+.ojp__section-head {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 13px 16px 14px 16px;
+    background:
+        radial-gradient(ellipse at 88% 130%, rgba(201, 162, 77, 0.30), transparent 58%),
+        linear-gradient(135deg, #7d1418 0%, #5c0e11 60%, #4a0b0e 100%);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.10);
+}
+
+.ojp__section-head::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: 2px;
+    background: linear-gradient(90deg,
+        var(--oj-gold-dk) 0%,
+        var(--oj-gold) 18%,
+        #f7e8c0 50%,
+        var(--oj-gold) 82%,
+        var(--oj-gold-dk) 100%);
+}
+
+.ojp__section-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 26px;
+    height: 26px;
+    border-radius: 7px;
+    border: 1px solid rgba(243, 224, 175, 0.45);
+    background: rgba(255, 255, 255, 0.16);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.20);
+}
+
+.ojp__section-head h3 {
+    margin: 0;
+    font-size: 12.5px;
+    font-weight: 800;
+    letter-spacing: 1.4px;
+    text-transform: uppercase;
+    color: var(--oj-gold-lt);
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.35);
+}
+
+/* ---------------- ROWS ---------------- */
+.ojp-row {
+    padding: 11px 14px;
+    border-top: 1px solid #f0ece5;
+}
+
+.ojp-row:first-of-type { border-top: none; }
+.ojp-row_alt { background: #fbfaf8; }
+.ojp-row_locked { background: #eef5fd; }
+
+.ojp-row__main {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+}
+
+.ojp-row__icon {
+    flex: 0 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 24px;
+    height: 24px;
+    border-radius: 6px;
+    background: #fdf1e2;
+    --slds-c-icon-color-foreground-default: #a3202a;
+}
+
+.ojp-row__label {
+    flex: 0 0 122px;
+    font-size: 12.5px;
+    font-weight: 600;
+    color: #4a4a4a;
+}
+
+.ojp-row__sep {
+    flex: 0 0 auto;
+    color: #b8ada0;
+    font-size: 12.5px;
+}
+
+.ojp-row__value {
+    flex: 1 1 auto;
+    min-width: 0;
+    font-size: 13px;
+    font-weight: 700;
+    color: #1f1f1f;
+    word-break: break-word;
+}
+
+.ojp-row__btn {
+    flex: 0 0 auto;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 5px 10px;
+    border: 1px solid #e2b7bb;
+    border-radius: 6px;
+    background: #fdf2f3;
+    color: #a3202a;
+    font-size: 11px;
+    font-weight: 700;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: background 0.2s ease, border-color 0.2s ease;
+}
+
+.ojp-row__btn svg { width: 12px; height: 12px; flex: 0 0 auto; }
+.ojp-row__btn:hover { background: #fbe4e6; border-color: #cf8f95; }
+
+.ojp-row__btn_active {
+    background: #a3202a;
+    border-color: #a3202a;
+    color: #fff;
+}
+
+.ojp-row__btn_active:hover { background: #8a1a23; border-color: #8a1a23; }
+
+.ojp-row__locked {
+    flex: 0 0 auto;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    color: #1b5fa8;
+    font-size: 11px;
+    font-weight: 700;
+    text-align: left;
+}
+
+.ojp-row__locked svg { width: 13px; height: 13px; flex: 0 0 auto; }
+
+.ojp-row__locked em {
+    display: block;
+    font-style: normal;
+    font-weight: 500;
+    font-size: 10px;
+    color: #6d8bab;
+}
+
+.ojp-row__edit {
+    margin: 9px 0 2px 33px;
+    max-width: 340px;
+}
+
+/* ---------------- NOTES ---------------- */
+.ojp__note {
+    display: flex;
+    align-items: flex-start;
+    gap: 11px;
+    margin-top: 14px;
+    padding: 14px 16px;
+    border-radius: 12px;
+    box-shadow: 0 1px 2px rgba(60, 45, 30, 0.04);
+    border: 1px solid transparent;
+}
+
+.ojp__note-icon { flex: 0 0 auto; }
+.ojp__note-icon svg { width: 19px; height: 19px; display: block; }
+
+.ojp__note strong {
+    display: block;
+    margin-bottom: 3px;
+    font-size: 12.5px;
+    font-weight: 800;
+}
+
+.ojp__note p,
+.ojp__note ul {
+    margin: 0;
+    font-size: 11.5px;
+    line-height: 1.5;
+}
+
+.ojp__note ul {
+    padding-left: 15px;
+    list-style: disc;
+}
+
+.ojp__note_info {
+    background: #eef5fd;
+    border-color: #cfe0f3;
+    color: #40607f;
+}
+.ojp__note_info .ojp__note-icon,
+.ojp__note_info strong { color: #1b5fa8; }
+
+.ojp__note_warn {
+    background: #fdf4e3;
+    border-color: #ecd3a6;
+    color: #7b6647;
+}
+.ojp__note_warn .ojp__note-icon,
+.ojp__note_warn strong { color: #b9822c; }
+
+.ojp__note_safe {
+    background: #fff;
+    border-color: #e6e3dd;
+    color: #5a6b60;
+    align-items: center;
+}
+.ojp__note_safe .ojp__note-icon { color: #2e9c53; }
+
+/* ---------------- CTA ---------------- */
+.ojp__cta {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    width: 100%;
+    margin-top: 20px;
+    padding: 17px 22px;
+    border: 1.5px solid rgba(201, 162, 77, 0.55);
+    border-radius: 12px;
+    background:
+        radial-gradient(ellipse at 50% 0%, rgba(201, 162, 77, 0.22), transparent 62%),
+        linear-gradient(180deg, #94151b 0%, #6d0f13 55%, #4d0a0d 100%);
+    color: #fff;
+    font-size: 16px;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    cursor: pointer;
+    box-shadow:
+        0 12px 26px -8px rgba(77, 10, 13, 0.55),
+        inset 0 1px 0 rgba(255, 255, 255, 0.18);
+    transition: transform 0.15s ease, box-shadow 0.2s ease, filter 0.2s ease;
+}
+
+.ojp__cta:hover:not(:disabled) { filter: brightness(1.1); }
+.ojp__cta:active:not(:disabled) { transform: translateY(1px); }
+.ojp__cta-lead { width: 20px; height: 20px; flex: 0 0 auto; }
+.ojp__cta-arrow { width: 20px; height: 20px; flex: 0 0 auto; }
+
+.ojp__cta:disabled {
+    border-color: rgba(201, 162, 77, 0.28);
+    background: linear-gradient(180deg, #ded7cb 0%, #cfc7b9 100%);
+    color: #fbf8f3;
+    box-shadow: none;
+    cursor: not-allowed;
+}
+
+/* Secondary action: same shape, gold foil instead of the maroon fill */
+.ojp__cta_ghost {
+    margin-top: 12px;
+    border: 1.5px solid rgba(201, 162, 77, 0.85);
+    background: linear-gradient(180deg, #fffdf8 0%, var(--oj-cream) 100%);
+    color: var(--oj-gold-dk);
+    font-size: 14.5px;
+    box-shadow:
+        0 3px 10px rgba(84, 50, 24, 0.10),
+        inset 0 1px 0 rgba(255, 255, 255, 0.9);
+}
+
+.ojp__cta_ghost:hover:not(:disabled) {
+    filter: none;
+    background: linear-gradient(180deg, #fff 0%, #fdf5e5 100%);
+    color: var(--oj-maroon-ink);
+}
+
+/* ---------------- RESPONSIVE ---------------- */
+@media only screen and (max-width: 560px) {
+    .ojp__split { flex-direction: column; }
+    .ojp-row__main { flex-wrap: wrap; }
+    .ojp-row__label { flex: 0 0 auto; }
+    .ojp-row__value { flex: 1 1 100%; margin-left: 33px; }
+    .ojp-row__btn,
+    .ojp-row__locked { margin-left: 33px; }
+    .ojp-row__edit { margin-left: 33px; }
+}
+
+/* ---------------- TODAY'S SHOWROOM VISIT CARD (ojpv-*) ---------------- */
+.ojpv__hero {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 17px 16px 15px 16px;
+    background:
+        radial-gradient(ellipse at 8% 0%, rgba(201, 162, 77, 0.16), transparent 55%),
+        linear-gradient(180deg, #fffaf1 0%, var(--oj-cream) 100%);
+}
+
+.ojpv__hero-icon {
+    flex: 0 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 48px;
+    height: 48px;
+    border-radius: 12px;
+    border: 1.5px solid rgba(201, 162, 77, 0.65);
+    background: linear-gradient(180deg, #fff 0%, #fffaf1 100%);
+    color: var(--oj-maroon-ink);
+    box-shadow:
+        0 3px 8px rgba(84, 50, 24, 0.12),
+        inset 0 1px 0 rgba(255, 255, 255, 0.9);
+}
+
+.ojpv__hero-icon svg { width: 25px; height: 25px; }
+
+.ojpv__hero-text {
+    flex: 1 1 auto;
+    min-width: 0;
+}
+
+.ojpv__hero-label {
+    display: block;
+    font-size: 10.5px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: var(--oj-ink-soft);
+}
+
+.ojpv__hero-text strong {
+    display: block;
+    margin-top: 2px;
+    font-size: 17px;
+    font-weight: 800;
+    line-height: 1.25;
+    color: var(--oj-maroon-ink);
+    word-break: break-word;
+}
+
+.ojpv__pill {
+    flex: 0 0 auto;
+    padding: 5px 12px;
+    border-radius: 999px;
+    border: 1px solid #cbe8d3;
+    background: #f0f9f2;
+    color: #1f7a41;
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: 0.6px;
+    text-transform: uppercase;
+    white-space: nowrap;
+}
+
+.ojpv__pill_done {
+    border-color: var(--oj-line);
+    background: #f7f3ec;
+    color: var(--oj-gold-dk);
+}
+
+/* Gold ornament between the showroom line and the detail tiles.
+   Sits on the same cream as the hero so the two read as one panel. */
+.ojpv__orn {
+    margin: 0 auto;
+    padding: 0 0 14px 0;
+    max-width: 170px;
+    background: transparent;
+}
+
+.ojpv__orn-wrap { background: var(--oj-cream); }
+
+.ojpv__grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    gap: 1px;
+    padding: 1px 0 0 0;
+    background: #f0ece5;
+    border-top: 1px solid #f0ece5;
+}
+
+.ojpv__tile {
+    padding: 15px 14px;
+    background: linear-gradient(180deg, #fff 0%, #fffdf8 100%);
+}
+
+.ojpv__tile-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 27px;
+    height: 27px;
+    border-radius: 8px;
+    border: 1px solid rgba(201, 162, 77, 0.35);
+    background: linear-gradient(180deg, #fffdf8 0%, var(--oj-cream) 100%);
+    --slds-c-icon-color-foreground-default: var(--oj-gold-dk);
+}
+
+.ojpv__tile-label {
+    display: block;
+    margin-top: 7px;
+    font-size: 10.5px;
+    font-weight: 700;
+    letter-spacing: 0.7px;
+    text-transform: uppercase;
+    color: var(--oj-ink-soft);
+}
+
+.ojpv__tile-value {
+    display: block;
+    margin-top: 3px;
+    font-size: 13.5px;
+    font-weight: 700;
+    line-height: 1.35;
+    color: var(--oj-ink);
+    word-break: break-word;
+}
+
+/* =====================================================================
+   INVOICE SCREEN  (oji-*)
+   Shares the ojp-* shell: topbar, gold rule, body, sections, notes, CTA.
+   ===================================================================== */
+.oji__head {
+    padding: 4px 0 2px 0;
+    text-align: center;
+}
+
+.oji__title {
+    margin: 0;
+    font-family: Georgia, "Times New Roman", serif;
+    font-size: 25px;
+    line-height: 1.2;
+    font-weight: 700;
+    color: var(--oj-maroon-ink);
+    letter-spacing: 0.2px;
+}
+
+.oji__lede {
+    margin: 12px 0 0 0;
+    font-size: 12.5px;
+    line-height: 1.5;
+    color: var(--oj-ink-soft);
+}
+
+.oji__pane {
+    padding: 15px 16px 17px 16px;
+    background: linear-gradient(180deg, #fffaf1 0%, var(--oj-cream) 100%);
+}
+
+.oji__hint {
+    margin: 0;
+    font-size: 11.5px;
+    line-height: 1.5;
+    color: var(--oj-ink-soft);
+}
+
+.oji__field { margin-top: 14px; }
+
+.oji__label {
+    display: block;
+    margin-bottom: 6px;
+    font-size: 10.5px;
+    font-weight: 700;
+    letter-spacing: 0.8px;
+    text-transform: uppercase;
+    color: var(--oj-gold-dk);
+}
+
+.oji__inputrow {
+    display: flex;
+    align-items: stretch;
+    gap: 9px;
+}
+
+.oji__input {
+    flex: 1 1 auto;
+    min-width: 0;
+    --slds-c-input-color-border: var(--oj-line);
+    --slds-c-input-color-border-focus: var(--oj-gold);
+    --slds-c-input-radius-border: 8px;
+    --slds-c-input-shadow-focus: 0 0 0 2px rgba(201, 162, 77, 0.35);
+    --slds-c-input-color-background: #fff;
+}
+
+/* Gold outline action, matching the request-update buttons on the profile screen */
+.oji__btn {
+    flex: 0 0 auto;
+    padding: 0 16px;
+    min-height: 40px;
+    border: 1.5px solid rgba(201, 162, 77, 0.85);
+    border-radius: 8px;
+    background: #fff;
+    color: var(--oj-gold-dk);
+    font-size: 12.5px;
+    font-weight: 800;
+    letter-spacing: 0.4px;
+    white-space: nowrap;
+    cursor: pointer;
+    transition: background 0.2s ease, filter 0.2s ease;
+}
+
+/* The solid variant is excluded rather than left to override: it only sets
+   filter on hover, so this cream would otherwise paint straight over its
+   maroon gradient and the button would turn white. */
+.oji__btn:hover:not(:disabled):not(.oji__btn_solid) { background: #fdf5e5; }
+
+.oji__btn_solid {
+    border-color: transparent;
+    background: linear-gradient(180deg, #94151b 0%, #6d0f13 55%, #4d0a0d 100%);
+    color: #fff;
+}
+
+.oji__btn_solid:hover:not(:disabled) { filter: brightness(1.1); }
+
+.oji__btn:disabled {
+    opacity: 0.55;
+    cursor: not-allowed;
+}
+
+.oji__verified {
+    flex: 0 0 auto;
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    padding: 0 15px;
+    min-height: 40px;
+    border: 1px solid #cbe8d3;
+    border-radius: 8px;
+    background: #f0f9f2;
+    color: #1f7a41;
+    font-size: 12.5px;
+    font-weight: 800;
+    letter-spacing: 0.4px;
+    white-space: nowrap;
+}
+
+.oji__verified svg { width: 16px; height: 16px; flex: 0 0 auto; }
+
+/* Quiet second chance under the code box - a code can expire while the
+   customer is still looking for the email. */
+.oji__resend {
+    margin-top: 9px;
+    padding: 0;
+    border: 0;
+    background: none;
+    color: var(--oj-maroon-ink);
+    font-size: 12.5px;
+    font-weight: 700;
+    text-decoration: underline;
+    text-underline-offset: 3px;
+    cursor: pointer;
+}
+
+.oji__resend:hover:not(:disabled) { color: var(--oj-gold-dk); }
+
+.oji__resend:disabled {
+    opacity: 0.55;
+    cursor: not-allowed;
+}
+
+.oji__error {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 12px;
+    padding: 9px 12px;
+    border: 1px solid #f0c4c4;
+    border-radius: 8px;
+    background: #fdf0f0;
+    color: #a0161c;
+    font-size: 12px;
+    line-height: 1.45;
+}
+
+.oji__error svg { width: 17px; height: 17px; flex: 0 0 auto; }
+
+/* ---------------- EMAIL VERIFICATION CARDS ----------------
+   One card per address. They are stacked rather than side by side so the
+   second one reads as an alternative to the first, not a second thing to
+   fill in. */
+.oji__mails {
+    display: grid;
+    gap: 10px;
+    margin-top: 14px;
+}
+
+.oji__mail {
+    padding: 12px 13px 14px 13px;
+    border: 1px solid var(--oj-line);
+    border-radius: 12px;
+    background: #fff;
+    box-shadow: 0 1px 2px rgba(31, 22, 12, 0.05);
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+/* A proved address is settled - the green edge carries that on its own */
+.oji__mail_on {
+    border-color: #cbe8d3;
+    box-shadow:
+        inset 3px 0 0 0 #1f7a41,
+        0 1px 2px rgba(31, 22, 12, 0.05);
+}
+
+.oji__mail-head {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.oji__mail-title {
+    font-size: 10.5px;
+    font-weight: 700;
+    letter-spacing: 0.8px;
+    text-transform: uppercase;
+    color: var(--oj-gold-dk);
+}
+
+.oji__mail-tag,
+.oji__mail-status {
+    padding: 3px 8px;
+    border-radius: 999px;
+    font-size: 9.5px;
+    font-weight: 800;
+    letter-spacing: 0.6px;
+    text-transform: uppercase;
+    white-space: nowrap;
+}
+
+.oji__mail-tag {
+    background: #f4f1ea;
+    color: var(--oj-ink-soft);
+}
+
+/* Pushed to the far end so the eye can run down the states of both cards */
+.oji__mail-status {
+    margin-left: auto;
+    border: 1px solid var(--oj-line);
+    background: #faf8f4;
+    color: var(--oj-ink-soft);
+}
+
+.oji__mail-status_on {
+    border-color: #cbe8d3;
+    background: #f0f9f2;
+    color: #1f7a41;
+}
+
+.oji__mail-status_wait {
+    border-color: rgba(201, 162, 77, 0.55);
+    background: #fdf5e5;
+    color: var(--oj-gold-dk);
+}
+
+.oji__mail-hint {
+    margin: 6px 0 10px 0;
+    font-size: 11px;
+    line-height: 1.5;
+    color: var(--oj-ink-soft);
+}
+
+/* The address on file is read back, not typed, so it is not an input */
+.oji__mail-addr {
+    display: flex;
+    align-items: center;
+    flex: 1 1 auto;
+    min-width: 0;
+    padding: 0 12px;
+    min-height: 40px;
+    border: 1px solid var(--oj-line);
+    border-radius: 8px;
+    background: #faf8f4;
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--oj-ink);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.oji__mail .oji__field { margin-top: 12px; }
+
+/* The one line that answers "where is this going?" before they commit */
+.oji__dest {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    margin-top: 12px;
+    padding: 10px 12px;
+    border: 1px solid #cbe8d3;
+    border-radius: 8px;
+    background: #f0f9f2;
+    color: #1f6b3c;
+    font-size: 12px;
+    line-height: 1.45;
+}
+
+.oji__dest svg { width: 17px; height: 17px; flex: 0 0 auto; }
+
+/* Addresses are long and must break rather than widen the pane */
+.oji__dest strong {
+    font-weight: 800;
+    word-break: break-all;
+}
+
+.oji__dest_wait {
+    border-color: rgba(201, 162, 77, 0.6);
+    background: #fdf5e5;
+    color: var(--oj-gold-dk);
+}
+
+/* ---------------- INVOICE CHOICES ---------------- */
+.oji__choices {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 1px;
+    background: #f0ece5;
+}
+
+.oji__choice {
+    position: relative;
+    display: block;
+    width: 100%;
+    padding: 15px 14px 15px 40px;
+    border: none;
+    background: #fff;
+    text-align: left;
+    cursor: pointer;
+    transition: background 0.2s ease;
+}
+
+.oji__choice:hover { background: #fbfaf8; }
+
+.oji__choice strong {
+    display: block;
+    font-size: 13.5px;
+    font-weight: 800;
+    line-height: 1.3;
+    color: var(--oj-ink);
+}
+
+.oji__choice span:not(.oji__choice-tick) {
+    display: block;
+    margin-top: 3px;
+    font-size: 11px;
+    line-height: 1.4;
+    color: var(--oj-ink-soft);
+}
+
+/* Empty ring until selected, gold disc with a tick once chosen */
+.oji__choice-tick {
+    position: absolute;
+    top: 16px;
+    left: 13px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 19px;
+    height: 19px;
+    border: 1.5px solid var(--oj-line);
+    border-radius: 50%;
+    background: #fff;
+    color: transparent;
+}
+
+.oji__choice-tick svg { width: 11px; height: 11px; }
+
+.oji__choice_on {
+    background: linear-gradient(180deg, #fffaf1 0%, var(--oj-cream) 100%);
+    box-shadow:
+        inset 4px 0 0 0 var(--oj-gold),
+        inset 0 1px 0 rgba(255, 255, 255, 0.9);
+}
+
+.oji__choice_on:hover { background: var(--oj-cream); }
+
+.oji__choice_on strong { color: var(--oj-maroon-ink); }
+
+.oji__choice_on .oji__choice-tick {
+    border-color: var(--oj-gold);
+    background: var(--oj-gold);
+    color: #fff;
+}
+
+/* --- Date range on the specific-invoice list --- */
+.oji__range {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    gap: 12px;
+    padding: 14px 15px;
+    background: linear-gradient(180deg, #fffaf1 0%, var(--oj-cream) 100%);
+    border-bottom: 1px solid var(--oj-line);
+}
+
+.oji__range-field { min-width: 0; }
+
+/* Sits inside the range block, so it keeps the block's own margins */
+.oji__error_range { margin: 0 15px 14px 15px; }
+
+/* --- How many bills are ticked, and the all / none shortcut --- */
+.oji__pickbar {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 15px;
+    background: #faf8f4;
+    border-bottom: 1px solid var(--oj-line);
+}
+
+.oji__pickbar-count {
+    font-size: 11.5px;
+    font-weight: 700;
+    letter-spacing: 0.3px;
+    color: var(--oj-ink-soft);
+}
+
+.oji__pickbar-all {
+    margin-left: auto;
+    padding: 5px 12px;
+    border: 1.5px solid rgba(201, 162, 77, 0.85);
+    border-radius: 999px;
+    background: #fff;
+    color: var(--oj-gold-dk);
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    white-space: nowrap;
+    cursor: pointer;
+    transition: background 0.2s ease;
+}
+
+.oji__pickbar-all:hover { background: #fdf5e5; }
+
+/* --- Invoices read back from Business Central --- */
+
+/* Holds the spinner's absolute positioning as well as the plain messages */
+.oji__bills-note {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    min-height: 64px;
+    padding: 18px 16px;
+    background: #fff;
+    font-size: 12.5px;
+    color: var(--oj-ink-soft);
+    text-align: center;
+}
+
+.oji__bills {
+    display: grid;
+    gap: 1px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    background: #f0ece5;
+    /* Twelve months of bills cannot push the CTA off the screen */
+    max-height: 260px;
+    overflow-y: auto;
+}
+
+/* Column one holds the radio and collapses to nothing when there is only one
+   bill, so a single invoice still sits flush against the left edge. */
+.oji__bill {
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    align-items: center;
+    gap: 2px 12px;
+    width: 100%;
+    padding: 13px 15px;
+    border: none;
+    background: #fff;
+    text-align: left;
+    cursor: pointer;
+    transition: background 0.2s ease;
+}
+
+.oji__bill:hover { background: #fbfaf8; }
+
+.oji__bill-radio {
+    grid-column: 1;
+    grid-row: 1 / span 3;
+    align-self: center;
+    width: 18px;
+    height: 18px;
+    margin: 0 2px 0 0;
+    accent-color: var(--oj-gold);
+    cursor: pointer;
+}
+
+.oji__bill-no {
+    grid-column: 2;
+    font-size: 13px;
+    font-weight: 800;
+    line-height: 1.3;
+    color: var(--oj-ink);
+    /* Document numbers are long and must not wrap the row into two lines */
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.oji__bill-date {
+    grid-column: 2;
+    font-size: 11px;
+    line-height: 1.4;
+    color: var(--oj-ink-soft);
+}
+
+/* Who the bill was raised to - name and BC customer code */
+.oji__bill-cust {
+    grid-column: 2;
+    font-size: 11px;
+    line-height: 1.4;
+    color: var(--oj-ink-soft);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.oji__bill-value {
+    grid-row: 1 / span 3;
+    grid-column: 3;
+    align-self: center;
+    font-size: 14px;
+    font-weight: 800;
+    white-space: nowrap;
+    color: var(--oj-maroon-ink);
+}
+
+.oji__bill_on {
+    background: linear-gradient(180deg, #fffaf1 0%, var(--oj-cream) 100%);
+    box-shadow:
+        inset 4px 0 0 0 var(--oj-gold),
+        inset 0 1px 0 rgba(255, 255, 255, 0.9);
+}
+
+.oji__bill_on:hover { background: var(--oj-cream); }
+
+/* =====================================================================
+   FEEDBACK SUBMITTED SCREEN  (ojd-*)
+   Shares the ojp-* shell: topbar, gold rule, body, notes.
+   ===================================================================== */
+.ojd__hero {
+    position: relative;
+    padding: 30px 22px 26px 22px;
+    border: 1.5px solid rgba(201, 162, 77, 0.6);
+    border-radius: 16px;
+    background:
+        radial-gradient(ellipse at 50% 0%, rgba(201, 162, 77, 0.16), transparent 62%),
+        linear-gradient(180deg, #fffaf1 0%, var(--oj-cream) 100%);
+    box-shadow:
+        0 2px 4px rgba(60, 45, 30, 0.05),
+        0 18px 38px -18px rgba(85, 16, 15, 0.35),
+        inset 0 1px 0 rgba(255, 255, 255, 0.9);
+    text-align: center;
+}
+
+/* Gold foil capping the card */
+.ojd__hero::before {
+    content: "";
+    position: absolute;
+    left: 18%;
+    right: 18%;
+    top: -1px;
+    height: 3px;
+    border-radius: 0 0 3px 3px;
+    background: linear-gradient(90deg,
+        transparent 0%,
+        var(--oj-gold) 20%,
+        #f7e8c0 50%,
+        var(--oj-gold) 80%,
+        transparent 100%);
+}
+
+.ojd__tick {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 72px;
+    height: 72px;
+    margin: 0 auto;
+    border: 3px solid #2d8a4e;
+    border-radius: 50%;
+    background: #fff;
+    color: #2d8a4e;
+    box-shadow: 0 4px 14px rgba(45, 138, 78, 0.18);
+}
+
+.ojd__tick svg { width: 38px; height: 38px; }
+
+.ojd__title {
+    margin: 16px 0 0 0;
+    font-family: Georgia, "Times New Roman", serif;
+    font-size: 23px;
+    line-height: 1.25;
+    font-weight: 700;
+    color: #1f7a42;
+    letter-spacing: 0.2px;
+}
+
+.ojd__text {
+    margin: 12px 0 0 0;
+    font-size: 13px;
+    line-height: 1.55;
+    color: var(--oj-ink-soft);
+}
+
+.ojd__text strong {
+    font-weight: 800;
+    color: var(--oj-maroon-ink);
+}
+
+/* Gold variant: the visit is closed rather than newly celebrated */
+.ojd__hero_gold {
+    background:
+        radial-gradient(ellipse at 50% 0%, rgba(201, 162, 77, 0.22), transparent 62%),
+        linear-gradient(180deg, #fffaf1 0%, var(--oj-cream) 100%);
+}
+
+.ojd__tick_gold {
+    border-color: var(--oj-gold);
+    color: var(--oj-gold-dk);
+    box-shadow:
+        0 4px 14px rgba(201, 162, 77, 0.30),
+        inset 0 1px 0 rgba(255, 255, 255, 0.9);
+}
+
+.ojd__title_gold { color: var(--oj-maroon-ink); }
+
+/* Timestamp chip under the message */
+.ojd__stamp {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    margin: 16px 0 0 0;
+    padding: 8px 16px;
+    border: 1px solid rgba(201, 162, 77, 0.6);
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.75);
+    color: var(--oj-gold-dk);
+    font-size: 12.5px;
+    font-weight: 800;
+    letter-spacing: 0.3px;
+}
+
+.ojd__stamp svg { width: 15px; height: 15px; flex: 0 0 auto; }
+
+.ojd__prompt {
+    margin: 20px 0 0 0;
+    font-size: 13.5px;
+    font-weight: 800;
+    letter-spacing: 0.3px;
+    text-align: center;
+    color: var(--oj-ink);
+}
+
+/* ---------------- ACTION CARDS ---------------- */
+.ojd__action {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    width: 100%;
+    margin-top: 13px;
+    padding: 17px 16px;
+    border: 1.5px solid var(--oj-line);
+    border-radius: 14px;
+    background: linear-gradient(180deg, #fff 0%, #fffdf8 100%);
+    text-align: left;
+    cursor: pointer;
+    box-shadow:
+        0 1px 2px rgba(60, 45, 30, 0.05),
+        0 10px 22px -14px rgba(85, 16, 15, 0.30);
+    transition: border-color 0.2s ease, background 0.2s ease, transform 0.15s ease,
+                box-shadow 0.2s ease;
+}
+
+.ojd__action:hover {
+    border-color: var(--oj-gold);
+    background: linear-gradient(180deg, #fffdf8 0%, #fdf5e5 100%);
+    box-shadow: 0 14px 28px -14px rgba(85, 16, 15, 0.42);
+}
+
+.ojd__action:active { transform: translateY(1px); }
+
+.ojd__action-icon {
+    flex: 0 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    border-radius: 10px;
+    border: 1px solid rgba(201, 162, 77, 0.55);
+    background: var(--oj-cream);
+    color: var(--oj-gold-dk);
+}
+
+.ojd__action-icon svg { width: 21px; height: 21px; }
+
+.ojd__action-text {
+    flex: 1 1 auto;
+    min-width: 0;
+}
+
+.ojd__action-text strong {
+    display: block;
+    font-size: 14.5px;
+    font-weight: 800;
+    line-height: 1.3;
+    color: var(--oj-maroon-ink);
+}
+
+.ojd__action-text span {
+    display: block;
+    margin-top: 3px;
+    font-size: 11.5px;
+    line-height: 1.45;
+    color: var(--oj-ink-soft);
+}
+
+.ojd__action-arrow {
+    flex: 0 0 auto;
+    width: 17px;
+    height: 17px;
+    color: var(--oj-gold);
+}
+
+/* Recommended next step */
+.ojd__action_primary {
+    border-color: var(--oj-gold);
+    background:
+        radial-gradient(ellipse at 0% 0%, rgba(201, 162, 77, 0.18), transparent 60%),
+        linear-gradient(180deg, #fffaf1 0%, var(--oj-cream) 100%);
+    box-shadow:
+        0 1px 2px rgba(60, 45, 30, 0.05),
+        0 14px 30px -16px rgba(85, 16, 15, 0.42),
+        inset 0 1px 0 rgba(255, 255, 255, 0.9);
+}
+
+.ojd__action_primary .ojd__action-icon {
+    border-color: transparent;
+    background: linear-gradient(180deg, #94151b 0%, #6d0f13 55%, #4d0a0d 100%);
+    color: #fff;
+}
+
+/* Quiet exit */
+.ojd__action_quiet .ojd__action-icon {
+    border-color: #e6e3dd;
+    background: #f7f5f1;
+    color: var(--oj-ink-soft);
+}
+
+.ojd__action_quiet .ojd__action-text strong { color: var(--oj-ink); }
+
+@media only screen and (max-width: 420px) {
+    .ojd__title { font-size: 20px; }
+}
+
+/* =====================================================================
+   CUSTOMER NOT FOUND SCREEN  (ojn-*)
+   ===================================================================== */
+.ojn__inner {
+    position: relative;
+    z-index: 2;
+    flex: 1 1 auto;
+    width: 100%;
+    max-width: 460px;
+    margin: 0 auto;
+    padding: 4px 26px 26px 26px;
+    box-sizing: border-box;
+    text-align: center;
+}
+
+/* ---------------- X MARK ---------------- */
+.ojn__mark {
+    display: block;
+    width: 190px;
+    max-width: 60%;
+    height: auto;
+    margin: 18px auto 0 auto;
+}
+
+/* ---------------- HEADINGS ---------------- */
+.ojn__title {
+    margin: 14px 0 0 0;
+    font-family: Georgia, "Times New Roman", serif;
+    font-size: 31px;
+    line-height: 1.15;
+    font-weight: 700;
+    color: #a0161c;
+    letter-spacing: 0.2px;
+    text-shadow: 0 1px 0 rgba(255, 255, 255, 0.7);
+}
+
+.ojn__text {
+    margin: 14px 0 0 0;
+    font-size: 14.5px;
+    line-height: 1.6;
+    color: #3f3f3f;
+}
+
+.ojn__text strong {
+    font-weight: 800;
+    color: #c8102e;
+}
+
+.ojn__rule {
+    display: block;
+    width: 54px;
+    height: 1px;
+    margin: 16px auto 0 auto;
+    background: rgba(201, 162, 77, 0.75);
+}
+
+/* ---------------- CONTACT ---------------- */
+.ojn__headset {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 30px;
+    height: 30px;
+    margin: 18px auto 0 auto;
+    color: var(--oj-gold-dk);
+}
+
+.ojn__headset svg { width: 24px; height: 24px; }
+
+.ojn__contact {
+    margin: 6px auto 0 auto;
+    max-width: 300px;
+    padding: 12px 18px;
+    border: 1.5px solid rgba(201, 162, 77, 0.75);
+    border-radius: 10px;
+    background: rgba(255, 255, 255, 0.45);
+}
+
+.ojn__contact-row {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    padding: 5px 0;
+    color: #a8801f;
+    font-size: 19px;
+    font-weight: 800;
+    letter-spacing: 0.4px;
+    text-decoration: none;
+    transition: color 0.2s ease;
+}
+
+.ojn__contact-row:hover { color: #7d5320; }
+.ojn__contact-row svg { width: 17px; height: 17px; flex: 0 0 auto; }
+
+/* ---------------- CTA ---------------- */
+.ojn__cta {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 11px;
+    width: 100%;
+    max-width: 340px;
+    margin: 24px auto 0 auto;
+    padding: 16px 22px;
+    border: 1.5px solid rgba(201, 162, 77, 0.55);
+    border-radius: 12px;
+    background:
+        radial-gradient(ellipse at 50% 0%, rgba(201, 162, 77, 0.22), transparent 62%),
+        linear-gradient(180deg, #94151b 0%, #6d0f13 55%, #4d0a0d 100%);
+    color: #fff;
+    font-size: 16px;
+    font-weight: 800;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    cursor: pointer;
+    box-shadow:
+        0 12px 26px -8px rgba(77, 10, 13, 0.55),
+        inset 0 1px 0 rgba(255, 255, 255, 0.18);
+    transition: transform 0.15s ease, filter 0.2s ease;
+}
+
+.ojn__cta:hover { filter: brightness(1.1); }
+.ojn__cta:active { transform: translateY(1px); }
+.ojn__cta svg { width: 19px; height: 19px; flex: 0 0 auto; }
+
+/* ---------------- RESPONSIVE ---------------- */
+@media only screen and (max-width: 420px) {
+    .ojn__inner { padding: 4px 18px 22px 18px; }
+    .ojn__title { font-size: 25px; }
+    .ojn__text { font-size: 13.5px; }
+    .ojn__contact-row { font-size: 16.5px; }
+    .ojn__cta { font-size: 14.5px; }
+}
+
+/* =====================================================================
+   SHOWROOM VISIT NOT FOUND SCREEN  (ojnv-*)
+   Shares the ojn-* shell, adds its own blocks.
+   ===================================================================== */
+.ojnv__verified {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    margin: 20px 0 0 0;
+    padding: 14px 16px;
+    text-align: left;
+    border: 1.5px solid rgba(45, 138, 78, 0.35);
+    border-radius: 12px;
+    background: rgba(233, 248, 238, 0.85);
+}
+
+.ojnv__verified-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex: 0 0 auto;
+    width: 42px;
+    height: 42px;
+    border: 2.4px solid #2d8a4e;
+    border-radius: 50%;
+    color: #2d8a4e;
+    background: #fff;
+}
+
+.ojnv__verified-icon svg { width: 24px; height: 24px; }
+
+.ojnv__verified-text h2 {
+    margin: 0;
+    font-size: 16.5px;
+    font-weight: 800;
+    color: #1f7a42;
+}
+
+.ojnv__verified-text p {
+    margin: 3px 0 0 0;
+    font-size: 13px;
+    line-height: 1.45;
+    color: #4a5a4f;
+}
+
+/* ---------------- HEADLINE ---------------- */
+.ojnv__head {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    margin: 18px 0 0 0;
+    text-align: left;
+}
+
+.ojnv__warn-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex: 0 0 auto;
+    width: 52px;
+    height: 52px;
+    border: 3px solid var(--oj-gold);
+    border-radius: 50%;
+    color: var(--oj-gold);
+    background: #fff;
+}
+
+.ojnv__warn-icon svg { width: 26px; height: 26px; }
+
+.ojnv__title {
+    margin: 0;
+    font-size: 26px;
+    line-height: 1.18;
+    font-weight: 800;
+    color: #a0161c;
+    letter-spacing: 0.2px;
+}
+
+/* ---------------- NOTE BOX ---------------- */
+.ojnv__note {
+    display: flex;
+    align-items: center;
+    gap: 13px;
+    margin: 18px 0 0 0;
+    padding: 13px 15px;
+    text-align: left;
+    border: 1.5px solid rgba(201, 162, 77, 0.65);
+    border-radius: 12px;
+    background: rgba(253, 245, 229, 0.9);
+}
+
+.ojnv__note-icon {
+    flex: 0 0 auto;
+    color: var(--oj-gold-dk);
+}
+
+.ojnv__note-icon svg { width: 28px; height: 28px; }
+
+.ojnv__note p {
+    margin: 0;
+    font-size: 13.5px;
+    line-height: 1.55;
+    color: #3f3f3f;
+}
+
+/* ---------------- ICON + TEXT ROW ---------------- */
+.ojnv__row {
+    display: flex;
+    align-items: center;
+    gap: 13px;
+    margin: 16px 0 0 0;
+    text-align: left;
+}
+
+.ojnv__row-icon {
+    flex: 0 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 34px;
+    height: 34px;
+    color: var(--oj-gold-dk);
+}
+
+.ojnv__row-icon svg { width: 26px; height: 26px; }
+
+.ojnv__row p {
+    margin: 0;
+    font-size: 13.5px;
+    line-height: 1.55;
+    color: #3f3f3f;
+}
+
+.ojnv__row strong {
+    font-weight: 800;
+    color: #c8102e;
+}
+
+.ojnv__contact {
+    margin-top: 8px;
+    max-width: 100%;
+}
+
+.ojnv__contact .ojn__contact-row + .ojn__contact-row {
+    border-top: 1px solid rgba(201, 162, 77, 0.45);
+}
+
+/* ---------------- ACTIONS ---------------- */
+.ojnv__cta-hint {
+    margin: 16px 0 0 0;
+    font-size: 13px;
+    line-height: 1.5;
+    color: #6b6257;
+}
+
+.ojnv__cta-hint + .ojn__cta { margin-top: 12px; }
+
+/* Secondary action: same shape, gold outline instead of the red fill */
+.ojnv__cta_ghost {
+    margin-top: 12px;
+    border: 1.5px solid rgba(201, 162, 77, 0.85);
+    background: rgba(255, 255, 255, 0.6);
+    color: #8a5f18;
+    box-shadow: none;
+}
+
+.ojnv__cta_ghost:hover {
+    filter: none;
+    background: rgba(253, 245, 229, 0.95);
+}
+
+@media only screen and (max-width: 420px) {
+    .ojnv__title { font-size: 23px; }
+    .ojnv__note p,
+    .ojnv__row p { font-size: 12.8px; }
+    .ojnv__cta-hint { font-size: 12.2px; }
+}
+/* =====================================================================
+   TABLET
+   The journey runs on a showroom tab, so above 768px everything is
+   given room to breathe rather than stretched out of a phone layout.
+   ===================================================================== */
+@media only screen and (min-width: 768px) {
+
+    /* ---- shell ---- */
+    /* Taller base band here, so the frames have to clear more of it */
+    :host { --oj-base-h: 58px; }
+
+    .oj-screen::before,
+    .ojw::before,
+    .ojp::before,
+    .ojn::before {
+        top: 14px; right: 14px; left: 14px;
+        bottom: calc(var(--oj-base-h) + 14px);
+        border-radius: 26px;
+    }
+
+    .oj-screen::after,
+    .ojw::after,
+    .ojp::after,
+    .ojn::after {
+        top: 23px; right: 23px; left: 23px;
+        bottom: calc(var(--oj-base-h) + 23px);
+        border-radius: 19px;
+    }
+
+    .oj-head { padding: 30px 34px 22px 34px; }
+    .oj-head__logo { max-height: 100px; }
+    .oj-head__btn { padding: 10px 20px; font-size: 14px; }
+    .oj-head__btn svg { width: 18px; height: 18px; }
+
+    /* Maroon showing below the foil stays proportional to the taller band */
+    .oj-base__dip { bottom: 28px; }
+    .oj-base__orn { width: 44px; height: 22px; margin-left: -22px; bottom: 7px; }
+
+    /* ---- shared page furniture ---- */
+    .ojp__body { max-width: 760px; padding: 12px 32px 40px 32px; }
+    .ojp__section { margin-top: 20px; border-radius: 16px; }
+    .ojp__section-head { padding: 15px 20px 16px 20px; }
+    .ojp__section-head h3 { font-size: 14px; letter-spacing: 1.6px; }
+    .ojp__section-icon { width: 30px; height: 30px; }
+    .ojp__note { padding: 16px 20px; }
+    .ojp__note strong { font-size: 14px; }
+    .ojp__note p, .ojp__note ul { font-size: 13px; }
+    .ojp__cta { padding: 20px 26px; font-size: 18px; border-radius: 14px; }
+    .ojp__cta-lead, .ojp__cta-arrow { width: 23px; height: 23px; }
+    .ojp__cta_ghost { font-size: 16px; }
+
+    /* ---- search ---- */
+    .oj-body__inner { max-width: 620px; padding: 8px 32px 40px 32px; }
+    .oj-welcome { font-size: 50px; }
+    .oj-welcome__sub { font-size: 17px; }
+    .oj-instruction { font-size: 16px; }
+    .oj-field__label { font-size: 15px; }
+    .oj-cc, .oj-phone { height: 60px; border-radius: 14px; }
+    .oj-cc, .oj-phone__input { font-size: 17px; }
+    .oj-cta { padding: 19px 24px; font-size: 18px; border-radius: 14px; }
+    .oj-trust__text strong { font-size: 14px; }
+    .oj-footer__row p { font-size: 13px; }
+
+    /* ---- welcome ---- */
+    .ojw__inner { max-width: 660px; padding: 8px 32px 38px 32px; }
+    .ojw__title { font-size: 52px; }
+    .ojw__subtitle { font-size: 23px; }
+    .ojw__lede { font-size: 17px; }
+    .ojw__cta { font-size: 20px; padding: 20px 26px; }
+
+    /* ---- profile / visit ---- */
+    .ojp__identity { padding: 18px; }
+    .ojp__identity-name { font-size: 20px; }
+    .ojp__banner { padding: 16px 20px; }
+    .ojp__banner-text strong { font-size: 17px; }
+    .ojp__banner-text span { font-size: 14px; }
+    .ojpv__hero { padding: 20px; }
+    .ojpv__hero-icon { width: 56px; height: 56px; }
+    .ojpv__hero-icon svg { width: 30px; height: 30px; }
+    .ojpv__hero-text strong { font-size: 20px; }
+    .ojpv__tile { padding: 18px 18px; }
+    .ojpv__tile-value { font-size: 15px; }
+    .ojp-row { padding: 14px 20px; }
+    .ojp-row__label, .ojp-row__value { font-size: 14.5px; }
+
+    /* ---- invoice ---- */
+    .oji__title { font-size: 32px; }
+    .oji__lede { font-size: 14.5px; }
+    .oji__pane { padding: 20px; }
+    .oji__hint { font-size: 13px; }
+    .oji__btn, .oji__verified { min-height: 48px; font-size: 14px; }
+    .oji__mail { padding: 16px 17px 18px 17px; }
+    .oji__mail-title { font-size: 11.5px; }
+    .oji__mail-tag, .oji__mail-status { font-size: 10.5px; }
+    .oji__mail-hint { font-size: 12.5px; }
+    .oji__mail-addr { min-height: 48px; font-size: 14.5px; }
+    .oji__dest { font-size: 13.5px; padding: 12px 14px; }
+    .oji__choice { padding: 19px 18px 19px 48px; }
+    .oji__choice-tick { top: 20px; left: 17px; width: 22px; height: 22px; }
+    .oji__choice strong { font-size: 15px; }
+    .oji__choice span:not(.oji__choice-tick) { font-size: 12.5px; }
+    .oji__bill { padding: 16px 18px; }
+    .oji__bill-no { font-size: 14.5px; }
+    .oji__bill-date { font-size: 12.5px; }
+    .oji__bill-cust { font-size: 12.5px; }
+    .oji__bill-radio { width: 20px; height: 20px; }
+    .oji__range { padding: 16px 18px; }
+    .oji__pickbar { padding: 12px 18px; }
+    .oji__pickbar-count { font-size: 12.5px; }
+    .oji__pickbar-all { font-size: 12px; padding: 6px 14px; }
+    .oji__bill-value { font-size: 15.5px; }
+    .oji__bills { max-height: 300px; }
+    .oji__bills-note { font-size: 13.5px; }
+
+    /* ---- feedback ---- */
+    .language-toggle { margin-top: 18px; }
+    .lang-btn { padding: 10px 28px; font-size: 15px; }
+    .ojf__q { padding: 20px; }
+    .ojf__q-no { width: 30px; height: 30px; font-size: 13.5px; }
+    .ojf__q-text { font-size: 16.5px; }
+    .options-group { margin-left: 44px; gap: 11px; }
+    .star-btn__icon { max-width: 48px; }
+    .na-btn { padding: 14px 16px; font-size: 15px; border-radius: 12px; }
+    .ojf__comment { padding: 20px; }
+    .ojf__textarea { --slds-c-textarea-sizing-min-height: 120px; }
+
+    /* ---- submitted ---- */
+    .ojd__hero { padding: 40px 28px 32px 28px; }
+    .ojd__tick { width: 92px; height: 92px; }
+    .ojd__tick svg { width: 48px; height: 48px; }
+    .ojd__title { font-size: 30px; }
+    .ojd__text { font-size: 15px; }
+    .ojd__prompt { margin-top: 26px; font-size: 15.5px; }
+    .ojd__stamp { font-size: 14px; padding: 10px 20px; }
+    .ojd__action { padding: 21px 20px; border-radius: 16px; }
+    .ojd__action-icon { width: 48px; height: 48px; border-radius: 12px; }
+    .ojd__action-icon svg { width: 25px; height: 25px; }
+    .ojd__action-text strong { font-size: 17px; }
+    .ojd__action-text span { font-size: 13px; }
+    .ojd__action-arrow { width: 20px; height: 20px; }
+
+    /* ---- not found / no visit ---- */
+    .ojn__inner { max-width: 560px; padding: 8px 32px 34px 32px; }
+    .ojn__title { font-size: 36px; }
+    .ojn__text { font-size: 16px; }
+    .ojn__contact { max-width: 360px; padding: 16px 24px; }
+    .ojn__contact-row { font-size: 22px; }
+    .ojn__cta { max-width: 400px; padding: 19px 26px; font-size: 17px; }
+    .ojnv__title { font-size: 30px; }
+    .ojnv__verified { padding: 18px 20px; }
+    .ojnv__verified-text h2 { font-size: 18.5px; }
+    .ojnv__verified-text p,
+    .ojnv__note p,
+    .ojnv__row p { font-size: 14.5px; }
+}
+
+/* =====================================================================
+   HOW EACH SCREEN HANDLES HEIGHT
+
+   Default: the shell has a floor of the height available and grows past
+   it, so the page scrolls exactly as it did before any of the landscape
+   work. Nothing is pinned, nothing is clipped, no inner scroll areas.
+
+   The welcome and search screens are the exception. They are laid out to
+   fill the screen in landscape, so fdbScreen renders them with .ojp_fit
+   and they are pinned to the height available instead.
+   ===================================================================== */
+.ojp_fit {
+    height: var(--oj-vh, 100dvh);
+    min-height: 0;
+}
+
+/* Opened inside something else - a quick action dialog. The height belongs
+   to the container, so the shell asks for none of it and simply grows with
+   its content; the dialog does the scrolling. */
+.ojp_inline {
+    min-height: 0;
+    height: auto;
+}
+
+/* Only the pinned screens need their body to shrink; on a scrolling page a
+   body that shrinks would clip its own content instead of growing the page. */
+.ojp_fit .oj-body,
+.ojp_fit .ojw__inner,
+.ojp_fit .oj-body__inner { min-height: 0; }
+
+/* The wrappers added to the other screens for a two-column landscape are
+   left in place but inert. display:contents dissolves them, so those
+   screens render exactly as they did before the columns existed. */
+.oj-col,
+.ojs__col { display: contents; }
+
+/* ---------------- THE FOOT OF A PINNED SCREEN ----------------
+   Below the inner frame there is a 16px strip of no-man's land, and below
+   that the base band. Nothing may be laid out against the shell's own foot,
+   because the shell's foot is under the band - a footer that is a sibling
+   of the body lands in the strip however its padding is set.
+
+   So both pinned screens keep their footer inside the body box, where the
+   body's own bottom padding holds it clear of the frame. These two say so
+   in one place; the per-screen rules below only size it. */
+.ojw__inner > .oj-footer,
+.oj-body__inner > .oj-footer { padding-left: 0; padding-right: 0; padding-bottom: 0; }
+
+/* =====================================================================
+   THE LOGO AND THE HEADER RULE
+   The rule with the diamond is drawn as .oj-head::after, pinned 4px above
+   the header's bottom edge and 9px tall - so it occupies the last 13px of
+   the header. Any bottom padding smaller than that and the rule is drawn
+   straight through the logo, which is what put a gold line across the
+   Trust of Hallmark strapline. Every breakpoint now clears it.
+   ===================================================================== */
+.oj-head { padding-bottom: 18px; }
+
+@media only screen and (max-width: 480px) {
+    .oj-head { padding: 18px 14px 16px 14px; }
+}
+
+@media only screen and (min-width: 768px) {
+    .oj-head { padding: 30px 34px 22px 34px; }
+}
+
+/* Screens that ask for head-rule="none". The 18px of bottom padding above is
+   there to hold the rule and nothing else, so it goes with it - which is
+   height handed back to the body on the screens that are pinned to fit. */
+.ojp_norule .oj-head::after { display: none; }
+.ojp_norule .oj-head { padding-bottom: 8px; }
+
+/* =====================================================================
+   LANDSCAPE - WELCOME AND SEARCH ONLY
+   ===================================================================== */
+@media only screen and (orientation: landscape) {
+
+    /* Landscape is short on height, and the logo header is the largest
+       fixed block on every screen - but the top padding is not free space.
+       The decorative frame is inset 14px from the top and its inner
+       hairline 23px, and the logo is centred at the top of the page, so
+       anything less than that and both lines are drawn straight across
+       the logo. 26px puts it just inside the inner frame.
+
+       The bottom keeps its 18px for the header rule, which is 9px tall
+       pinned 4px up and so owns the last 13px.
+
+       The sides have to clear the frame, not the page edge: the inner
+       hairline is inset 16px and turns its corner right where the Help
+       and Back buttons sit, so 22px left the button resting on it. */
+    .oj-head { padding: 26px clamp(30px, 3.4vw, 46px) 18px; }
+    .oj-head__logo { max-height: clamp(28px, calc(var(--oj-vhu) * 7.5), 52px); }
+    .oj-head__btn { padding: 6px 12px; font-size: 11.5px; }
+    .oj-head__btn svg { width: 15px; height: 15px; }
+    .oj-head::after { max-width: 340px; }
+
+    /* ---- the two columns ----
+       Each column packs its own content. Put both in the same grid rows
+       and every row grows to whichever side is taller, stranding the
+       other in the gap. */
+    .ojw__col,
+    .ojs__col {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        min-height: 0;
+    }
+
+    /* ---------------- WELCOME ---------------- */
+    .ojw__inner {
+        display: grid;
+        grid-template-columns: 1.02fr 1fr;
+        grid-template-rows: 1fr auto;
+        column-gap: clamp(20px, 3.4vw, 52px);
+        max-width: 1120px;
+        height: 100%;
+
+        /* The foot of this box is not the foot of the page: the base band
+           takes the last 48px and the two frames stop 9px and 16px short
+           of that again. 4px of bottom padding put the footer's ornament
+           straight through both lines. Clear the inner one. */
+        padding: 2px clamp(26px, 3.6vw, 48px) clamp(20px, calc(var(--oj-vhu) * 3), 26px);
+    }
+
+    .ojw__col_lead { grid-column: 1; grid-row: 1; }
+    .ojw__col_act  { grid-column: 2; grid-row: 1; }
+    .ojw__inner > .oj-footer { grid-column: 1 / -1; grid-row: 2;
+                               padding: clamp(4px, calc(var(--oj-vhu) * 1), 12px) 0 0; }
+
+    .ojw__title     { margin-top: 0; font-size: clamp(24px, calc(var(--oj-vhu) * 4.4), 44px); }
+    .ojw__subtitle  { font-size: clamp(12px, calc(var(--oj-vhu) * 2), 19px); }
+    .ojw__col_lead > .oj-orn { margin-top: clamp(6px, calc(var(--oj-vhu) * 1.2), 14px); }
+    .ojw__lede      { margin-top: clamp(6px, calc(var(--oj-vhu) * 1.2), 12px);
+                      font-size: clamp(11.5px, calc(var(--oj-vhu) * 1.8), 15px); }
+
+    /* Explicit width, not max-width: the auto side margins make this
+       shrink-to-fit, and a shrink-to-fit box gives a width:100% child
+       nothing to resolve against. */
+    .ojw__video     { margin: clamp(8px, calc(var(--oj-vhu) * 1.8), 20px) auto 0;
+                      width: min(100%, 400px); }
+    .ojw__video-img { max-height: clamp(110px, calc(var(--oj-vhu) * 30), 260px); object-fit: cover; }
+
+    .ojw__section   { margin-top: 0; font-size: clamp(12px, calc(var(--oj-vhu) * 2), 18px); }
+
+    /* Two by two rather than four across: the right column is half as wide
+       as the page was, and it has height going spare beside the film. */
+    .ojw__benefits {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        margin-top: clamp(8px, calc(var(--oj-vhu) * 1.8), 20px);
+        row-gap: clamp(8px, calc(var(--oj-vhu) * 1.8), 20px);
+    }
+    .ojw__benefit + .ojw__benefit { border-left: 0; }
+    .ojw__benefit:nth-child(even) { border-left: 1px solid rgba(201, 162, 77, 0.45); }
+    .ojw__benefit:nth-child(n + 3) {
+        border-top: 1px solid rgba(201, 162, 77, 0.45);
+        padding-top: clamp(6px, calc(var(--oj-vhu) * 1.4), 16px);
+    }
+    .ojw__benefit-icon { width: clamp(28px, calc(var(--oj-vhu) * 5), 44px);
+                         height: clamp(28px, calc(var(--oj-vhu) * 5), 44px); }
+    .ojw__benefit p    { font-size: clamp(9px, calc(var(--oj-vhu) * 1.45), 11.5px); }
+
+    .ojw__timer     { margin-top: clamp(8px, calc(var(--oj-vhu) * 1.8), 20px); }
+    .ojw__cta       { margin-top: clamp(10px, calc(var(--oj-vhu) * 2.2), 24px);
+                      font-size: clamp(13px, calc(var(--oj-vhu) * 2.1), 18px);
+                      padding: clamp(10px, calc(var(--oj-vhu) * 1.85), 18px) 22px; }
+
+    .ojw__inner > .oj-footer .oj-footer__row p { font-size: clamp(9.5px, calc(var(--oj-vhu) * 1.5), 11.5px); }
+
+    /* ---------------- SEARCH ---------------- */
+    .oj-body__inner {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        grid-template-rows: 1fr auto;
+        column-gap: clamp(20px, 3.4vw, 52px);
+        max-width: 1060px;
+        height: 100%;
+        align-items: center;
+
+        /* Same reckoning as the welcome screen: the base band takes the
+           last 48px and the inner frame stops 16px above that again, so
+           the box has to hold its content clear of both. */
+        padding-bottom: clamp(20px, calc(var(--oj-vhu) * 3), 26px);
+    }
+
+    .ojs__col_lead { grid-column: 1; grid-row: 1; }
+    .ojs__col_act  { grid-column: 2; grid-row: 1; }
+    .oj-body__inner > .ojs__footer { grid-column: 1 / -1; grid-row: 2;
+                                     padding-top: clamp(4px, calc(var(--oj-vhu) * 1), 12px); }
+    .oj-body__inner > .ojs__footer .oj-footer__row p { font-size: clamp(9.5px, calc(var(--oj-vhu) * 1.5), 11.5px); }
+    .oj-body__inner > .ojs__footer .oj-orn_footer { margin-top: clamp(4px, calc(var(--oj-vhu) * 0.8), 10px); }
+
+    .oj-welcome      { margin-top: 0; font-size: clamp(24px, calc(var(--oj-vhu) * 5.2), 50px); }
+    .oj-welcome__sub { font-size: clamp(11.5px, calc(var(--oj-vhu) * 1.85), 16px); }
+    .oj-instruction  { font-size: clamp(11.5px, calc(var(--oj-vhu) * 1.85), 16px); }
+    .oj-body__inner > .ojs__col > .oj-orn:first-child { margin-top: 0; }
+    .oj-field        { margin-top: clamp(6px, calc(var(--oj-vhu) * 1.4), 16px); }
+    .oj-cta          { padding: clamp(10px, calc(var(--oj-vhu) * 2), 18px) 18px;
+                       font-size: clamp(12.5px, calc(var(--oj-vhu) * 2), 16px); }
+    /* The strip is what pays for the room the footer now takes below it -
+       it was the loosest block on the screen and reads the same tighter. */
+    .oj-trust        { margin-top: clamp(6px, calc(var(--oj-vhu) * 1.4), 16px);
+                       padding: clamp(6px, calc(var(--oj-vhu) * 1.5), 12px) 4px; }
+    .oj-trust__item  { padding: 0 8px; gap: 6px; }
+    .oj-trust__icon  { width: clamp(22px, calc(var(--oj-vhu) * 4.2), 32px);
+                       height: clamp(22px, calc(var(--oj-vhu) * 4.2), 32px); }
+    .oj-trust__text strong { font-size: clamp(9.5px, calc(var(--oj-vhu) * 1.6), 11px); }
+    .oj-trust__text span   { font-size: clamp(9px, calc(var(--oj-vhu) * 1.45), 10.5px); }
+
+    /* ---- short landscape: a desktop window, or heavy browser chrome ----
+       Only the pinned screens need this - the rest scroll. Driven by a
+       class, not by a height media query: a height media query reads the
+       browser viewport, which is taller than our box by the height of the
+       Salesforce chrome, so it fires late or never. */
+    .ojp_short.ojp_fit .ojw__video { display: none; }
+    .ojp_short.ojp_fit .ojw__inner > .oj-footer .oj-footer__row { display: none; }
+    .ojp_short.ojp_fit .oj-trust { display: none; }
+}
+
+/* =====================================================================
+   TABLET LANDSCAPE - THE SEARCH SCREEN'S WELCOME COLUMN
+
+   Everything in the landscape block above is sized off the height
+   available, which is the right instinct when height is what runs out.
+   On a tablet held sideways it is not: a 1024x768 panel has room to
+   spare across, and sizing the welcome off the 768 left it reading at
+   phone size in the middle of a wide, half-empty column.
+
+   So take whichever of the two is larger - the height-driven size, or a
+   share of the width - and lift the ceiling to match. The column holds
+   only the two ornaments, the heading and two lines of copy, so there is
+   height to spend even at the top of the range.
+   ===================================================================== */
+@media only screen and (orientation: landscape) and (min-width: 768px) {
+
+    .oj-welcome {
+        font-size: clamp(34px, max(calc(var(--oj-vhu) * 5.2), 4.4vw), 58px);
+    }
+
+    .oj-welcome__sub {
+        margin-top: clamp(8px, calc(var(--oj-vhu) * 1.6), 14px);
+        font-size: clamp(15px, max(calc(var(--oj-vhu) * 1.85), 1.7vw), 21px);
+    }
+
+    .oj-instruction {
+        margin-top: clamp(10px, calc(var(--oj-vhu) * 2), 18px);
+        font-size: clamp(14px, max(calc(var(--oj-vhu) * 1.85), 1.55vw), 19px);
+    }
+
+    /* Scale up the video for tablet landscape where we have more room */
+    .ojw__video { width: min(100%, 520px); }
+    .ojw__video-img { max-height: clamp(200px, calc(var(--oj-vhu) * 45), 420px); }
+
+
+    /* The rules and their lotus grow with the heading, or they read as a
+       hairline tucked under type twice their weight. */
+    .oj-body__inner .oj-orn { max-width: min(320px, 82%); }
+    .oj-body__inner .oj-orn_sm { max-width: min(210px, 58%); }
+    .oj-body__inner .oj-orn__lotus { width: 52px; height: 26px; }
+    .oj-body__inner .oj-orn__diamond { width: 9px; height: 9px; }
+
+    /* Wide but short is a desktop window, not a tablet: the width is there
+       to justify the larger type but the height is not there to hang it
+       in. Hand those back to the height-driven sizes. */
+    .ojp_short .oj-welcome      { font-size: clamp(24px, calc(var(--oj-vhu) * 5.2), 40px); }
+    .ojp_short .oj-welcome__sub { margin-top: 6px;
+                                  font-size: clamp(11.5px, calc(var(--oj-vhu) * 1.85), 16px); }
+    .ojp_short .oj-instruction  { margin-top: clamp(6px, calc(var(--oj-vhu) * 1.6), 14px);
+                                  font-size: clamp(11.5px, calc(var(--oj-vhu) * 1.85), 16px); }
+    .ojp_short .oj-body__inner .oj-orn__lotus { width: 42px; height: 21px; }
+    .ojp_short .oj-body__inner .oj-orn__diamond { width: 8px; height: 8px; }
+}

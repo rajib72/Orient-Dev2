@@ -1,0 +1,33 @@
+/* Smooth transitions for row highlighting */
+.default-row {
+    transition: all 0.2s ease-in-out;
+}
+
+/* Highlight the row when selected */
+.selected-row {
+    background-color: #f3f9fd; /* Subtle Salesforce blue */
+    box-shadow: inset 4px 0 0 #0176d3; /* Blue left border indicator */
+    transition: all 0.2s ease-in-out;
+}
+
+/* Vertically center all table content */
+.vertical-center {
+    vertical-align: middle !important;
+}
+
+/* Make field labels bold and distinct */
+.field-label {
+    font-weight: 600;
+    color: #080707;
+}
+
+/* Style the old value to look like a clean, read-only badge */
+.old-value-badge {
+    color: #444444;
+    background-color: #f3f3f3;
+    border: 1px solid #e5e5e5;
+    padding: 0.25rem 0.5rem;
+    border-radius: 0.25rem;
+    display: inline-block;
+    max-width: 100%;
+}

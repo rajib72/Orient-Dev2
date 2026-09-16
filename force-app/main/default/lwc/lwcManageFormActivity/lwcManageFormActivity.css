@@ -1,0 +1,373 @@
+.mainWrapper {
+    background: linear-gradient(135deg, #f8fbff, #eef4ff);
+    padding: 18px;
+    border-radius: 14px;
+}
+
+.headerCard {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    background: #ffffff;
+    padding: 18px 20px;
+    border-radius: 16px;
+    margin-bottom: 18px;
+    border-left: 5px solid #2563eb;
+    box-shadow: 0 8px 22px rgba(0, 0, 0, 0.08);
+}
+
+.iconCircle {
+    width: 46px;
+    height: 46px;
+    background: #efe7ff;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.headerCard h2 {
+    margin: 0;
+    color: #1f2937;
+    font-size: 21px;
+    font-weight: 700;
+}
+
+.headerCard p {
+    margin: 5px 0 0;
+    color: #6b7280;
+    font-size: 13px;
+}
+
+.formCard {
+    background: #ffffff;
+    padding: 22px;
+    border-radius: 16px;
+    box-shadow: 0 8px 22px rgba(0, 0, 0, 0.08);
+}
+
+.sectionTitle {
+    color: #2563eb;
+    font-size: 15px;
+    font-weight: 700;
+    margin-bottom: 18px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid #d8e6f3;
+}
+
+.secondSection {
+    margin-top: 22px;
+}
+
+.inputGap {
+    margin-bottom: 16px;
+}
+
+.storeGroupHeader,
+.teamAssignmentHeader {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+}
+
+.storeGroupHeader {
+    background: linear-gradient(135deg, #eef4ff, #ffffff);
+    border: 1px solid #dbeafe;
+    border-left: 4px solid #2563eb;
+    border-radius: 12px;
+    padding: 12px 14px;
+    margin-bottom: 14px;
+}
+
+.storeGroupHeader h4 {
+    margin: 0;
+    color: #1d4ed8;
+    font-size: 14px;
+    font-weight: 800;
+    text-transform: uppercase;
+}
+
+.storeGroupHeader p {
+    margin: 3px 0 0;
+    color: #64748b;
+    font-size: 12px;
+}
+
+.teamAssignmentCard {
+    background: #f8fbff;
+    border: 1px solid #bfdbfe;
+    border-radius: 14px;
+    padding: 14px;
+    margin-bottom: 16px;
+}
+
+.teamAssignmentHeader {
+    margin-bottom: 12px;
+}
+
+.teamAssignmentHeader h5 {
+    margin: 0;
+    color: #1d4ed8;
+    font-size: 14px;
+    font-weight: 800;
+}
+
+.executiveList {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
+    margin-top: 14px;
+}
+
+.executiveCard {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 12px;
+    padding: 12px;
+    background: #ffffff;
+    border: 1px solid #e5e7eb;
+    border-radius: 14px;
+    cursor: pointer;
+}
+
+.selectedCard {
+    border-color: #2563eb;
+    background: #eff6ff;
+}
+
+.disabledCard {
+    opacity: 0.58;
+    cursor: not-allowed;
+}
+
+.avatarCircle {
+    width: 34px;
+    height: 34px;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #ffffff;
+    font-weight: 700;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #2563eb, #7c3aed);
+}
+
+.executiveInfo {
+    flex: 1;
+    min-width: 0;
+}
+
+.executiveName {
+    color: #111827;
+    font-size: 14px;
+    font-weight: 700;
+}
+
+.executiveSubText {
+    color: #6b7280;
+    font-size: 11px;
+}
+
+.checkArea {
+    width: 24px;
+    height: 24px;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #ffffff;
+    border: 1px solid #cbd5e1;
+    border-radius: 50%;
+}
+
+.selectedCard .checkArea {
+    background: #2563eb;
+    border-color: #2563eb;
+}
+
+.checkIcon {
+    --slds-c-icon-color-foreground-default: #ffffff;
+}
+
+.assignmentDateBox {
+    width: 100%;
+    position: relative;
+    margin-top: 8px;
+    padding-top: 10px;
+    border-top: 1px dashed #bfdbfe;
+}
+
+.customLabel {
+    display: block;
+    margin-bottom: 4px;
+    font-size: 12px;
+}
+
+.dateMultiSelectBox {
+    min-height: 34px;
+    position: relative;
+    display: flex;
+    align-items: center;
+    padding: 7px 34px 7px 12px;
+    background: #ffffff;
+    border: 1px solid #747474;
+    border-radius: 8px;
+    cursor: pointer;
+}
+
+.dateDropdownIcon {
+    position: absolute;
+    top: 9px;
+    right: 12px;
+}
+
+.dateDropdownPanel {
+    position: absolute;
+    left: 0;
+    right: 0;
+    z-index: 99999;
+    max-height: 230px;
+    overflow-y: auto;
+    padding: 6px;
+    background: #ffffff;
+    border: 1px solid #dbeafe;
+    border-radius: 10px;
+    box-shadow: 0 10px 24px rgba(15, 23, 42, 0.18);
+}
+
+.dateOption {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 9px;
+    border-radius: 8px;
+    cursor: pointer;
+}
+
+.selectedDateOption {
+    color: #1d4ed8;
+    font-weight: 700;
+    background: #eef4ff;
+}
+
+.dateCheckBox {
+    width: 18px;
+}
+
+.selectedDatePills {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-top: 8px;
+}
+
+.datePill {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 4px 9px;
+    color: #1d4ed8;
+    font-size: 11px;
+    font-weight: 700;
+    background: #e0ecff;
+    border-radius: 999px;
+}
+
+.datePillClose {
+    padding: 0;
+    color: #1d4ed8;
+    font-size: 14px;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+}
+
+.dateLocationList {
+    margin-top: 14px;
+    padding-top: 12px;
+    border-top: 1px dashed #bfdbfe;
+}
+
+.dateLocationTitle {
+    margin-bottom: 9px;
+    color: #1d4ed8;
+    font-size: 12px;
+    font-weight: 800;
+}
+
+.dateLocationRow {
+    display: grid;
+    grid-template-columns: minmax(135px, 0.38fr) minmax(0, 1fr);
+    gap: 12px;
+    align-items: end;
+    padding: 10px;
+    margin-bottom: 9px;
+    background: #ffffff;
+    border: 1px solid #dbeafe;
+    border-radius: 10px;
+}
+
+.dateLabelBox {
+    min-height: 34px;
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    font-size: 12px;
+    font-weight: 700;
+}
+
+.placeholderText {
+    color: #6b7280;
+    font-size: 13px;
+}
+
+.selectedText {
+    color: #111827;
+    font-size: 13px;
+    font-weight: 600;
+}
+
+.emptyMsg {
+    margin-top: 10px;
+    padding: 10px 12px;
+    color: #9a3412;
+    font-size: 13px;
+    background: #fff7ed;
+    border: 1px solid #fed7aa;
+    border-radius: 10px;
+}
+
+.footerBtn {
+    display: flex;
+    justify-content: flex-end;
+    padding: 15px 18px;
+    margin-top: 18px;
+    background: #ffffff;
+    border-radius: 14px;
+}
+
+.spinnerOverlay {
+    position: fixed;
+    inset: 0;
+    z-index: 99999;
+    background: rgba(255, 255, 255, 0.55);
+}
+
+@media only screen and (max-width: 760px) {
+    .executiveList {
+        grid-template-columns: 1fr;
+    }
+
+    .dateLocationRow {
+        grid-template-columns: 1fr;
+    }
+
+    .storeGroupHeader,
+    .teamAssignmentHeader {
+        align-items: stretch;
+        flex-direction: column;
+    }
+}

@@ -1,0 +1,318 @@
+<apex:component controller="Ctrl_CustomerFinalApprovalEmail" access="global">
+
+    <apex:attribute name="requestId"
+        type="Id"
+        description="Orient Customer Change Request Id"
+        assignTo="{!changeRequestId}" />
+
+    <div style="font-family:Arial,Helvetica,sans-serif;color:#2e2e2e;font-size:14px;line-height:1.5;">
+
+        <div style="margin-bottom:18px;">
+            Hello
+            <strong>
+                <apex:outputText value="{!submittedByName}" />
+            </strong>,
+            <br/>
+            The approval process for your Customer Profile change request has been completed.
+        </div>
+
+        <div style="margin-bottom:18px;padding:14px 16px;border:1px solid #a7d7b2;border-radius:12px;background:#f1f9f1;">
+            <table
+                role="presentation"
+                width="100%"
+                cellpadding="0"
+                cellspacing="0"
+                style="border-collapse:collapse;">
+
+                <tr>
+                    <td style="vertical-align:top;">
+                        <div style="color:#2e844a;font-size:11px;font-weight:bold;text-transform:uppercase;letter-spacing:.4px;">
+                            Final Status
+                        </div>
+                        <div style="margin-top:3px;color:#216e39;font-size:18px;font-weight:bold;">
+                            Approval Process Completed
+                        </div>
+                    </td>
+
+                    <td align="right" style="vertical-align:top;">
+                        <span style="display:inline-block;margin-left:6px;padding:5px 10px;border-radius:999px;background:#eaf7ee;color:#2e844a;font-size:11px;font-weight:bold;">
+                            {!approvedCount} Approved
+                        </span>
+
+                        <span style="display:inline-block;margin-left:6px;padding:5px 10px;border-radius:999px;background:#fdecef;color:#a31420;font-size:11px;font-weight:bold;">
+                            {!rejectedCount} Rejected
+                        </span>
+                    </td>
+                </tr>
+            </table>
+        </div>
+
+        <div style="margin-bottom:18px;border:1px solid #f0c9cc;border-radius:12px;background:#fffafa;padding:15px 16px;">
+            <table
+                role="presentation"
+                width="100%"
+                cellpadding="0"
+                cellspacing="0"
+                style="border-collapse:collapse;">
+
+                <tr>
+                    <td width="50%" style="padding:4px 12px 10px 0;vertical-align:top;">
+                        <div style="color:#9c5a60;font-size:11px;font-weight:bold;text-transform:uppercase;letter-spacing:.4px;">
+                            Customer Name
+                        </div>
+                        <div style="margin-top:3px;font-size:16px;font-weight:bold;">
+                            <apex:outputText value="{!customerName}" />
+                        </div>
+                    </td>
+
+                    <td width="50%" style="padding:4px 0 10px 12px;vertical-align:top;">
+                        <div style="color:#9c5a60;font-size:11px;font-weight:bold;text-transform:uppercase;letter-spacing:.4px;">
+                            Change Request
+                        </div>
+                        <div style="margin-top:3px;font-size:16px;font-weight:bold;">
+                            <apex:outputText value="{!changeRequestName}" />
+                        </div>
+                    </td>
+                </tr>
+
+                <tr>
+                    <td width="50%" style="padding:8px 12px 4px 0;vertical-align:top;">
+                        <div style="color:#9c5a60;font-size:11px;font-weight:bold;text-transform:uppercase;letter-spacing:.4px;">
+                            Approval Store
+                        </div>
+                        <div style="margin-top:3px;font-weight:bold;">
+                            <apex:outputText value="{!approvalStoreName}" />
+                        </div>
+                    </td>
+
+                    <td width="50%" style="padding:8px 0 4px 12px;vertical-align:top;">
+                        <div style="color:#9c5a60;font-size:11px;font-weight:bold;text-transform:uppercase;letter-spacing:.4px;">
+                            Location Code
+                        </div>
+                        <div style="margin-top:3px;font-weight:bold;">
+                            <apex:outputText value="{!locationCode}" />
+                        </div>
+                    </td>
+                </tr>
+
+                <tr>
+                    <td width="50%" style="padding:8px 12px 4px 0;vertical-align:top;">
+                        <div style="color:#9c5a60;font-size:11px;font-weight:bold;text-transform:uppercase;letter-spacing:.4px;">
+                            Submitted By
+                        </div>
+                        <div style="margin-top:3px;font-weight:bold;">
+                            <apex:outputText value="{!submittedByName}" />
+                        </div>
+                    </td>
+
+                    <td width="50%" style="padding:8px 0 4px 12px;vertical-align:top;">
+                        <div style="color:#9c5a60;font-size:11px;font-weight:bold;text-transform:uppercase;letter-spacing:.4px;">
+                            Submitted Date &amp; Time
+                        </div>
+                        <div style="margin-top:3px;font-weight:bold;">
+                            <apex:outputText value="{!submittedDateTimeIST}" />
+                        </div>
+                    </td>
+                </tr>
+
+                <tr>
+                    <td width="50%" style="padding:8px 12px 4px 0;vertical-align:top;">
+                        <div style="color:#9c5a60;font-size:11px;font-weight:bold;text-transform:uppercase;letter-spacing:.4px;">
+                            Process Completed By
+                        </div>
+                        <div style="margin-top:3px;font-weight:bold;">
+                            <apex:outputText value="{!finalApprovedByName}" />
+                        </div>
+                    </td>
+
+                    <td width="50%" style="padding:8px 0 4px 12px;vertical-align:top;">
+                        <div style="color:#9c5a60;font-size:11px;font-weight:bold;text-transform:uppercase;letter-spacing:.4px;">
+                            Process Completed Date &amp; Time
+                        </div>
+                        <div style="margin-top:3px;font-weight:bold;">
+                            <apex:outputText value="{!finalApprovedDateTimeIST}" />
+                        </div>
+                    </td>
+                </tr>
+            </table>
+        </div>
+
+        <div style="margin-bottom:18px;border:1px solid #f0c9cc;border-radius:12px;overflow:hidden;">
+            <div style="background:#b51f2a;color:#ffffff;font-size:14px;font-weight:bold;padding:10px 14px;">
+                Final Field Decisions ({!totalChangeCount})
+            </div>
+
+            <div style="padding:12px;background:#fffdfd;">
+                <apex:repeat value="{!changeRows}"
+                    var="item">
+
+                    <div style="margin-bottom:10px;border:1px solid #ead5d7;border-radius:10px;background:#ffffff;overflow:hidden;">
+                        <div style="padding:10px 12px;border-bottom:1px solid #f0e1e3;background:#fffafa;">
+                            <table
+                                role="presentation"
+                                width="100%"
+                                cellpadding="0"
+                                cellspacing="0"
+                                style="border-collapse:collapse;">
+
+                                <tr>
+                                    <td style="vertical-align:middle;">
+                                        <div style="color:#9c5a60;font-size:10px;font-weight:bold;text-transform:uppercase;letter-spacing:.4px;">
+                                            <apex:outputText value="{!item.sectionName}" />
+                                        </div>
+
+                                        <div style="margin-top:2px;color:#2e2e2e;font-size:14px;font-weight:bold;">
+                                            <apex:outputText value="{!item.fieldLabel}" />
+                                        </div>
+                                    </td>
+
+                                    <td align="right" style="vertical-align:middle;">
+                                        <span style="{!item.outcomeStyle}">
+                                            <apex:outputText value="{!item.outcomeLabel}" />
+                                        </span>
+                                    </td>
+                                </tr>
+                            </table>
+                        </div>
+
+                        <table
+                            role="presentation"
+                            width="100%"
+                            cellpadding="0"
+                            cellspacing="0"
+                            style="border-collapse:collapse;table-layout:fixed;">
+
+                            <tr>
+                                <td width="50%" style="padding:10px 12px;vertical-align:top;border-right:1px solid #f0e1e3;background:#fffdfd;">
+                                    <div style="color:#9c5a60;font-size:10px;font-weight:bold;text-transform:uppercase;">
+                                        Existing Value
+                                    </div>
+
+                                    <div style="margin-top:4px;white-space:pre-wrap;word-break:break-word;">
+                                        <apex:outputText value="{!item.oldValue}" />
+                                    </div>
+                                </td>
+
+                                <td width="50%" style="padding:10px 12px;vertical-align:top;background:#fff7f8;">
+                                    <div style="color:#9c5a60;font-size:10px;font-weight:bold;text-transform:uppercase;">
+                                        Requested Value
+                                    </div>
+
+                                    <div style="margin-top:4px;color:#8f1721;font-weight:bold;white-space:pre-wrap;word-break:break-word;">
+                                        <apex:outputText value="{!item.newValue}" />
+                                    </div>
+                                </td>
+                            </tr>
+                        </table>
+
+                        <div style="padding:9px 12px;border-top:1px solid #f0e1e3;background:#ffffff;color:#67575a;font-size:12px;">
+                            <strong>
+                                <apex:outputText value="{!item.outcomeLabel}" />
+                                By:
+                            </strong>
+                            <apex:outputText value="{!item.decisionByName}" />
+
+                            <span style="color:#b8a6a8;"> &nbsp;•&nbsp; </span>
+
+                            <strong>Date:</strong>
+                            <apex:outputText value="{!item.decisionDateTimeIST}" />
+
+                            <apex:outputPanel rendered="{!item.bcPushApplicable}"
+                                layout="inline">
+
+                                <span style="display:inline-block;margin-left:8px;padding:2px 6px;border-radius:999px;background:#f4eef0;color:#8f5960;font-size:10px;font-weight:bold;">
+                                    BC
+                                </span>
+                            </apex:outputPanel>
+                        </div>
+
+                        <apex:outputPanel rendered="{!item.isRejected}"
+                            layout="block">
+
+                            <div style="padding:9px 12px;border-top:1px solid #f0e1e3;background:#fff4f5;">
+                                <div style="color:#a31420;font-size:10px;font-weight:bold;text-transform:uppercase;">
+                                    Rejection Reason
+                                </div>
+
+                                <div style="margin-top:3px;color:#6f3439;white-space:pre-wrap;word-break:break-word;">
+                                    <apex:outputText value="{!item.rejectionReason}" />
+                                </div>
+                            </div>
+                        </apex:outputPanel>
+                    </div>
+                </apex:repeat>
+            </div>
+        </div>
+
+        <apex:outputPanel rendered="{!hasBCDetails}"
+            layout="block">
+
+            <div style="margin-bottom:18px;border:1px solid #d9d9d9;border-radius:12px;background:#fafafa;padding:14px 16px;">
+                <div style="margin-bottom:8px;color:#5c5c5c;font-size:12px;font-weight:bold;text-transform:uppercase;">
+                    Business Central Update
+                </div>
+
+                <table
+                    role="presentation"
+                    width="100%"
+                    cellpadding="0"
+                    cellspacing="0"
+                    style="border-collapse:collapse;">
+
+                    <tr>
+                        <td width="50%" style="padding:4px 10px 4px 0;vertical-align:top;">
+                            <div style="color:#777;font-size:10px;font-weight:bold;text-transform:uppercase;">
+                                BC Customer No
+                            </div>
+                            <div style="margin-top:2px;font-weight:bold;">
+                                <apex:outputText value="{!bcCustomerNo}" />
+                            </div>
+                        </td>
+
+                        <td width="50%" style="padding:4px 0 4px 10px;vertical-align:top;">
+                            <div style="color:#777;font-size:10px;font-weight:bold;text-transform:uppercase;">
+                                BC Push Status
+                            </div>
+                            <div style="margin-top:2px;font-weight:bold;">
+                                <apex:outputText value="{!bcPushStatus}" />
+                            </div>
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <td colspan="2" style="padding:8px 0 0;vertical-align:top;">
+                            <div style="color:#777;font-size:10px;font-weight:bold;text-transform:uppercase;">
+                                BC Update Date &amp; Time
+                            </div>
+                            <div style="margin-top:2px;">
+                                <apex:outputText value="{!bcPushDateTimeIST}" />
+                            </div>
+                        </td>
+                    </tr>
+                </table>
+            </div>
+        </apex:outputPanel>
+
+        <div style="margin-bottom:18px;border:1px solid #f0c9cc;border-radius:12px;background:#fff9f9;padding:14px 16px;">
+            <div style="margin-bottom:6px;color:#b51f2a;font-size:12px;font-weight:bold;text-transform:uppercase;">
+                Original Change Reason
+            </div>
+
+            <div style="white-space:pre-wrap;word-break:break-word;">
+                <apex:outputText value="{!changeReason}" />
+            </div>
+        </div>
+
+        <div style="margin:24px 0 8px;text-align:center;">
+            <apex:outputLink value="{!customerUrl}"
+                style="display:inline-block;background:#c81724;color:#ffffff;text-decoration:none;font-weight:bold;padding:11px 24px;border-radius:22px;margin:0 5px 8px;">
+                Open Customer
+            </apex:outputLink>
+
+            <apex:outputLink value="{!changeRequestUrl}"
+                style="display:inline-block;background:#ffffff;color:#a61d28;text-decoration:none;font-weight:bold;padding:10px 22px;border:1px solid #dbaeb2;border-radius:22px;margin:0 5px 8px;">
+                View Change Request
+            </apex:outputLink>
+        </div>
+    </div>
+</apex:component>

@@ -1,0 +1,589 @@
+.customModal {
+    z-index: 9002;
+}
+
+.customBackdrop {
+    z-index: 9001;
+}
+
+.customModalContainer {
+    width: 86%;
+    max-width: 1050px;
+    min-width: 720px;
+}
+
+.customModalHeader {
+    border-bottom: 1px solid #dddbda;
+    padding: 16px 20px;
+}
+
+.modalSubtitle {
+    margin-top: 4px;
+    color: #706e6b;
+    font-size: 13px;
+}
+
+.customModalBody {
+    padding: 0;
+    background: #f3f4f6;
+    max-height: 76vh;
+    overflow-y: auto;
+}
+
+@media only screen and (max-width: 768px) {
+    .customModalContainer {
+        width: 96%;
+        min-width: unset;
+        max-width: 96%;
+        margin: 10px auto;
+    }
+
+    .customModalBody {
+        max-height: 78vh;
+    }
+}
+
+.pageWrapper {
+    min-height: 100vh;
+    background: #f3f4f6;
+    color: #181818;
+    font-family: "Salesforce Sans", Arial, sans-serif;
+}
+
+.topBar {
+    background: #ffffff;
+    border-bottom: 1px solid #dddbda;
+    min-height: 58px;
+    padding: 0 24px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.topBar h1 {
+    font-size: 20px;
+    font-weight: 700;
+    color: #181818;
+    margin: 0;
+}
+
+.topSearch {
+    width: 360px;
+}
+
+.mainContent {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 280px;
+    gap: 18px;
+    padding: 20px 24px;
+}
+
+.leftContent {
+    min-width: 0;
+}
+
+.pageHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 14px;
+}
+
+.pageHeader h2 {
+    font-size: 24px;
+    font-weight: 700;
+    color: #181818;
+    margin: 0;
+}
+
+.pageHeader p {
+    font-size: 13px;
+    color: #706e6b;
+    margin-top: 6px;
+}
+
+.totalCard {
+    background: #ffffff;
+    border: 1px solid #dddbda;
+    border-radius: 4px;
+    padding: 12px 14px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    min-width: 220px;
+}
+
+.totalIcon {
+    background: #f3f6f9;
+    width: 38px;
+    height: 38px;
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.totalCard span {
+    display: block;
+    font-size: 11px;
+    font-weight: 700;
+    color: #3e3e3c;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+}
+
+.totalCard strong {
+    display: block;
+    color: #0176d3;
+    font-size: 22px;
+    line-height: 1;
+    margin-top: 3px;
+}
+
+.totalCard p {
+    margin: 4px 0 0 0;
+    font-size: 11px;
+    color: #706e6b;
+}
+
+.filterCard {
+    background: #ffffff;
+    border: 1px solid #dddbda;
+    border-radius: 4px;
+    padding: 14px;
+    margin-bottom: 16px;
+}
+
+.filterGrid {
+    display: grid;
+    grid-template-columns: 170px 170px 190px minmax(260px, 1fr) auto;
+    gap: 12px;
+    align-items: end;
+}
+
+.filterGrid label {
+    display: block;
+    color: #3e3e3c;
+    font-size: 12px;
+    font-weight: 600;
+    margin-bottom: 6px;
+}
+
+.btnBox {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    white-space: nowrap;
+}
+
+.dateCard {
+    background: #ffffff;
+    border-radius: 4px;
+    border: 1px solid #dddbda;
+    margin-bottom: 12px;
+    overflow: hidden;
+}
+
+.dateHeader {
+    padding: 13px 16px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    cursor: pointer;
+    background: #ffffff;
+    border-bottom: 1px solid #dddbda;
+}
+
+.dateHeader:hover {
+    background: #f7f9fb;
+}
+
+.dateTitle {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.calendarIcon {
+    background: #eef4ff;
+    width: 30px;
+    height: 30px;
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.dateTitle h3 {
+    margin: 0;
+    font-size: 16px;
+    font-weight: 700;
+    color: #181818;
+}
+
+.countBadge {
+    background: #f3f6f9;
+    color: #0176d3;
+    border: 1px solid #d8dde6;
+    border-radius: 12px;
+    padding: 3px 9px;
+    font-size: 11px;
+    font-weight: 700;
+}
+
+.tableWrapper {
+    padding: 0;
+    overflow-x: auto;
+}
+
+.activityTable {
+    width: 100%;
+    border-collapse: collapse;
+    background: #ffffff;
+}
+
+.activityTable thead {
+    background: #f3f3f3;
+}
+
+.activityTable th {
+    text-align: left;
+    color: #514f4d;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+    padding: 10px 12px;
+    border-bottom: 1px solid #dddbda;
+    font-weight: 700;
+    white-space: nowrap;
+}
+
+.activityTable td {
+    padding: 11px 12px;
+    color: #181818;
+    font-size: 13px;
+    border-bottom: 1px solid #ecebea;
+    vertical-align: middle;
+}
+
+.activityTable tbody tr:hover {
+    background: #f7f9fb;
+}
+
+.activityTable tbody tr:last-child td {
+    border-bottom: none;
+}
+
+.cellWithIcon,
+.storeCell {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+}
+
+.miniIcon {
+    background: #f3f6f9;
+    width: 26px;
+    height: 26px;
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.storeCell {
+    color: #181818;
+}
+
+.storeCell b {
+    font-weight: 600;
+}
+
+.activityTable a {
+    color: #0176d3;
+    font-weight: 600;
+    text-decoration: none;
+}
+
+.activityTable a:hover {
+    text-decoration: underline;
+}
+
+.actionCol {
+    text-align: right;
+    width: 130px;
+    white-space: nowrap;
+}
+
+/* Right Side Professional Guidance Panel */
+.rightInfo {
+    padding-top: 93px;
+}
+
+.capturePanel {
+    background: #ffffff;
+    border: 1px solid #dddbda;
+    border-radius: 6px;
+    padding: 18px;
+    min-height: 315px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+    position: sticky;
+    top: 78px;
+}
+
+.panelTop {
+    display: flex;
+    gap: 12px;
+    align-items: flex-start;
+    padding-bottom: 16px;
+    border-bottom: 1px solid #ecebea;
+}
+
+.panelIcon {
+    width: 42px;
+    height: 42px;
+    border-radius: 6px;
+    background: #eef4ff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.panelTop h3 {
+    font-size: 16px;
+    font-weight: 700;
+    color: #181818;
+    margin: 0;
+    line-height: 1.3;
+}
+
+.panelTop p {
+    font-size: 12px;
+    color: #706e6b;
+    margin: 5px 0 0 0;
+    line-height: 1.4;
+}
+
+.processBox {
+    padding: 18px 0 14px;
+}
+
+.processItem {
+    display: flex;
+    align-items: flex-start;
+    gap: 11px;
+}
+
+.stepNo {
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    background: #0176d3;
+    color: #ffffff;
+    font-size: 12px;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    margin-top: 2px;
+}
+
+.processItem strong {
+    display: block;
+    font-size: 13px;
+    font-weight: 700;
+    color: #181818;
+}
+
+.processItem p {
+    font-size: 12px;
+    color: #706e6b;
+    margin: 3px 0 0 0;
+    line-height: 1.4;
+}
+
+.processLine {
+    width: 1px;
+    height: 18px;
+    background: #d8dde6;
+    margin: 6px 0 6px 13px;
+}
+
+.panelFooter {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    background: #f3f6f9;
+    border: 1px solid #d8dde6;
+    border-radius: 4px;
+    padding: 10px;
+    font-size: 12px;
+    color: #3e3e3c;
+    line-height: 1.4;
+}
+
+/* Old right card classes kept safely in case old HTML exists */
+.illustrationBox {
+    background: #ffffff;
+    border: 1px solid #dddbda;
+    border-radius: 4px;
+    padding: 18px;
+    min-height: 250px;
+}
+
+.illustrationIcon {
+    width: 44px;
+    height: 44px;
+    border-radius: 4px;
+    margin-bottom: 16px;
+    background: #f3f6f9;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.illustrationBox h3 {
+    font-size: 16px;
+    font-weight: 700;
+    color: #181818;
+    line-height: 1.35;
+    margin: 0;
+}
+
+.illustrationBox p {
+    color: #706e6b;
+    font-size: 13px;
+    line-height: 1.5;
+    margin-top: 12px;
+}
+
+.emptyState {
+    background: #ffffff;
+    border: 1px solid #dddbda;
+    border-radius: 4px;
+    text-align: center;
+    padding: 34px 20px;
+}
+
+.emptyIcon {
+    width: 46px;
+    height: 46px;
+    border-radius: 4px;
+    background: #f3f6f9;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 14px;
+}
+
+.emptyState h3 {
+    font-size: 16px;
+    font-weight: 700;
+    color: #181818;
+    margin: 0;
+}
+
+.emptyState p {
+    color: #706e6b;
+    margin-top: 6px;
+    font-size: 13px;
+}
+
+.spinnerOverlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 9999;
+    background: rgba(255, 255, 255, 0.6);
+}
+
+/* Salesforce base component small refinements */
+lightning-button {
+    --slds-c-button-radius-border: 4px;
+}
+
+lightning-input,
+lightning-combobox {
+    --slds-c-input-radius-border: 4px;
+}
+
+/* Tablet */
+@media only screen and (max-width: 1100px) {
+    .mainContent {
+        grid-template-columns: 1fr;
+    }
+
+    .rightInfo {
+        display: none;
+    }
+
+    .filterGrid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .btnBox {
+        justify-content: flex-start;
+    }
+}
+
+/* Mobile */
+@media only screen and (max-width: 768px) {
+    .topBar {
+        height: auto;
+        padding: 14px;
+        flex-direction: column;
+        align-items: stretch;
+        gap: 12px;
+    }
+
+    .topSearch {
+        width: 100%;
+    }
+
+    .mainContent {
+        padding: 14px;
+    }
+
+    .pageHeader {
+        flex-direction: column;
+        gap: 12px;
+    }
+
+    .pageHeader h2 {
+        font-size: 22px;
+    }
+
+    .totalCard {
+        width: 100%;
+    }
+
+    .filterGrid {
+        grid-template-columns: 1fr;
+    }
+
+    .btnBox {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 10px;
+    }
+
+    .dateHeader {
+        padding: 12px;
+    }
+
+    .dateTitle h3 {
+        font-size: 15px;
+    }
+
+    .tableWrapper {
+        overflow-x: auto;
+    }
+
+    .activityTable {
+        min-width: 900px;
+    }
+}
