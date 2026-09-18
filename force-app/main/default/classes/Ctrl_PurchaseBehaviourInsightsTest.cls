@@ -49,6 +49,12 @@ private class Ctrl_PurchaseBehaviourInsightsTest {
         );
         insert pbi2;
 
+        // Loyalty record for acc1
+        Loyalty_Retention_Insights__c lri1 = new Loyalty_Retention_Insights__c(
+            Customer_Name__c = acc1.Id
+        );
+        insert lri1;
+
         // Customer 3: Occasional buyer with upcoming > 15 days
         Account acc3 = new Account(
             Name = 'Amit Roy',
@@ -112,6 +118,11 @@ private class Ctrl_PurchaseBehaviourInsightsTest {
         System.assertNotEquals(null, payload.latestInsight.averageTicketSize, 'ATS should be populated');
         System.assertNotEquals(null, payload.latestInsight.formattedTicketSize, 'Formatted ATS should not be null');
 
+        // Check categories
+        System.assertNotEquals(null, payload.categories, 'Categories should not be null');
+        System.assertEquals(13, payload.totalCategoriesCount, 'Should have 13 categories configured');
+        System.assert(payload.activeCategoriesCount >= 2, 'Should have at least 2 active categories (PBI & LRI)');
+
         // Check second insight (overdue, regular buyer)
         System.assertEquals('OVERDUE', payload.insights[1].nextPurchaseStatus);
         System.assertEquals('Regular Buyer', payload.insights[1].frequencyTier);
@@ -144,12 +155,15 @@ private class Ctrl_PurchaseBehaviourInsightsTest {
         System.assertEquals(false, payload.hasInsights, 'Customer should have no insights');
         System.assertEquals(0, payload.totalInsightsCount, 'Should have 0 insight records');
         System.assertEquals(null, payload.latestInsight, 'Latest insight should be null');
+        System.assertNotEquals(null, payload.categories, 'Categories should still be populated with 13 metadata modules');
+        System.assertEquals(13, payload.totalCategoriesCount);
     }
 
     @IsTest
     static void testResolveRecordContext() {
         Account acc = [SELECT Id FROM Account WHERE Phone = '9876543210' LIMIT 1];
         Purchase_Behaviour_Insights__c pbi = [SELECT Id FROM Purchase_Behaviour_Insights__c WHERE Customer_Name__c = :acc.Id LIMIT 1];
+        Loyalty_Retention_Insights__c lri = [SELECT Id FROM Loyalty_Retention_Insights__c WHERE Customer_Name__c = :acc.Id LIMIT 1];
 
         Test.startTest();
         // Resolve with Account Id
@@ -158,11 +172,17 @@ private class Ctrl_PurchaseBehaviourInsightsTest {
         System.assertNotEquals(null, payloadAcc);
         System.assertEquals('Debolina Sen', payloadAcc.customer.customerName);
 
-        // Resolve with Insight Id
+        // Resolve with PBI Id
         Ctrl_PurchaseBehaviourInsights.CustomerInsightPayload payloadPbi =
             Ctrl_PurchaseBehaviourInsights.resolveRecordContext(pbi.Id);
         System.assertNotEquals(null, payloadPbi);
         System.assertEquals('Debolina Sen', payloadPbi.customer.customerName);
+
+        // Resolve with LRI Id
+        Ctrl_PurchaseBehaviourInsights.CustomerInsightPayload payloadLri =
+            Ctrl_PurchaseBehaviourInsights.resolveRecordContext(lri.Id);
+        System.assertNotEquals(null, payloadLri);
+        System.assertEquals('Debolina Sen', payloadLri.customer.customerName);
 
         // Resolve with null
         Ctrl_PurchaseBehaviourInsights.CustomerInsightPayload payloadNull =

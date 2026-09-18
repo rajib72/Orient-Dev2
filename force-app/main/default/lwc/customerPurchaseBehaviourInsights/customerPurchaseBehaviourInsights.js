@@ -17,6 +17,13 @@ export default class CustomerPurchaseBehaviourInsights extends NavigationMixin(L
     @track selectedInsight = null;
     @track selectedInsightId = null;
 
+    @track categories = [];
+    @track activeCategoryKey = 'all';
+    @track fieldSearchTerm = '';
+    @track totalCategoriesCount = 0;
+    @track activeCategoriesCount = 0;
+    @track totalFieldsCount = 0;
+
     isLoading = false;
     loadingMessage = 'Loading...';
     searchPerformed = false;
@@ -28,7 +35,7 @@ export default class CustomerPurchaseBehaviourInsights extends NavigationMixin(L
     }
 
     /* -------------------------------------------------------------
-     * RECORD CONTEXT LOADER (FOR ACCOUNT / INSIGHT RECORD PAGES)
+     * RECORD CONTEXT LOADER (FOR ACCOUNT / ANY INSIGHT RECORD PAGES)
      * ----------------------------------------------------------- */
     async loadByRecordId(recId) {
         this.isLoading = true;
@@ -86,11 +93,9 @@ export default class CustomerPurchaseBehaviourInsights extends NavigationMixin(L
                 }));
 
                 if (decoratedMatches.length === 1) {
-                    // Exact single match: auto-select customer directly
                     this.customerMatches = [];
                     await this.loadCustomerInsights(decoratedMatches[0].customerId);
                 } else {
-                    // Multiple matches found: let user choose
                     this.customerMatches = decoratedMatches;
                 }
             } else {
@@ -114,7 +119,7 @@ export default class CustomerPurchaseBehaviourInsights extends NavigationMixin(L
      * ----------------------------------------------------------- */
     async loadCustomerInsights(customerId) {
         this.isLoading = true;
-        this.loadingMessage = 'Loading purchase behaviour insights...';
+        this.loadingMessage = 'Loading Customer 360 intelligence across all 13 modules...';
         try {
             const payload = await getCustomerInsightsPayload({ customerId: customerId });
             this.applyPayload(payload);
@@ -128,9 +133,13 @@ export default class CustomerPurchaseBehaviourInsights extends NavigationMixin(L
 
     applyPayload(payload) {
         this.activeCustomer = payload.customer;
+        this.totalCategoriesCount = payload.totalCategoriesCount || 0;
+        this.activeCategoriesCount = payload.activeCategoriesCount || 0;
+        this.totalFieldsCount = payload.totalFieldsCount || 0;
+        this.categories = payload.categories || [];
 
         const rawList = payload.insights || [];
-        this.insightsList = rawList.map((item, index) => {
+        this.insightsList = rawList.map((item) => {
             return {
                 ...item,
                 formattedShortDate: item.lastPurchaseDate ? this.formatDate(item.lastPurchaseDate) : 'No Date',
@@ -158,6 +167,9 @@ export default class CustomerPurchaseBehaviourInsights extends NavigationMixin(L
         this.insightsList = [];
         this.selectedInsight = null;
         this.selectedInsightId = null;
+        this.categories = [];
+        this.activeCategoryKey = 'all';
+        this.fieldSearchTerm = '';
         this.searchPerformed = false;
         this.customerMatches = [];
     }
@@ -165,8 +177,26 @@ export default class CustomerPurchaseBehaviourInsights extends NavigationMixin(L
     async handleRefresh() {
         if (this.activeCustomer && this.activeCustomer.customerId) {
             await this.loadCustomerInsights(this.activeCustomer.customerId);
-            this.showToast('Success', 'Customer insights refreshed successfully.', 'success');
+            this.showToast('Success', 'Customer 360 insights refreshed successfully.', 'success');
         }
+    }
+
+    /* -------------------------------------------------------------
+     * CATEGORY TAB & FILTER ACTIONS
+     * ----------------------------------------------------------- */
+    handleCategoryTabClick(event) {
+        const selectedKey = event.currentTarget.dataset.key;
+        if (selectedKey) {
+            this.activeCategoryKey = selectedKey;
+        }
+    }
+
+    handleFieldSearchInput(event) {
+        this.fieldSearchTerm = (event.target.value || '').trim().toLowerCase();
+    }
+
+    handleClearFieldSearch() {
+        this.fieldSearchTerm = '';
     }
 
     handleSnapshotChange(event) {
@@ -184,7 +214,6 @@ export default class CustomerPurchaseBehaviourInsights extends NavigationMixin(L
         if (found) {
             this.selectedInsightId = recordId;
             this.selectedInsight = found;
-            // Update selected row styling in table
             this.insightsList = this.insightsList.map(item => ({
                 ...item,
                 rowClass: item.recordId === recordId ? 'oj-row-selected' : ''
@@ -193,7 +222,7 @@ export default class CustomerPurchaseBehaviourInsights extends NavigationMixin(L
     }
 
     /* -------------------------------------------------------------
-     * NAVIGATION ACTIONS
+     * RECORD NAVIGATION ACTIONS
      * ----------------------------------------------------------- */
     handleViewAccount() {
         if (!this.activeCustomer || !this.activeCustomer.customerId) return;
@@ -219,11 +248,29 @@ export default class CustomerPurchaseBehaviourInsights extends NavigationMixin(L
         });
     }
 
+    handleViewCategoryRecord(event) {
+        const recId = event.currentTarget.dataset.id;
+        const objName = event.currentTarget.dataset.object;
+        if (!recId) return;
+        this[NavigationMixin.Navigate]({
+            type: 'standard__recordPage',
+            attributes: {
+                recordId: recId,
+                objectApiName: objName || 'Account',
+                actionName: 'view'
+            }
+        });
+    }
+
     /* -------------------------------------------------------------
      * COMPUTED GETTERS & UI HELPERS
      * ----------------------------------------------------------- */
     get hasSearchInput() {
         return !!this.searchKey && this.searchKey.length > 0;
+    }
+
+    get hasFieldSearchInput() {
+        return !!this.fieldSearchTerm && this.fieldSearchTerm.length > 0;
     }
 
     get isSearchDisabled() {
@@ -262,94 +309,73 @@ export default class CustomerPurchaseBehaviourInsights extends NavigationMixin(L
         return this.activeCustomer && this.activeCustomer.phone ? `tel:${this.activeCustomer.phone}` : '#';
     }
 
-    get selectedInsightFormattedATS() {
-        if (!this.selectedInsight) return '₹ 0';
-        if (this.selectedInsight.formattedTicketSize && this.selectedInsight.formattedTicketSize !== '₹ 0') {
-            return this.selectedInsight.formattedTicketSize;
-        }
-        if (this.selectedInsight.averageTicketSize != null) {
-            return new Intl.NumberFormat('en-IN', {
-                style: 'currency',
-                currency: 'INR',
-                maximumFractionDigits: 0
-            }).format(this.selectedInsight.averageTicketSize);
-        }
-        return '₹ 0';
+
+    /* -------------------------------------------------------------
+     * CATEGORY TABS & FILTERED MODULES GETTERS
+     * ----------------------------------------------------------- */
+    get categoryTabs() {
+        const allTab = {
+            key: 'all',
+            label: 'All Modules (360°)',
+            shortCode: 'ALL',
+            fieldCount: this.totalFieldsCount,
+            hasRecord: this.activeCategoriesCount > 0,
+            activeClass: this.activeCategoryKey === 'all' ? 'oj-tab-btn oj-tab-btn-active' : 'oj-tab-btn'
+        };
+
+        const moduleTabs = (this.categories || []).map(cat => ({
+            key: cat.categoryKey,
+            label: cat.objectLabel,
+            shortCode: cat.shortCode,
+            fieldCount: cat.fieldCount,
+            hasRecord: cat.hasRecord,
+            activeClass: this.activeCategoryKey === cat.categoryKey ? 'oj-tab-btn oj-tab-btn-active' : 'oj-tab-btn'
+        }));
+
+        return [allTab, ...moduleTabs];
     }
 
-    get selectedInsightFormattedLastPurchase() {
-        if (!this.selectedInsight || !this.selectedInsight.lastPurchaseDate) {
-            return 'No Record';
+    get filteredCategories() {
+        if (!this.categories || this.categories.length === 0) {
+            return [];
         }
-        return this.formatDate(this.selectedInsight.lastPurchaseDate);
+
+        const term = this.fieldSearchTerm;
+        const selectedKey = this.activeCategoryKey;
+
+        return this.categories
+            .filter(cat => selectedKey === 'all' || cat.categoryKey === selectedKey)
+            .map(cat => {
+                const allFields = cat.fields || [];
+                const matchedFields = term
+                    ? allFields.filter(f =>
+                        (f.label && f.label.toLowerCase().includes(term)) ||
+                        (f.apiName && f.apiName.toLowerCase().includes(term)) ||
+                        (f.value && String(f.value).toLowerCase().includes(term))
+                    )
+                    : allFields;
+
+                return {
+                    ...cat,
+                    displayFields: matchedFields,
+                    matchingFieldsCount: matchedFields.length,
+                    statusBadgeClass: cat.hasRecord ? 'oj-badge-status-linked' : 'oj-badge-status-none',
+                    statusBadgeText: cat.hasRecord ? 'Record Linked' : 'No Record'
+                };
+            })
+            .filter(cat => !term || cat.displayFields.length > 0);
     }
 
-    get selectedInsightFormattedNextPurchase() {
-        if (!this.selectedInsight || !this.selectedInsight.nextExpectedPurchaseDate) {
-            return 'Not Scheduled';
-        }
-        return this.formatDate(this.selectedInsight.nextExpectedPurchaseDate);
+    get hasFilteredCategories() {
+        return this.filteredCategories && this.filteredCategories.length > 0;
     }
 
-    get selectedInsightDaysAgoLabel() {
-        if (!this.selectedInsight || this.selectedInsight.daysSinceLastPurchase == null) {
-            return null;
+    get totalMatchingFieldsCount() {
+        let count = 0;
+        for (const cat of this.filteredCategories) {
+            count += cat.matchingFieldsCount || 0;
         }
-        const d = this.selectedInsight.daysSinceLastPurchase;
-        if (d === 0) return 'Purchased Today';
-        if (d === 1) return '1 day ago';
-        return `${d} days ago`;
-    }
-
-    get selectedInsightOccasion() {
-        return this.selectedInsight && this.selectedInsight.purchaseOccasion
-            ? this.selectedInsight.purchaseOccasion
-            : 'General / Ongoing';
-    }
-
-    get selectedInsightFormattedCreatedDate() {
-        if (!this.selectedInsight || !this.selectedInsight.createdDate) {
-            return '—';
-        }
-        return this.formatDateTime(this.selectedInsight.createdDate);
-    }
-
-    get frequencyTierBadgeClass() {
-        if (!this.selectedInsight) return 'oj-badge-neutral';
-        const tier = (this.selectedInsight.frequencyTier || '').toLowerCase();
-        if (tier.includes('vip') || tier.includes('high')) {
-            return 'oj-badge-gold';
-        }
-        if (tier.includes('regular')) {
-            return 'oj-badge-maroon';
-        }
-        return 'oj-badge-neutral';
-    }
-
-    get nextPurchaseBadgeClass() {
-        if (!this.selectedInsight) return 'oj-badge-neutral';
-        const status = this.selectedInsight.nextPurchaseStatus;
-        if (status === 'OVERDUE') return 'oj-badge-overdue';
-        if (status === 'DUE_SOON') return 'oj-badge-warning';
-        if (status === 'UPCOMING') return 'oj-badge-positive';
-        return 'oj-badge-neutral';
-    }
-
-    get nextPurchaseStatusLabel() {
-        if (!this.selectedInsight) return '';
-        const status = this.selectedInsight.nextPurchaseStatus;
-        const days = this.selectedInsight.daysUntilNextPurchase;
-
-        if (status === 'OVERDUE') {
-            return days ? `⚠️ Overdue by ${Math.abs(days)} days` : '⚠️ Overdue';
-        }
-        if (status === 'DUE_SOON') {
-            return days === 0 ? '⚡ Due Today' : `⚡ Due in ${days} days`;
-        }
-        if (status === 'UPCOMING') {
-            return `✓ In ${days} days`;
-        }
-        return 'Not Scheduled';
+        return count;
     }
 
     /* -------------------------------------------------------------

@@ -2,6 +2,7 @@
 <CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
     <fullName>Communication_Opt_in__c</fullName>
     <defaultValue>false</defaultValue>
+    <externalId>false</externalId>
     <label>Communication Opt-in</label>
     <trackHistory>false</trackHistory>
     <trackTrending>false</trackTrending>

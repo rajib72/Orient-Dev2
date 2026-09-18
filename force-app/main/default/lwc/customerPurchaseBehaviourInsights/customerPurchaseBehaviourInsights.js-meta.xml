@@ -2,8 +2,8 @@
 <LightningComponentBundle xmlns="http://soap.sforce.com/2006/04/metadata">
     <apiVersion>67.0</apiVersion>
     <isExposed>true</isExposed>
-    <masterLabel>Customer Purchase Behaviour Insights</masterLabel>
-    <description>Orient Jewellers Customer Purchase Behaviour Insights viewer with phone search and predictive metrics.</description>
+    <masterLabel>Customer 360 Insights Intelligence</masterLabel>
+    <description>Orient Jewellers Customer 360 Insights viewer across all 13 intelligence modules with phone search and predictive metrics.</description>
     <targets>
         <target>lightning__AppPage</target>
         <target>lightning__HomePage</target>
@@ -17,6 +17,18 @@
             <objects>
                 <object>Account</object>
                 <object>Purchase_Behaviour_Insights__c</object>
+                <object>Loyalty_Retention_Insights__c</object>
+                <object>Product_Design_Preference_Insights__c</object>
+                <object>Service_After_Sales_Insights__c</object>
+                <object>Digital_Omni_Channel_Insights__c</object>
+                <object>Financial_Scheme_Insights__c</object>
+                <object>Visit_Store_Interaction_Insights__c</object>
+                <object>Customer_Satisfaction_NPS_Insights__c</object>
+                <object>Loyalty_Reward_Insights__c</object>
+                <object>Risk_Compliance_Insights__c</object>
+                <object>Referral_Advocacy_Insights__c</object>
+                <object>Event_Occasion_Insights__c</object>
+                <object>Engagement_Communication_Insights__c</object>
             </objects>
         </targetConfig>
     </targetConfigs>
